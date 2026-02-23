@@ -1,0 +1,30 @@
+config:
+  target: "http://127.0.0.1:4000"
+  phases:
+    - duration: 10
+      arrivalRate: 100
+      name: "Warm up"
+    - duration: 20
+      arrivalRate: 100
+      rampTo: 1000
+      name: "Ramp to 1000"
+    - duration: 10
+      arrivalRate: 1000
+      name: "Burst 1000"
+
+scenarios:
+  - name: "Core User Flow (Browse, Detail, Valuate)"
+    flow:
+      - get:
+          url: "/api/vehicles?sort=recommended"
+      - get:
+          url: "/api/vehicles?status=in_auction"
+      - post:
+          url: "/api/valuation/predict"
+          json:
+            make: "Toyota"
+            model: "Camry"
+            year: 2021
+            mileage: 45000
+            condition: "good"
+            trim: "XSE"

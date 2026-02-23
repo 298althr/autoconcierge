@@ -1,0 +1,24 @@
+FROM node:20-alpine
+
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install ALL dependencies (including devDependencies for nodemon)
+RUN npm install --legacy-peer-deps
+
+# Copy application source
+COPY . .
+
+# Copy and prepare entrypoint script
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Expose API port
+EXPOSE 4000
+
+# Use entrypoint to handle missing node_modules, then run dev
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["npm", "run", "dev"]

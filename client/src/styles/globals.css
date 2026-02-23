@@ -1,0 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Outfit:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand Palette */
+  --burgundy: #800020;
+  --burgundy-light: #B3002D;
+  --burgundy-dark: #600018;
+
+  /* Surfaces - Minimalist Light Mode */
+  --surface: #FFFFFF;
+  --surface-50: #F8FAFC;
+  --surface-100: #F1F5F9;
+  --surface-200: #E2E8F0;
+
+  /* Typography Colors */
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+
+  /* Typography Fonts */
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-subheading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Utility */
+  --emerald: #10B981;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--surface)] text-[length:var(--text-primary)] font-body antialiased;
+    color: var(--text-primary);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[var(--burgundy)] text-white px-6 py-3 rounded-xl hover:bg-[var(--burgundy-light)] transition-all font-semibold active:scale-95;
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-[var(--surface-200)] rounded-2xl shadow-xl;
+  }
+}

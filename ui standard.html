@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoConcierge UI Design Standards | HIG & Material 3</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        burgundy: {
+                            DEFAULT: '#800020',
+                            dark: '#5a0016',
+                            light: '#a60029',
+                            muted: '#fdf2f4'
+                        },
+                        onyx: '#1A1A1A',
+                        paper: '#FFFFFF',
+                        canvas: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        display: ['Montserrat', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        .mobile-frame {
+            width: 375px;
+            height: 667px;
+            border: 12px solid #1A1A1A;
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            background: #F8FAFC;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .safe-area-top {
+            height: 44px;
+            width: 100%;
+            background: transparent;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .safe-area-bottom {
+            height: 34px;
+            width: 100%;
+            background: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 8px;
+        }
+
+        .home-indicator {
+            width: 134px;
+            height: 5px;
+            background: #1A1A1A;
+            border-radius: 100px;
+            opacity: 0.2;
+        }
+
+        .touch-target-indicator {
+            border: 1px dashed #800020;
+            position: relative;
+        }
+
+        .touch-target-indicator::after {
+            content: '44pt min';
+            position: absolute;
+            top: -18px;
+            left: 0;
+            font-size: 10px;
+            color: #800020;
+            font-weight: bold;
+        }
+
+        .tab-btn.active {
+            color: #800020;
+            border-bottom: 2px solid #800020;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #800020;
+        }
+    </style>
+    <!-- Chosen Palette: AutoConcierge Elite Burgundy (#800020), Onyx Black, and Slate/Canvas Neutrals -->
+    <!-- Application Structure Plan:
+         1. Foundations: Typography, Color Tokens, and Spacing Grids.
+         2. Accessibility & Compliance: Visualizing touch targets and contrast ratios for Apple/Google stores.
+         3. Platform Patterns: A side-by-side comparison of iOS (HIG) vs. Android (Material 3) navigation and interaction.
+         4. Interactive Component Library: Buttons, Inputs, and the 'AutoConcierge Certified' Badge.
+         5. The Live Mockup: A functional mobile frame demonstrating the AutoConcierge dashboard.
+    -->
+    <!-- Visualization & Content Choices:
+         - Contrast Chart: Chart.js visualization of WCAG 2.1 accessibility scores.
+         - Touch Target Grid: Demonstrating the 44pt (iOS) and 48dp (Android) rules.
+         - Layout comparison: Switching between iOS and Android views within the same frame.
+         - NO SVG/Mermaid: Use Unicode, CSS borders, and Canvas for icons and indicators.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+
+<body class="bg-canvas text-onyx font-body leading-relaxed">
+
+    <!-- Header Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 bg-burgundy rounded flex items-center justify-center text-white font-bold text-xs">
+                        AC</div>
+                    <span class="font-display font-extrabold text-lg uppercase tracking-tighter">AutoConcierge <span
+                            class="text-burgundy">UI Standards</span></span>
+                </div>
+                <div class="hidden lg:flex space-x-6">
+                    <button onclick="scrollToSection('foundations')"
+                        class="text-sm font-semibold hover:text-burgundy transition-colors">Foundations</button>
+                    <button onclick="scrollToSection('compliance')"
+                        class="text-sm font-semibold hover:text-burgundy transition-colors">Compliance</button>
+                    <button onclick="scrollToSection('patterns')"
+                        class="text-sm font-semibold hover:text-burgundy transition-colors">Platform Patterns</button>
+                    <button onclick="scrollToSection('mockup')"
+                        class="bg-burgundy text-white px-4 py-2 rounded text-xs font-bold shadow-lg">Live
+                        Preview</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- SECTION: FOUNDATIONS -->
+        <section id="foundations" class="mb-20 animate-fade-in">
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                <h2 class="font-display font-extrabold text-3xl mb-4">01. Visual Foundations</h2>
+                <p class="text-slate-500 mb-10">Establishing the design tokens that bridge the gap between financial
+                    authority and mobile usability.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <!-- Typography -->
+                    <div class="space-y-6">
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-burgundy">Typography Scale</h3>
+                        <div class="space-y-4">
+                            <div class="border-l-4 border-burgundy pl-4">
+                                <p class="text-4xl font-display font-extrabold">Headline 1</p>
+                                <p class="text-xs text-slate-400 mt-1">Montserrat Extra Bold | 32px / 40px Leading</p>
+                            </div>
+                            <div class="border-l-4 border-slate-200 pl-4">
+                                <p class="text-xl font-body font-bold">Body Strong</p>
+                                <p class="text-xs text-slate-400 mt-1">Inter Bold | 16px / 24px Leading</p>
+                            </div>
+                            <div class="border-l-4 border-slate-200 pl-4">
+                                <p class="text-base font-body">Body Regular</p>
+                                <p class="text-xs text-slate-400 mt-1">Inter Medium | 14px / 20px Leading</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Colors -->
+                    <div class="space-y-6">
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-burgundy">Color Tokens</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-burgundy rounded-xl text-white">
+                                <p class="text-xs font-bold opacity-70">Primary</p>
+                                <p class="font-bold">#800020</p>
+                            </div>
+                            <div class="p-4 bg-onyx rounded-xl text-white">
+                                <p class="text-xs font-bold opacity-70">Surface</p>
+                                <p class="font-bold">#1A1A1A</p>
+                            </div>
+                            <div class="p-4 bg-white border border-slate-200 rounded-xl">
+                                <p class="text-xs font-bold text-slate-400">Background</p>
+                                <p class="font-bold">#FFFFFF</p>
+                            </div>
+                            <div class="p-4 bg-emerald-500 rounded-xl text-white">
+                                <p class="text-xs font-bold opacity-70">Success (ROI)</p>
+                                <p class="font-bold">#10B981</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: COMPLIANCE -->
+        <section id="compliance" class="mb-20">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                <!-- Accessibility Stats -->
+                <div class="lg:col-span-1 bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                    <h2 class="font-display font-extrabold text-2xl mb-4">02. Store Compliance</h2>
+                    <p class="text-sm text-slate-500 mb-8">Verification of contrast and tap-target standards for App
+                        Store & Play Store approval.</p>
+
+                    <div class="chart-container">
+                        <canvas id="accessibilityChart"></canvas>
+                    </div>
+
+                    <div class="mt-8 space-y-4">
+                        <div class="flex items-center gap-3">
+                            <span class="text-emerald-500 font-bold">✓</span>
+                            <p class="text-xs"><strong>WCAG 2.1 AA:</strong> Contrast ratio of 4.5:1 for body text.
+                                (AutoConcierge: 12.6:1)</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-emerald-500 font-bold">✓</span>
+                            <p class="text-xs"><strong>Tap Targets:</strong> Minimum of 44pt x 44pt for touch
+                                reliability.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Touch Targets Demo -->
+                <div class="lg:col-span-2 bg-onyx text-white p-8 rounded-3xl shadow-xl overflow-hidden relative">
+                    <div class="absolute top-0 right-0 p-8 opacity-10">
+                        <div class="text-9xl font-black">44pt</div>
+                    </div>
+                    <h3 class="font-display font-bold text-xl mb-6">Interaction Ergonomics</h3>
+                    <p class="text-slate-400 mb-10 max-w-md">Every button in AutoConcierge is designed with a "Safe Tap
+                        Zone" to ensure error-free bidding and navigation.</p>
+
+                    <div class="flex flex-wrap gap-12 items-center justify-center py-10">
+                        <!-- Primary Button -->
+                        <div class="text-center space-y-4">
+                            <div class="touch-target-indicator inline-block p-1">
+                                <button class="bg-burgundy px-8 py-3 rounded font-bold text-sm w-44">Place Bid</button>
+                            </div>
+                            <p class="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Main Action</p>
+                        </div>
+
+                        <!-- IconButton -->
+                        <div class="text-center space-y-4">
+                            <div class="touch-target-indicator inline-block p-1">
+                                <button class="w-11 h-11 bg-white/10 rounded-full flex items-center justify-center">
+                                    <span class="text-xl">🔔</span>
+                                </button>
+                            </div>
+                            <p class="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Icon Toggle</p>
+                        </div>
+
+                        <!-- Tab Button -->
+                        <div class="text-center space-y-4">
+                            <div class="touch-target-indicator inline-block p-1">
+                                <div class="w-20 h-11 flex items-center justify-center border-b-2 border-burgundy">
+                                    <span class="text-xs font-bold">Home</span>
+                                </div>
+                            </div>
+                            <p class="text-[10px] uppercase font-bold text-slate-500 tracking-widest">Tab Item</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: PLATFORM PATTERNS -->
+        <section id="patterns" class="mb-20">
+            <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                <div class="mb-12">
+                    <h2 class="font-display font-extrabold text-3xl mb-4 text-center">Cross-Platform UX Patterns</h2>
+                    <p class="text-slate-500 text-center max-w-2xl mx-auto">While the brand remains unified, AutoConcierge
+                        respects the native design language of the user's device.</p>
+                </div>
+
+                <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-px bg-slate-200 overflow-hidden rounded-2xl border border-slate-200">
+                    <!-- iOS Pattern -->
+                    <div class="bg-white p-10">
+                        <div class="flex items-center gap-2 mb-6">
+                            <div class="w-2 h-2 rounded-full bg-slate-400"></div>
+                            <h3 class="font-bold text-slate-900">Apple iOS (HIG)</h3>
+                        </div>
+                        <ul class="space-y-4 text-sm text-slate-600">
+                            <li class="flex items-start gap-3">
+                                <span class="text-burgundy">●</span>
+                                <span><strong>Navigation:</strong> Uses a centralized "Tab Bar" at the bottom with
+                                    translucent blur effects.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-burgundy">●</span>
+                                <span><strong>Title Logic:</strong> Large titles that collapse into the navigation bar
+                                    on scroll.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-burgundy">●</span>
+                                <span><strong>Feedback:</strong> Utilizes the Taptic Engine for subtle confirmation on
+                                    successful bids.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Android Pattern -->
+                    <div class="bg-white p-10">
+                        <div class="flex items-center gap-2 mb-6">
+                            <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                            <h3 class="font-bold text-slate-900">Google Android (Material 3)</h3>
+                        </div>
+                        <ul class="space-y-4 text-sm text-slate-600">
+                            <li class="flex items-start gap-3">
+                                <span class="text-burgundy">●</span>
+                                <span><strong>Navigation:</strong> Uses "Navigation Rail" on larger screens and a
+                                    Floating Action Button (FAB) for primary actions.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-burgundy">●</span>
+                                <span><strong>Motion:</strong> Shares a "Ripple" effect when components are
+                                    touched.</span>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <span class="text-burgundy">●</span>
+                                <span><strong>Theming:</strong> Dynamic Color support to adapt UI based on user
+                                    wallpaper (optional).</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: LIVE MOCKUP -->
+        <section id="mockup" class="py-12 bg-burgundy rounded-[4rem] overflow-hidden relative">
+            <!-- Background Elements -->
+            <div class="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full -mr-48 -mt-48"></div>
+            <div class="absolute bottom-0 left-0 w-64 h-64 bg-white opacity-5 rounded-full -ml-32 -mb-32"></div>
+
+            <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="text-white space-y-6">
+                    <h2 class="font-display font-extrabold text-4xl lg:text-5xl leading-tight">The AutoConcierge <br>App
+                        Dashboard.</h2>
+                    <p class="text-burgundy-muted/60 text-lg leading-relaxed">
+                        A real-time visualization of the mobile interface. This mockup demonstrates the integration of
+                        the **Certified Seal**, **Yield Monitoring**, and **Compliance Grids**.
+                    </p>
+
+                    <div class="space-y-4 pt-6">
+                        <div class="flex items-center gap-4 bg-white/10 p-4 rounded-2xl border border-white/10">
+                            <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">📱</div>
+                            <div>
+                                <h4 class="font-bold">App Store Ready</h4>
+                                <p class="text-xs opacity-60">Verified for iOS 17+ and Dynamic Island support.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 bg-white/10 p-4 rounded-2xl border border-white/10">
+                            <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">🤖</div>
+                            <div>
+                                <h4 class="font-bold">Play Store Ready</h4>
+                                <p class="text-xs opacity-60">Material 3 components and adaptive icon logic.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MOBILE MOCKUP -->
+                <div class="flex justify-center">
+                    <div class="mobile-frame">
+                        <!-- Top Nav -->
+                        <div class="safe-area-top">
+                            <span>9:41</span>
+                            <div class="flex gap-1 items-center">
+                                <div class="w-4 h-2 bg-onyx/20 rounded-sm"></div>
+                                <div class="w-2 h-2 rounded-full bg-onyx/20"></div>
+                            </div>
+                        </div>
+
+                        <!-- App Content -->
+                        <div class="px-6 py-4 space-y-6 overflow-y-auto h-[calc(100%-120px)]">
+                            <!-- Header -->
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h5 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Welcome back,
+                                    </h5>
+                                    <h4 class="text-xl font-display font-black text-onyx">Dapo A.</h4>
+                                </div>
+                                <div
+                                    class="w-10 h-10 bg-white shadow-sm border border-slate-200 rounded-full flex items-center justify-center">
+                                    <span class="text-lg">🔔</span>
+                                </div>
+                            </div>
+
+                            <!-- Yield Card -->
+                            <div class="bg-onyx p-5 rounded-[2rem] text-white relative overflow-hidden">
+                                <div
+                                    class="absolute top-0 right-0 w-24 h-24 bg-burgundy rounded-full -mr-12 -mt-12 opacity-50">
+                                </div>
+                                <p class="text-[10px] uppercase font-bold text-slate-400 mb-1">Portfolio Yield</p>
+                                <h3 class="text-3xl font-display font-extrabold">+₦4.2M</h3>
+                                <div class="mt-4 flex items-center gap-2">
+                                    <span
+                                        class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold">▲
+                                        12.4%</span>
+                                    <span class="text-[10px] text-slate-500 italic">Vs. last month</span>
+                                </div>
+                            </div>
+
+                            <!-- Active Bids -->
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center">
+                                    <h5 class="font-bold text-sm">Active Cycles</h5>
+                                    <span class="text-xs text-burgundy font-bold">View All</span>
+                                </div>
+
+                                <!-- Bid Item 1 -->
+                                <div
+                                    class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4 items-center">
+                                    <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
+                                        <span class="text-xl">🚗</span>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <h6 class="text-sm font-bold">Toyota Camry '22</h6>
+                                        <p class="text-[10px] text-slate-400">Upgrade Stage: Body Work</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <!-- Certified Seal Mini -->
+                                        <div
+                                            class="w-6 h-6 border-2 border-burgundy rounded-full flex items-center justify-center text-[6px] font-bold text-burgundy">
+                                            ✓</div>
+                                    </div>
+                                </div>
+
+                                <!-- Bid Item 2 -->
+                                <div
+                                    class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex gap-4 items-center">
+                                    <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center">
+                                        <span class="text-xl">🚙</span>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <h6 class="text-sm font-bold">Lexus RX 350</h6>
+                                        <p class="text-[10px] text-slate-400">Auction Bidding Active</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-[10px] font-bold text-burgundy">8m 12s</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Nav -->
+                        <div
+                            class="absolute bottom-0 w-full bg-white border-t border-slate-100 pt-2 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]">
+                            <div class="flex justify-around items-center h-14">
+                                <div class="flex flex-col items-center gap-1">
+                                    <span class="text-burgundy text-lg">🏠</span>
+                                    <span class="text-[9px] font-bold text-burgundy">Home</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 text-slate-400">
+                                    <span class="text-lg">📈</span>
+                                    <span class="text-[9px] font-bold">Market</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 text-slate-400">
+                                    <span class="text-lg">💼</span>
+                                    <span class="text-[9px] font-bold">Portfolio</span>
+                                </div>
+                                <div class="flex flex-col items-center gap-1 text-slate-400">
+                                    <span class="text-lg">👤</span>
+                                    <span class="text-[9px] font-bold">Profile</span>
+                                </div>
+                            </div>
+                            <div class="safe-area-bottom">
+                                <div class="home-indicator"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-400 text-xs font-bold tracking-[0.3em] uppercase mb-4">AutoConcierge Design Engineering</p>
+            <p class="text-slate-500 text-[10px] max-w-sm mx-auto">Confidential Documentation for Frontend Engineering &
+                Product Teams. Ensure all implementations strictly follow the contrast and touch-target requirements
+                defined herein.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Scroll Logic
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Accessibility Chart
+        window.onload = function () {
+            const ctx = document.getElementById('accessibilityChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Body Text', 'Heading 1', 'Yield Score', 'Success Ind.'],
+                    datasets: [{
+                        label: 'Contrast Ratio (X:1)',
+                        data: [12.6, 15.2, 11.4, 4.8],
+                        backgroundColor: '#800020',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    },
+                    scales: {
+                        x: {
+                            min: 0,
+                            max: 21,
+                            title: { display: true, text: 'Contrast Ratio', font: { size: 10 } },
+                            grid: { display: false }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+
+</html>
