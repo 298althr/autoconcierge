@@ -1,0 +1,18 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+# Do NOT run npm ci here — node_modules are handled by the entrypoint
+# This ensures the named volume (Linux filesystem) is populated at runtime
+
+EXPOSE 3001
+
+ENV PORT=3001
+ENV HOSTNAME="0.0.0.0"
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV WATCHPACK_POLLING=true
+ENV CHOKIDAR_USEPOLLING=true
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
+ENTRYPOINT ["sh", "/entrypoint.sh"]
+CMD ["npm", "run", "dev"]
