@@ -22,7 +22,17 @@ app.use(helmet({
 app.use(cors({
     origin: (origin, callback) => {
         if (!origin) return callback(null, true);
-        if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+
+        const allowedOrigins = [
+            env.CLIENT_URL,
+            ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : [])
+        ];
+
+        if (
+            allowedOrigins.some(o => origin.startsWith(o)) ||
+            origin.includes('localhost') ||
+            origin.includes('127.0.0.1')
+        ) {
             return callback(null, true);
         }
         callback(new Error('Not allowed by CORS'));
