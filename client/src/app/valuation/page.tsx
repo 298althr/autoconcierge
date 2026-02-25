@@ -2,21 +2,14 @@
 
 import React, { useState } from 'react';
 import { apiFetch } from '@/lib/api';
-<<<<<<< HEAD
-=======
-import { Button } from '@/components/ui/Base';
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, AlertCircle, Zap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-<<<<<<< HEAD
 import { motion } from 'framer-motion';
 import MotionBackground from '@/components/landing/MotionBackground';
 import PillHeader from '@/components/landing/PillHeader';
 import PremiumButton from '@/components/ui/PremiumButton';
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 
 const STEPS = [
     { id: 'vehicle', title: 'Vehicle Info', description: 'What are you valuing?' },
@@ -63,7 +56,6 @@ export default function ValuationPage() {
     };
 
     return (
-<<<<<<< HEAD
         <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-32 pb-20">
             <MotionBackground />
             <PillHeader />
@@ -88,27 +80,11 @@ export default function ValuationPage() {
                             <span className={`mt-4 text-[10px] font-bold uppercase tracking-widest transition-colors duration-500 ${step >= i ? 'text-burgundy' : 'text-slate-400'}`}>
                                 {s.title}
                             </span>
-=======
-        <div className="min-h-screen bg-canvas pb-20 pt-10">
-            <div className="max-w-3xl mx-auto px-4">
-                {/* Progress Header */}
-                <div className="flex justify-between mb-12 relative">
-                    <div className="absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -translate-y-1/2 z-0" />
-                    {STEPS.map((s, i) => (
-                        <div key={s.id} className="relative z-10 flex flex-col items-center">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-4 ${step >= i ? 'bg-burgundy border-burgundy text-white' : 'bg-white border-gray-100 text-gray-400'
-                                } transition-all duration-500 font-bold`}>
-                                {step > i ? <CheckCircle2 size={18} /> : i + 1}
-                            </div>
-                            <span className={`mt-2 text-xs font-bold uppercase tracking-widest ${step >= i ? 'text-burgundy' : 'text-gray-400'
-                                }`}>{s.title}</span>
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                         </div>
                     ))}
                 </div>
 
                 {/* Step Content */}
-<<<<<<< HEAD
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -149,68 +125,10 @@ export default function ValuationPage() {
                                 <div>
                                     <label className="premium-label">Transmission</label>
                                     <select value={formData.transmission} onChange={e => setFormData({ ...formData, transmission: e.target.value })} className="premium-input">
-=======
-                <div className="bg-white rounded-3xl p-8 md:p-12 shadow-xl border border-gray-50 overflow-hidden relative">
-
-                    {step === 0 && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-                            <h2 className="text-3xl font-black">Identify your vehicle</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-onyx-light">Make</label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. Toyota"
-                                        value={formData.make}
-                                        onChange={e => setFormData({ ...formData, make: e.target.value })}
-                                        className="w-full px-5 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-burgundy outline-none border-none transition-all"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-onyx-light">Model</label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. Camry"
-                                        value={formData.model}
-                                        onChange={e => setFormData({ ...formData, model: e.target.value })}
-                                        className="w-full px-5 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-burgundy outline-none border-none transition-all"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-onyx-light">Trim / Variant</label>
-                                    <input
-                                        type="text"
-                                        placeholder="e.g. XSE, XLE, SE"
-                                        value={formData.trim}
-                                        onChange={e => setFormData({ ...formData, trim: e.target.value })}
-                                        className="w-full px-5 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-burgundy outline-none border-none transition-all"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-onyx-light">Year</label>
-                                    <select
-                                        value={formData.year}
-                                        onChange={e => setFormData({ ...formData, year: parseInt(e.target.value) })}
-                                        className="w-full px-5 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-burgundy outline-none border-none transition-all"
-                                    >
-                                        {Array.from({ length: 30 }, (_, i) => 2026 - i).map(y => (
-                                            <option key={y} value={y}>{y}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-onyx-light">Transmission</label>
-                                    <select
-                                        value={formData.transmission}
-                                        onChange={e => setFormData({ ...formData, transmission: e.target.value })}
-                                        className="w-full px-5 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-burgundy outline-none border-none transition-all"
-                                    >
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                                         <option value="automatic">Automatic</option>
                                         <option value="manual">Manual</option>
                                     </select>
                                 </div>
-<<<<<<< HEAD
                                 <div>
                                     <label className="premium-label">Mileage (KM)</label>
                                     <input type="number" value={formData.mileage_km} onChange={e => setFormData({ ...formData, mileage_km: parseInt(e.target.value) })} className="premium-input" />
@@ -245,91 +163,30 @@ export default function ValuationPage() {
                                 <p className="text-slate-500 text-sm font-subheading">Precision affects liquidity matching.</p>
                             </div>
 
-=======
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-onyx-light">Mileage (KM)</label>
-                                    <input
-                                        type="number"
-                                        value={formData.mileage_km}
-                                        onChange={e => setFormData({ ...formData, mileage_km: parseInt(e.target.value) })}
-                                        className="w-full px-5 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-burgundy outline-none border-none transition-all"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-xs font-black uppercase tracking-widest text-onyx-light">Year of Entry to NG</label>
-                                    <select
-                                        value={formData.year_of_entry}
-                                        onChange={e => setFormData({ ...formData, year_of_entry: parseInt(e.target.value) })}
-                                        className="w-full px-5 py-4 rounded-2xl bg-gray-50 focus:ring-2 focus:ring-burgundy outline-none border-none transition-all"
-                                    >
-                                        {Array.from({ length: 11 }, (_, i) => 2025 - i).map(y => (
-                                            <option key={y} value={y}>{y}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div className="flex items-center space-x-3 pt-6">
-                                    <input
-                                        type="checkbox"
-                                        id="accident_history"
-                                        checked={formData.accident_history}
-                                        onChange={e => setFormData({ ...formData, accident_history: e.target.checked })}
-                                        className="w-5 h-5 accent-burgundy cursor-pointer"
-                                    />
-                                    <label htmlFor="accident_history" className="text-sm font-black uppercase tracking-widest text-onyx-light cursor-pointer">Has Accident History?</label>
-                                </div>
-                            </div>
-                            <div className="pt-6">
-                                <Button onClick={nextStep} className="w-full py-5 text-lg" disabled={!formData.make || !formData.model}>
-                                    Continue <ArrowRight className="ml-2" />
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-
-                    {step === 1 && (
-                        <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-                            <h2 className="text-3xl font-black">Current Condition</h2>
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                             <div className="grid grid-cols-1 gap-4">
                                 {['excellent', 'good', 'fair', 'poor'].map((c) => (
                                     <button
                                         key={c}
                                         onClick={() => setFormData({ ...formData, condition: c })}
-<<<<<<< HEAD
                                         className={`flex items-center justify-between p-6 rounded-2xl border transition-all text-left ${formData.condition === c ? 'border-burgundy bg-burgundy/5 shadow-md shadow-burgundy/10' : 'border-slate-200 bg-white hover:border-burgundy/30'}`}
                                     >
                                         <div>
                                             <p className="font-heading font-bold capitalize text-lg text-slate-900">{c}</p>
                                             <p className="text-xs font-body text-slate-500 mt-1">
-=======
-                                        className={`flex items-center justify-between p-6 rounded-2xl border-2 transition-all group ${formData.condition === c ? 'border-burgundy bg-burgundy/5' : 'border-gray-100 hover:border-burgundy/30'
-                                            }`}
-                                    >
-                                        <div className="text-left">
-                                            <p className="font-bold capitalize text-lg">{c}</p>
-                                            <p className="text-sm text-onyx-light">
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                                                 {c === 'excellent' && 'Like new, no mechanical or visual defects.'}
                                                 {c === 'good' && 'Minor wear, well-maintained.'}
                                                 {c === 'fair' && 'Visible wear, might need minor repairs.'}
                                                 {c === 'poor' && 'Significant wear or mechanical issues.'}
                                             </p>
                                         </div>
-<<<<<<< HEAD
                                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${formData.condition === c ? 'border-burgundy bg-burgundy' : 'border-slate-200'}`}>
                                             {formData.condition === c && <motion.div layoutId="checkdot" className="w-2 h-2 bg-white rounded-full" />}
-=======
-                                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.condition === c ? 'border-burgundy bg-burgundy' : 'border-gray-200'
-                                            }`}>
-                                            {formData.condition === c && <div className="w-2 h-2 bg-white rounded-full" />}
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                                         </div>
                                     </button>
                                 ))}
                             </div>
 
                             {error && (
-<<<<<<< HEAD
                                 <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-red-50 text-red-600 rounded-xl flex items-center space-x-2 text-xs font-bold font-subheading">
                                     <AlertCircle size={16} />
                                     <span>{error}</span>
@@ -373,48 +230,10 @@ export default function ValuationPage() {
                                     <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md px-5 py-2 rounded-full border border-white/10">
                                         <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
                                         <span className="text-[10px] font-bold uppercase tracking-widest text-emerald-50">Confidence: {Math.round(result.confidence * 100)}%</span>
-=======
-                                <div className="p-4 bg-red-50 text-red-600 rounded-xl flex items-center space-x-2">
-                                    <AlertCircle size={18} />
-                                    <span className="text-sm font-bold">{error}</span>
-                                </div>
-                            )}
-
-                            <div className="flex gap-4 pt-6">
-                                <Button variant="ghost" onClick={prevStep} className="flex-1 py-5">Back</Button>
-                                <Button onClick={handlePredict} className="flex-[2] py-5 text-lg" disabled={loading}>
-                                    {loading ? 'Analyzing...' : 'Get Valuation'} <Sparkles className="ml-2" />
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-
-                    {step === 2 && result && (
-                        <div className="space-y-8 animate-in zoom-in-95 duration-500">
-                            <div className="text-center">
-                                <div className="w-20 h-20 bg-emerald/10 text-emerald rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <Sparkles size={40} />
-                                </div>
-                                <h2 className="text-4xl font-black mb-2">Estimation Ready</h2>
-                                <p className="text-onyx-light font-medium">Predicted market value in Nigeria</p>
-                            </div>
-
-                            <div className="bg-onyx text-white p-10 rounded-[40px] shadow-2xl relative overflow-hidden">
-                                <div className="absolute top-0 right-0 p-8 scale-150 opacity-10 rotate-12">
-                                    <Zap size={100} />
-                                </div>
-                                <div className="relative z-10 text-center">
-                                    <p className="text-xs font-black uppercase tracking-[0.3em] text-white/40 mb-2">AI Output ({result.source})</p>
-                                    <p className="text-6xl md:text-7xl font-black mb-4 tracking-tighter">₦{result.estimated_value.toLocaleString()}</p>
-                                    <div className="inline-flex items-center space-x-2 bg-white/10 px-4 py-1.5 rounded-full border border-white/10">
-                                        <div className="w-2 h-2 rounded-full bg-emerald" />
-                                        <span className="text-xs font-bold uppercase tracking-widest">Confidence: {Math.round(result.confidence * 100)}%</span>
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                                     </div>
                                 </div>
                             </div>
 
-<<<<<<< HEAD
                             <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-center shadow-inner">
                                 <p className="text-sm text-slate-600 font-body leading-relaxed max-w-lg mx-auto italic">&quot;{result.reasoning}&quot;</p>
                             </div>
@@ -441,35 +260,5 @@ export default function ValuationPage() {
                 </motion.div>
             </div>
         </main>
-=======
-                            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 italic text-onyx-light text-center">
-                                &quot;{result.reasoning}&quot;
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <button
-                                    onClick={() => {
-                                        // Store result for the sell page
-                                        sessionStorage.setItem('pending_listing', JSON.stringify({
-                                            ...formData,
-                                            estimated_value: result.estimated_value
-                                        }));
-                                        window.location.href = token ? '/sell' : '/register?redirect=/sell';
-                                    }}
-                                    className="btn-primary py-5 text-center flex items-center justify-center overflow-hidden"
-                                >
-                                    Sell at this Price
-                                </button>
-                                <Button variant="outline" onClick={() => setStep(0)} className="py-5">
-                                    Try Another Car
-                                </Button>
-                            </div>
-                        </div>
-                    )}
-
-                </div>
-            </div>
-        </div>
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
     );
 }

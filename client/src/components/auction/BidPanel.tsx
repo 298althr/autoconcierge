@@ -8,18 +8,11 @@ interface Props {
     depositPct: number;
     walletBalance: number;
     onBid: (amount: number) => Promise<void>;
-<<<<<<< HEAD
     onViewHistory: () => void;
     disabled?: boolean;
 }
 
 export const BidPanel: React.FC<Props> = ({ currentPrice, bidIncrement, depositPct, walletBalance, onBid, onViewHistory, disabled }) => {
-=======
-    disabled?: boolean;
-}
-
-export const BidPanel: React.FC<Props> = ({ currentPrice, bidIncrement, depositPct, walletBalance, onBid, disabled }) => {
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -112,7 +105,6 @@ export const BidPanel: React.FC<Props> = ({ currentPrice, bidIncrement, depositP
                             </button>
                         ))}
                     </div>
-<<<<<<< HEAD
 
                     <button
                         onClick={onViewHistory}
@@ -120,8 +112,6 @@ export const BidPanel: React.FC<Props> = ({ currentPrice, bidIncrement, depositP
                     >
                         View My Bid Portfolio
                     </button>
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                 </div>
             </div>
         </div>

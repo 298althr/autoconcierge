@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
   "name": "Autogaard",
-=======
-  "name": "autoconcierge",
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
   "version": "1.0.0",
   "description": "Nigeria's AI-powered used car marketplace with real-time auctions",
   "private": true,
@@ -27,7 +23,3 @@
     "node": ">=20.0.0"
   }
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28

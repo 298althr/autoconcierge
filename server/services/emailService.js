@@ -37,27 +37,16 @@ class EmailService {
     }
 
     async sendWelcomeEmail(user) {
-<<<<<<< HEAD
         const subject = 'Welcome to Autogaard';
         const html = `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                 <h1 style="color: #800020;">Welcome to Autogaard, ${user.display_name || 'Dealer'}!</h1>
-=======
-        const subject = 'Welcome to AutoConcierge';
-        const html = `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-                <h1 style="color: #800020;">Welcome to AutoConcierge, ${user.display_name || 'Dealer'}!</h1>
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                 <p>We're thrilled to have you join Nigeria's smartest car marketplace.</p>
                 <p>Start exploring our latest high-end vehicle auctions and use our AI valuation tool to trade with confidence.</p>
                 <div style="margin: 30px 0;">
                     <a href="${env.CLIENT_URL}/vehicles" style="background-color: #800020; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Explore Inventory</a>
                 </div>
-<<<<<<< HEAD
                 <p>Stay sharp,<br>The Autogaard Team</p>
-=======
-                <p>Stay sharp,<br>The AutoConcierge Team</p>
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
             </div>
         `;
         return this.send(user.email, subject, html);
@@ -91,11 +80,7 @@ class EmailService {
                 <div style="margin: 30px 0;">
                     <a href="${env.CLIENT_URL}/garage" style="background-color: #800020; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Complete Settlement</a>
                 </div>
-<<<<<<< HEAD
                 <p>Welcome to the elite club.<br>The Autogaard Team</p>
-=======
-                <p>Welcome to the elite club.<br>The AutoConcierge Team</p>
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
             </div>
         `;
         return this.send(user.email, subject, html);
@@ -128,11 +113,7 @@ class EmailService {
                 <div style="margin: 30px 0;">
                     <a href="${env.CLIENT_URL}/garage" style="background-color: #800020; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">View in Garage</a>
                 </div>
-<<<<<<< HEAD
                 <p>Thank you for choosing Autogaard.</p>
-=======
-                <p>Thank you for choosing AutoConcierge.</p>
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
             </div>
         `;
         return this.send(user.email, subject, html);
@@ -140,7 +121,3 @@ class EmailService {
 }
 
 module.exports = new EmailService();
-<<<<<<< HEAD
-
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28

@@ -5,14 +5,11 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-<<<<<<< HEAD
 import { motion } from 'framer-motion';
 import PremiumButton from '@/components/ui/PremiumButton';
 import PillHeader from '@/components/landing/PillHeader';
 import MotionBackground from '@/components/landing/MotionBackground';
 import Script from 'next/script';
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 
 export default function RegisterPage() {
     const [formData, setFormData] = useState({
@@ -24,18 +21,13 @@ export default function RegisterPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
-<<<<<<< HEAD
     const { register, googleLogin } = useAuth();
-=======
-    const { register } = useAuth();
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
     const router = useRouter();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-<<<<<<< HEAD
     const handleGoogleResponse = async (response: any) => {
         setLoading(true);
         setError('');
@@ -69,8 +61,6 @@ export default function RegisterPage() {
         }
     };
 
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -94,7 +84,6 @@ export default function RegisterPage() {
     };
 
     return (
-<<<<<<< HEAD
         <main
             className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] flex flex-col items-center justify-center py-10 overflow-x-hidden overflow-y-auto bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=2000')` }}
@@ -230,101 +219,3 @@ export default function RegisterPage() {
         </main>
     );
 }
-
-=======
-        <div className="min-h-screen flex items-center justify-center bg-canvas text-onyx font-body p-4">
-            <div className="w-full max-w-md p-8 glass-card">
-                <div className="flex flex-col items-center mb-8">
-                    <Image
-                        src="/logo/logo-light.png"
-                        alt="AutoConcierge Logo"
-                        width={200}
-                        height={50}
-                        className="mb-4"
-                    />
-                    <h1 className="text-2xl text-center font-display font-black">Join the Future</h1>
-                    <p className="text-onyx-light text-sm">Create your free account today</p>
-                </div>
-
-                {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-6 text-sm">
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-semibold mb-1">Full Name</label>
-                        <input
-                            type="text"
-                            name="display_name"
-                            value={formData.display_name}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-3 rounded border border-gray-200 focus:border-burgundy focus:ring-1 focus:ring-burgundy outline-none transition-all"
-                            placeholder="e.g. John Doe"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-semibold mb-1">Email Address</label>
-                        <input
-                            type="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-3 rounded border border-gray-200 focus:border-burgundy focus:ring-1 focus:ring-burgundy outline-none transition-all"
-                            placeholder="john@example.com"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-semibold mb-1">Phone Number (Optional)</label>
-                        <input
-                            type="tel"
-                            name="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            className="w-full px-4 py-3 rounded border border-gray-200 focus:border-burgundy focus:ring-1 focus:ring-burgundy outline-none transition-all"
-                            placeholder="08012345678"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-semibold mb-1">Password</label>
-                        <input
-                            type="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            className="w-full px-4 py-3 rounded border border-gray-200 focus:border-burgundy focus:ring-1 focus:ring-burgundy outline-none transition-all"
-                            placeholder="••••••••"
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full btn-primary disabled:opacity-50 flex justify-center items-center mt-4"
-                    >
-                        {loading ? (
-                            <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                        ) : (
-                            'Create Account'
-                        )}
-                    </button>
-                </form>
-
-                <p className="text-center mt-6 text-sm text-onyx-light">
-                    Already have an account?{' '}
-                    <Link href="/login" className="text-burgundy font-bold hover:underline">
-                        Sign In
-                    </Link>
-                </p>
-            </div>
-        </div>
-    );
-}
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28

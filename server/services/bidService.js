@@ -122,7 +122,6 @@ class BidService {
             client.release();
         }
     }
-<<<<<<< HEAD
     async getUserBids(userId, auctionId) {
         const result = await pool.query('SELECT * FROM bids WHERE user_id = $1 AND auction_id = $2 ORDER BY created_at DESC', [userId, auctionId]);
         return result.rows.map(row => ({
@@ -130,8 +129,6 @@ class BidService {
             amount: parseFloat(row.amount)
         }));
     }
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 }
 
 module.exports = new BidService();

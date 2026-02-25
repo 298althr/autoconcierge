@@ -32,12 +32,7 @@
 
 @layer base {
   body {
-<<<<<<< HEAD
     @apply bg-[var(--surface)] text-slate-900 font-body antialiased;
-=======
-    @apply bg-[var(--surface)] text-[length:var(--text-primary)] font-body antialiased;
-    color: var(--text-primary);
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
   }
 
   h1,
@@ -52,7 +47,6 @@
 
 @layer components {
   .btn-primary {
-<<<<<<< HEAD
     @apply bg-[var(--burgundy)] text-white px-6 py-3 rounded-full hover:bg-[var(--burgundy-light)] transition-all font-semibold active:scale-95;
   }
 
@@ -76,12 +70,5 @@
 
   .premium-pill {
     @apply bg-white/40 backdrop-blur-xl border border-white/40 rounded-full px-4 py-2 shadow-sm transition-all;
-=======
-    @apply bg-[var(--burgundy)] text-white px-6 py-3 rounded-xl hover:bg-[var(--burgundy-light)] transition-all font-semibold active:scale-95;
-  }
-
-  .glass-card {
-    @apply bg-white/80 backdrop-blur-md border border-[var(--surface-200)] rounded-2xl shadow-xl;
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
   }
 }

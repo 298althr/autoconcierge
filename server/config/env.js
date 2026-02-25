@@ -16,11 +16,7 @@ const envSchema = z.object({
     CLOUDINARY_API_KEY: z.string().optional(),
     CLOUDINARY_API_SECRET: z.string().optional(),
     SENDGRID_API_KEY: z.string().optional(),
-<<<<<<< HEAD
-    SENDGRID_FROM_EMAIL: z.string().email().default('no-reply@Autogaard.ng'),
-=======
-    SENDGRID_FROM_EMAIL: z.string().email().default('no-reply@autoconcierge.ng'),
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
+    SENDGRID_FROM_EMAIL: z.string().email().default('no-reply@Autogaard.ng')
 });
 
 const env = envSchema.safeParse(process.env);
@@ -31,7 +27,3 @@ if (!env.success) {
 }
 
 module.exports = env.data;
-<<<<<<< HEAD
-
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28

@@ -57,7 +57,6 @@ const FundWalletModal = ({ onClose, onSuccess }: FundWalletModalProps) => {
         setStep(2);
     };
 
-<<<<<<< HEAD
     const handleMethodSelect = async (m: 'paystack' | 'manual') => {
         if (m === 'paystack') {
             setLoading(true);
@@ -79,11 +78,6 @@ const FundWalletModal = ({ onClose, onSuccess }: FundWalletModalProps) => {
                 setError(err.message || 'Payment initialization failed');
                 setLoading(false);
             }
-=======
-    const handleMethodSelect = (m: 'paystack' | 'manual') => {
-        if (m === 'paystack') {
-            // Not implemented yet
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
         } else {
             setStep(3);
         }
@@ -248,35 +242,21 @@ const FundWalletModal = ({ onClose, onSuccess }: FundWalletModalProps) => {
                                 {step === 2 && (
                                     <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
                                         <button
-<<<<<<< HEAD
                                             onClick={() => handleMethodSelect('paystack')}
                                             className="w-full p-6 bg-white border-2 border-gray-100 rounded-3xl flex items-center justify-between group hover:border-burgundy transition-all"
                                         >
                                             <div className="flex items-center space-x-4">
                                                 <div className="w-12 h-12 bg-burgundy/5 rounded-2xl flex items-center justify-center text-burgundy group-hover:bg-burgundy group-hover:text-white transition-all">
-=======
-                                            className="w-full p-6 bg-white border-2 border-gray-100 rounded-3xl flex items-center justify-between group hover:border-burgundy/20 transition-all opacity-60 cursor-not-allowed"
-                                            disabled
-                                        >
-                                            <div className="flex items-center space-x-4">
-                                                <div className="w-12 h-12 bg-onyx/5 rounded-2xl flex items-center justify-center text-onyx">
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                                                     <CreditCard size={24} />
                                                 </div>
                                                 <div className="text-left">
                                                     <h4 className="font-black text-onyx">Paystack (Cards & Bank Transfer)</h4>
-<<<<<<< HEAD
                                                     <p className="text-xs text-onyx-light font-medium">Automatic verification • Instant</p>
                                                 </div>
                                             </div>
                                             <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-burgundy/10 group-hover:text-burgundy transition-all">
                                                 <ArrowRight size={16} />
                                             </div>
-=======
-                                                    <p className="text-xs font-bold text-burgundy uppercase tracking-widest mt-0.5">Coming Soon</p>
-                                                </div>
-                                            </div>
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
                                         </button>
 
                                         <button

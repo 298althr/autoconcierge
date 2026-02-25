@@ -18,19 +18,12 @@ type AuthContextType = {
     user: User | null;
     token: string | null;
     login: (email: string, password: string) => Promise<User>;
-<<<<<<< HEAD
     googleLogin: (credential: string) => Promise<User>;
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
     register: (data: any) => Promise<User>;
     logout: () => void;
     isLoading: boolean;
 };
 
-<<<<<<< HEAD
-
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -71,7 +64,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return user;
     }
 
-<<<<<<< HEAD
     async function googleLogin(credential: string) {
         const response = await apiFetch('/auth/google', {
             body: { credential },
@@ -83,9 +75,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return user;
     }
 
-
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
     async function register(data: any) {
         const response = await apiFetch('/auth/register', {
             body: data,
@@ -104,18 +93,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     return (
-<<<<<<< HEAD
         <AuthContext.Provider value={{ user, token, login, googleLogin, register, logout, isLoading }}>
             {children}
         </AuthContext.Provider>
     );
-
-=======
-        <AuthContext.Provider value={{ user, token, login, register, logout, isLoading }}>
-            {children}
-        </AuthContext.Provider>
-    );
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 }
 
 export function useAuth() {

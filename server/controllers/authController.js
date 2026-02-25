@@ -26,7 +26,6 @@ class AuthController {
         }
     }
 
-<<<<<<< HEAD
     async googleLogin(req, res, next) {
         try {
             const { credential } = req.body;
@@ -40,9 +39,6 @@ class AuthController {
         }
     }
 
-
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
     async logout(req, res, next) {
         try {
             res.status(200).json({

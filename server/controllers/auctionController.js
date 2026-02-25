@@ -44,8 +44,6 @@ class AuctionController {
             res.status(err.status || 500).json({ status: 'error', message: err.message });
         }
     }
-<<<<<<< HEAD
-
     async getMyBids(req, res) {
         try {
             const { id: auctionId } = req.params;
@@ -55,8 +53,6 @@ class AuctionController {
             res.status(err.status || 500).json({ status: 'error', message: err.message });
         }
     }
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 }
 
 module.exports = new AuctionController();
