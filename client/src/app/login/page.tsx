@@ -49,16 +49,24 @@ export default function LoginPage() {
                 return;
             }
 
+            const container = document.getElementById("google-button-container");
+            if (!container) return;
+
             (window as any).google.accounts.id.initialize({
                 client_id: clientId,
                 callback: handleGoogleResponse,
             });
+
             (window as any).google.accounts.id.renderButton(
-                document.getElementById("google-button-container"),
+                container,
                 { theme: "outline", size: "large", width: "100%", shape: "pill" }
             );
         }
     };
+
+    React.useEffect(() => {
+        initializeGoogleLogin();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
