@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
     "name": "Autogaard-client",
-=======
-    "name": "autoconcierge-client",
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
     "version": "0.1.0",
     "private": true,
     "scripts": {
@@ -38,7 +34,3 @@
         "@next/swc-linux-x64-gnu": "14.2.3"
     }
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
