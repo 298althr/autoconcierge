@@ -169,7 +169,7 @@ export default function LoginPage() {
                         <p className="text-slate-400 text-xs font-bold tracking-widest uppercase">
                             No account yet?
                             <Link href="/register" className="text-slate-900 ml-2 hover:text-burgundy transition-colors">
-                                Create Identity
+                                Create Account
                             </Link>
                         </p>
                     </div>
