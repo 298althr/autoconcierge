@@ -1,0 +1,81 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: Autogaard-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: Autogaard
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: Autogaard
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U Autogaard -d Autogaard" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+      network: host
+    container_name: Autogaard-server
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://Autogaard:password@postgres:5432/Autogaard
+      CLIENT_URL: http://localhost:3001
+      CORS_ORIGINS: http://localhost:3001
+    env_file:
+      - ./server/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      network: host
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:4000/api
+        NEXT_PUBLIC_SOCKET_URL: http://localhost:4000
+    container_name: Autogaard-client
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api
+      NEXT_PUBLIC_SOCKET_URL: http://localhost:4000
+      PORT: 3001
+      NEXT_TELEMETRY_DISABLED: 1
+    env_file:
+      - ./client/.env.local
+    depends_on:
+      - server
+
+volumes:
+  postgres_data:
+    driver: local
+  server_node_modules:
+    driver: local
+  client_node_modules:
+    driver: local
+  client_next_cache:
+    driver: local
+

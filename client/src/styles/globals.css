@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Outfit:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand Palette */
+  --burgundy: #800020;
+  --burgundy-light: #B3002D;
+  --burgundy-dark: #600018;
+
+  /* Surfaces - Minimalist Light Mode */
+  --surface: #FFFFFF;
+  --surface-50: #F8FAFC;
+  --surface-100: #F1F5F9;
+  --surface-200: #E2E8F0;
+
+  /* Typography Colors */
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+
+  /* Typography Fonts */
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
+  --font-subheading: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Utility */
+  --emerald: #10B981;
+}
+
+@layer base {
+  body {
+    @apply bg-[var(--surface)] text-slate-900 font-body antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-[var(--burgundy)] text-white px-6 py-3 rounded-full hover:bg-[var(--burgundy-light)] transition-all font-semibold active:scale-95;
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-md border border-white/20 rounded-[2.5rem];
+    box-shadow: 0 32px 64px -16px rgba(0, 0, 0, 0.08);
+  }
+
+  .premium-input {
+    @apply w-full bg-slate-50 border border-slate-200 rounded-full px-6 py-4 text-slate-900 focus:outline-none focus:ring-4 transition-all font-body text-sm;
+
+    &:focus {
+      --tw-ring-color: rgba(128, 0, 32, 0.05);
+      border-color: rgba(128, 0, 32, 0.3);
+    }
+  }
+
+  .premium-label {
+    @apply block text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 ml-6;
+  }
+
+  .premium-pill {
+    @apply bg-white/40 backdrop-blur-xl border border-white/40 rounded-full px-4 py-2 shadow-sm transition-all;
+  }
+}
