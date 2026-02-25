@@ -12,6 +12,8 @@ type User = {
     kyc_status: 'none' | 'pending' | 'verified' | 'rejected';
     avatar_url?: string;
     phone?: string;
+    address?: string;
+    kyc_data?: any;
 };
 
 type AuthContextType = {

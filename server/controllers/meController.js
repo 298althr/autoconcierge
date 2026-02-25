@@ -48,16 +48,32 @@ class MeController {
      */
     async updateProfile(req, res, next) {
         try {
-            const { display_name, phone, avatar_url } = req.body;
+            const { display_name, phone, avatar_url, address, occupation } = req.body;
+
+            // First get the existing kyc_data to merge the new non-identity fields
+            const userRes = await pool.query('SELECT kyc_data FROM users WHERE id = $1', [req.user.id]);
+            let currentKycData = typeof userRes.rows[0].kyc_data === 'string' ? JSON.parse(userRes.rows[0].kyc_data || '{}') : (userRes.rows[0].kyc_data || {});
+
+            const updatedKycData = {
+                ...currentKycData,
+                ...(address && { address }),
+                ...(occupation && { occupation })
+            };
+
             const result = await pool.query(
                 `UPDATE users 
                  SET display_name = COALESCE($1, display_name), 
                      phone = COALESCE($2, phone), 
-                     avatar_url = COALESCE($3, avatar_url)
-                 WHERE id = $4
-                 RETURNING id, email, display_name, phone, avatar_url, role`,
-                [display_name, phone, avatar_url, req.user.id]
+                     avatar_url = COALESCE($3, avatar_url),
+                     kyc_data = $4
+                 WHERE id = $5
+                 RETURNING id, email, display_name, phone, avatar_url, role, kyc_data`,
+                [display_name, phone, avatar_url, JSON.stringify(updatedKycData), req.user.id]
             );
+            res.status(200).json({
+                success: true,
+                data: result.rows[0]
+            });
             res.status(200).json({
                 success: true,
                 data: result.rows[0]
