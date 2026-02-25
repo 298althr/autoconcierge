@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, Car, Warehouse, Wallet, User } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function DashboardNavbar() {
     const pathname = usePathname();
@@ -42,20 +43,26 @@ export default function DashboardNavbar() {
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    className={`flex flex-col md:flex-row items-center justify-center space-y-1 md:space-y-0 md:space-x-2 px-3 md:px-4 py-2 rounded-xl transition-all duration-200 group ${isActive
-                                        ? 'text-burgundy'
-                                        : 'text-onyx-light hover:text-onyx hover:bg-gray-50'
-                                        }`}
+                                    className="block"
                                 >
-                                    <Icon
-                                        size={22}
-                                        className={`md:w-5 md:h-5 transition-transform duration-200 ${isActive ? 'scale-110 md:scale-100' : 'group-hover:scale-110 md:group-hover:scale-100'
+                                    <motion.div
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className={`flex flex-col md:flex-row items-center justify-center space-y-1 md:space-y-0 md:space-x-2 px-3 md:px-4 py-2 rounded-xl transition-colors duration-200 group ${isActive
+                                            ? 'text-burgundy'
+                                            : 'text-onyx-light hover:text-onyx hover:bg-gray-50'
                                             }`}
-                                    />
-                                    <span className={`text-[10px] md:text-sm font-bold tracking-wide transition-colors ${isActive ? 'text-burgundy' : 'text-onyx-light group-hover:text-onyx'
-                                        }`}>
-                                        {item.label}
-                                    </span>
+                                    >
+                                        <Icon
+                                            size={22}
+                                            className={`md:w-5 md:h-5 transition-transform duration-200 ${isActive ? 'scale-110 md:scale-100' : 'group-hover:scale-110 md:group-hover:scale-100'
+                                                }`}
+                                        />
+                                        <span className={`text-[10px] md:text-sm font-bold tracking-wide transition-colors ${isActive ? 'text-burgundy' : 'text-onyx-light group-hover:text-onyx'
+                                            }`}>
+                                            {item.label}
+                                        </span>
+                                    </motion.div>
                                 </Link>
                             );
                         })}
