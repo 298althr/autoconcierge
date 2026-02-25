@@ -5,9 +5,11 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
 
 const PillHeader = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { user, isLoading } = useAuth();
 
     return (
         <>
@@ -32,28 +34,38 @@ const PillHeader = () => {
 
                     <div className="hidden md:block w-px h-4 bg-slate-200/50 mx-2" />
 
-                    {/* Navigation Links */}
-                    <nav className="hidden md:flex items-center gap-1">
-                        <Link href="/vehicles" className="px-4 py-2 rounded-full text-[12px] font-subheading font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all">Marketplace</Link>
-                        <Link href="/vehicles?status=in_auction" className="px-4 py-2 rounded-full text-[12px] font-subheading font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all">Auctions</Link>
-                        <Link href="/valuation" className="px-4 py-2 rounded-full text-[12px] font-subheading font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all">Valuations</Link>
-                    </nav>
+                    {!isLoading && !user && (
+                        <>
+                            {/* Navigation Links */}
+                            <nav className="hidden md:flex items-center gap-1">
+                                <Link href="/vehicles" className="px-4 py-2 rounded-full text-[12px] font-subheading font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all">Marketplace</Link>
+                                <Link href="/vehicles?status=in_auction" className="px-4 py-2 rounded-full text-[12px] font-subheading font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all">Auctions</Link>
+                                <Link href="/valuation" className="px-4 py-2 rounded-full text-[12px] font-subheading font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all">Valuations</Link>
+                            </nav>
 
-                    <div className="hidden md:block w-px h-4 bg-slate-200/50 mx-2" />
+                            <div className="hidden md:block w-px h-4 bg-slate-200/50 mx-2" />
 
-                    {/* Dynamic Action Button */}
-                    <Link href="/login" className="hidden sm:flex bg-burgundy text-white text-[12px] font-subheading font-bold px-6 py-2.5 rounded-full hover:bg-burgundy-light transition-all shadow-lg shadow-burgundy-900/20 active:scale-95 ml-1">
-                        Enter
-                    </Link>
+                            {/* Dynamic Action Button */}
+                            <Link href="/login" className="hidden sm:flex bg-burgundy text-white text-[12px] font-subheading font-bold px-6 py-2.5 rounded-full hover:bg-burgundy-light transition-all shadow-lg shadow-burgundy-900/20 active:scale-95 ml-1">
+                                Enter
+                            </Link>
 
-                    {/* Mobile Menu Toggle */}
-                    <button
-                        onClick={() => setIsMobileMenuOpen(true)}
-                        className="md:hidden ml-1 p-2 bg-white/60 hover:bg-white text-slate-800 rounded-full transition-colors flex items-center justify-center"
-                        aria-label="Open Menu"
-                    >
-                        <Menu size={20} />
-                    </button>
+                            {/* Mobile Menu Toggle */}
+                            <button
+                                onClick={() => setIsMobileMenuOpen(true)}
+                                className="md:hidden ml-1 p-2 bg-white/60 hover:bg-white text-slate-800 rounded-full transition-colors flex items-center justify-center"
+                                aria-label="Open Menu"
+                            >
+                                <Menu size={20} />
+                            </button>
+                        </>
+                    )}
+
+                    {!isLoading && user && (
+                        <Link href="/dashboard" className="flex bg-burgundy text-white text-[12px] font-subheading font-bold px-6 py-2.5 rounded-full hover:bg-burgundy-light transition-all shadow-lg shadow-burgundy-900/20 active:scale-95 ml-1">
+                            Dashboard
+                        </Link>
+                    )}
                 </div>
             </motion.header>
 

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Bell, ArrowRight, ShieldAlert, BookOpen, Clock, Car } from 'lucide-react';
+import { Bell, ArrowRight, ShieldAlert, BookOpen, Clock, Car, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 
@@ -62,6 +62,29 @@ export default function DashboardHome() {
                         Top Up
                     </Link>
                 </div>
+            </motion.div>
+
+            {/* Quick Actions / Valuations */}
+            <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
+                <Link href="/valuation" className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-burgundy/30 group transition-all flex flex-col justify-between min-h-[120px]">
+                    <div className="w-10 h-10 rounded-full bg-burgundy/5 flex items-center justify-center mb-4 group-hover:bg-burgundy group-hover:scale-110 transition-all">
+                        <Zap size={20} className="text-burgundy group-hover:text-white transition-colors" />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-black text-onyx mb-1 group-hover:text-burgundy transition-colors">Instant Valuation</h3>
+                        <p className="text-[9px] uppercase font-bold text-onyx-light tracking-widest">AI Pricing Engine</p>
+                    </div>
+                </Link>
+
+                <Link href="/dashboard/garage" className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-onyx/30 group transition-all flex flex-col justify-between min-h-[120px]">
+                    <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center mb-4 group-hover:bg-onyx group-hover:scale-110 transition-all">
+                        <Car size={20} className="text-onyx group-hover:text-white transition-colors" />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-black text-onyx mb-1 group-hover:text-onyx transition-colors">My Garage</h3>
+                        <p className="text-[9px] uppercase font-bold text-onyx-light tracking-widest">Saved Assets</p>
+                    </div>
+                </Link>
             </motion.div>
 
             {/* Active Engagements (Bids) Carousel Placeholders */}
