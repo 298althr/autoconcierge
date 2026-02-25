@@ -16,18 +16,24 @@ async function migrate() {
             if (file.endsWith('.sql')) {
                 console.log(`  📄 Running ${file}...`);
                 const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf8');
-                await client.query(sql);
+                try {
+                    await client.query(sql);
+                } catch (err) {
+                    console.error(`❌ Error in ${file}:`);
+                    console.error(`SQL Snippet: ${sql.substring(0, 500)}`);
+                    throw err;
+                }
             }
         }
 
         await client.query('COMMIT');
         console.log('✅ Migrations completed successfully!');
     } catch (err) {
-        await client.query('ROLLBACK');
+        if (client) await client.query('ROLLBACK');
         console.error('❌ Migration failed:', err);
         process.exit(1);
     } finally {
-        client.release();
+        if (client) client.release();
         await pool.end();
     }
 }
