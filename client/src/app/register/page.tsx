@@ -50,12 +50,15 @@ export default function RegisterPage() {
 
     const initializeGoogleLogin = () => {
         if (typeof window !== 'undefined' && (window as any).google) {
-            const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+            // Strip potential quotes if they were added in Railway dashboard
+            const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID?.replace(/['"]+/g, '');
 
             if (!clientId) {
-                console.error('❌ NEXT_PUBLIC_GOOGLE_CLIENT_ID is missing in environment variables.');
+                console.error('❌ NEXT_PUBLIC_GOOGLE_CLIENT_ID is missing or empty in environment variables.');
                 return;
             }
+
+            console.log('🛡️ Initializing Google Sign-in with ID:', clientId.substring(0, 10) + '...');
 
             const container = document.getElementById("google-button-container");
             if (!container) return;
