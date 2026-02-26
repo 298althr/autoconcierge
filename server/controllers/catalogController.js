@@ -115,7 +115,27 @@ class CatalogController {
                         parsedPhotos = [row.photos];
                     }
                 }
-                return { ...row, photos: Array.isArray(parsedPhotos) ? parsedPhotos : [parsedPhotos] };
+
+                // Sanitize description and press release (strip HTML tags and decode entities)
+                const sanitize = (str) => {
+                    if (!str) return '';
+                    return str
+                        .replace(/<[^>]*>/g, '')
+                        .replace(/&amp;/g, '&')
+                        .replace(/&nbsp;/g, ' ')
+                        .replace(/&quot;/g, '"')
+                        .replace(/&apos;/g, "'")
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>')
+                        .trim();
+                };
+
+                return {
+                    ...row,
+                    description: sanitize(row.description),
+                    press_release: sanitize(row.press_release),
+                    photos: Array.isArray(parsedPhotos) ? parsedPhotos : [parsedPhotos]
+                };
             });
 
             for (let auto of automobiles) {
