@@ -25,7 +25,11 @@ export default function Home() {
 
     React.useEffect(() => {
         if (!isLoading && user) {
-            router.replace('/dashboard');
+            if (user.kyc_status === 'none') {
+                router.replace('/onboarding');
+            } else {
+                router.replace('/dashboard');
+            }
         }
     }, [user, isLoading, router]);
 

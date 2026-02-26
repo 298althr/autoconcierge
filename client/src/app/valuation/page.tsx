@@ -179,7 +179,11 @@ export default function ValuationPage() {
                                         disabled={!selectedModelId || engines.length === 0}
                                     >
                                         <option value="">Select Edition</option>
-                                        {engines.map(e => <option key={e.id} value={e.name}>{e.name} {e.specs && `(${e.specs})`}</option>)}
+                                        {engines.map(e => (
+                                            <option key={e.id} value={e.name}>
+                                                {e.name} {e.specs?.['Engine Specs']?.['Displacement:'] ? `— ${e.specs['Engine Specs']['Displacement:']}` : ''}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div>

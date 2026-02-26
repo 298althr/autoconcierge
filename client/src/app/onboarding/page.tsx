@@ -29,8 +29,9 @@ export default function OnboardingPage() {
         if (!isLoading && !user) {
             router.push('/login?redirect=/onboarding');
         }
-        // If user already has phone/address, they shouldn't be here (simplified logic for now)
-        if (user && user.phone && (user.address || user.kyc_data?.address)) {
+
+        // If user has already completed onboarding, go to dashboard
+        if (user && user.kyc_status !== 'none') {
             router.push('/dashboard');
         }
 

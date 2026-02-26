@@ -41,6 +41,7 @@ const PillHeader = () => {
                                 <Link href="/vehicles" className="px-4 py-2 rounded-full text-[12px] font-subheading font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all">Marketplace</Link>
                                 <Link href="/vehicles?status=in_auction" className="px-4 py-2 rounded-full text-[12px] font-subheading font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all">Auctions</Link>
                                 <Link href="/valuation" className="px-4 py-2 rounded-full text-[12px] font-subheading font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all">Valuations</Link>
+                                <Link href="/compare" className="px-4 py-2 rounded-full text-[12px] font-subheading font-bold text-slate-500 hover:text-slate-900 hover:bg-slate-100/50 transition-all">Compare</Link>
                             </nav>
 
                             <div className="hidden md:block w-px h-4 bg-slate-200/50 mx-2" />
@@ -96,6 +97,8 @@ const PillHeader = () => {
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/vehicles?status=in_auction" className="text-3xl font-heading font-extrabold text-slate-900 hover:text-burgundy transition-colors px-10">Auctions</Link>
                             <div className="w-16 h-px bg-slate-200" />
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/valuation" className="text-3xl font-heading font-extrabold text-slate-900 hover:text-burgundy transition-colors px-10">Valuations</Link>
+                            <div className="w-16 h-px bg-slate-200" />
+                            <Link onClick={() => setIsMobileMenuOpen(false)} href="/compare" className="text-3xl font-heading font-extrabold text-slate-900 hover:text-burgundy transition-colors px-10">Compare</Link>
 
                             <Link onClick={() => setIsMobileMenuOpen(false)} href="/login" className="mt-8 bg-burgundy text-white text-xl font-heading font-extrabold px-12 py-5 rounded-full hover:bg-burgundy-light transition-all shadow-xl shadow-burgundy/20 active:scale-95">
                                 Client Portal

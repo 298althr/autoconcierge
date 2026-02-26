@@ -34,7 +34,7 @@ const FundWalletModal = ({ onClose, onSuccess }: FundWalletModalProps) => {
     const [copied, setCopied] = useState(false);
 
     const amounts = ['50000', '100000', '500000', '1000000'];
-    const KYC_LIMIT = 5000000;
+    const KYC_LIMIT = 500000;
 
     const needsKYC = parseFloat(amount) > KYC_LIMIT && user?.kyc_status !== 'verified';
 
@@ -224,7 +224,7 @@ const FundWalletModal = ({ onClose, onSuccess }: FundWalletModalProps) => {
                                                     <AlertCircle className="shrink-0 mt-0.5" size={18} />
                                                     <div className="text-xs font-medium leading-relaxed">
                                                         <p className="font-bold text-sm mb-1">KYC Verification Required</p>
-                                                        Transactions above ₦5,000,000 are restricted for unverified accounts according to CBN regulations.
+                                                        Transactions above ₦500,000 are restricted for unverified accounts according to CBN regulations.
                                                     </div>
                                                 </div>
                                                 <Link href="/onboarding" className="block w-full py-3 bg-amber-600 text-white text-center rounded-xl font-bold text-sm hover:bg-amber-700 transition-colors">

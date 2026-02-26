@@ -1,5 +1,6 @@
 const { pool } = require('../config/database');
 const notificationService = require('./notificationService');
+const kycService = require('./kycService');
 
 class WalletService {
     async getBalance(userId) {
@@ -18,6 +19,9 @@ class WalletService {
     }
 
     async executeTransaction(userId, { type, amount, status = 'completed', description, paystack_ref }) {
+        // Enforce KYC for high-value transactions
+        await kycService.enforceKYC(userId, amount);
+
         const client = await pool.connect();
         try {
             await client.query('BEGIN');

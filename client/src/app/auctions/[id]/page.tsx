@@ -183,6 +183,7 @@ export default function AuctionRoomPage() {
                                 bidIncrement={auction.bid_increment}
                                 depositPct={auction.deposit_pct}
                                 walletBalance={wallet?.available || 0}
+                                kycStatus={user?.kyc_status}
                                 onBid={placeBid}
                                 onViewHistory={() => setShowHistoryModal(true)}
                                 disabled={auction.status !== 'live'}

@@ -7,18 +7,22 @@ interface Props {
     bidIncrement: number;
     depositPct: number;
     walletBalance: number;
+    kycStatus?: string;
     onBid: (amount: number) => Promise<void>;
     onViewHistory: () => void;
     disabled?: boolean;
 }
 
-export const BidPanel: React.FC<Props> = ({ currentPrice, bidIncrement, depositPct, walletBalance, onBid, onViewHistory, disabled }) => {
+export const BidPanel: React.FC<Props> = ({ currentPrice, bidIncrement, depositPct, walletBalance, kycStatus, onBid, onViewHistory, disabled }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const nextBid = currentPrice + bidIncrement;
     const depositNeeded = nextBid * (depositPct / 100);
     const hasEnoughBalance = walletBalance >= depositNeeded;
+
+    const KYC_THRESHOLD = 500000;
+    const needsKYC = depositNeeded > KYC_THRESHOLD && kycStatus !== 'verified';
 
     const handleBid = async (amount: number) => {
         setLoading(true);
@@ -74,6 +78,19 @@ export const BidPanel: React.FC<Props> = ({ currentPrice, bidIncrement, depositP
                             </p>
                         </div>
                     )}
+                    {needsKYC && (
+                        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex flex-col space-y-3 text-amber-100">
+                            <div className="flex items-center space-x-3">
+                                <Info size={16} />
+                                <p className="text-[11px] font-bold leading-tight">
+                                    KYC Verification Required for deposits {'>'} ₦500,000.
+                                </p>
+                            </div>
+                            <a href="/onboarding" className="text-[10px] bg-amber-500 text-white font-black py-2 px-4 rounded-lg text-center uppercase tracking-widest hover:bg-amber-600 transition-colors">
+                                Verify Account
+                            </a>
+                        </div>
+                    )}
                 </div>
 
                 {error && <p className="text-xs text-red-400 font-bold mb-4">{error}</p>}
@@ -82,7 +99,7 @@ export const BidPanel: React.FC<Props> = ({ currentPrice, bidIncrement, depositP
                     <Button
                         size="xl"
                         className="w-full bg-burgundy hover:bg-burgundy-dark text-white shadow-xl shadow-burgundy/20 group"
-                        disabled={loading || disabled || !hasEnoughBalance}
+                        disabled={loading || disabled || !hasEnoughBalance || needsKYC}
                         onClick={() => handleBid(nextBid)}
                     >
                         {loading ? <Loader2 className="animate-spin mr-2" /> : (
@@ -98,7 +115,7 @@ export const BidPanel: React.FC<Props> = ({ currentPrice, bidIncrement, depositP
                             <button
                                 key={amt}
                                 onClick={() => handleBid(amt)}
-                                disabled={loading || disabled || !hasEnoughBalance}
+                                disabled={loading || disabled || !hasEnoughBalance || needsKYC}
                                 className="p-3 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all disabled:opacity-50"
                             >
                                 +₦{(amt - nextBid).toLocaleString()}

@@ -11,6 +11,7 @@ const envSchema = z.object({
     JWT_REFRESH_SECRET: z.string().min(32),
     PAYSTACK_SECRET_KEY: z.string().optional(),
     GROQ_API_KEY: z.string().optional(),
+    GEMINI_API_KEY: z.string().optional(),
     CLOUDINARY_URL: z.string().optional(),
     CLOUDINARY_CLOUD_NAME: z.string().optional(),
     CLOUDINARY_API_KEY: z.string().optional(),
