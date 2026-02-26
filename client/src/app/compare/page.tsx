@@ -161,7 +161,7 @@ export default function ComparePage() {
                         <span className="text-[10px] font-bold uppercase tracking-widest text-burgundy">Comparison Protocol</span>
                     </motion.div>
                     <h1 className="text-5xl md:text-7xl font-heading font-extrabold tracking-tight text-slate-900 mb-4">
-                        Forensic Comparison.
+                        Vehicle Comparison.
                     </h1>
                     <p className="text-slate-500 max-w-2xl mx-auto font-subheading">
                         Select up to 4 vehicles to side-by-side analyze performance, architecture, and value liquidity.
