@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { apiFetch } from '@/lib/api';
-import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, AlertCircle, Zap } from 'lucide-react';
+import { Sparkles, ArrowRight, ArrowLeft, CheckCircle2, AlertCircle, Zap, Share2, Copy, Twitter, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
@@ -342,6 +342,45 @@ export default function ValuationPage() {
 
                             <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200 text-center shadow-inner">
                                 <p className="text-sm text-slate-600 font-body leading-relaxed max-w-lg mx-auto italic">&quot;{result.reasoning}&quot;</p>
+                            </div>
+
+                            {/* Social Sharing UI */}
+                            <div className="pt-4 border-t border-slate-100">
+                                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 text-center mb-6">Distribute Valuation Record</p>
+                                <div className="flex justify-center gap-4">
+                                    <button
+                                        onClick={() => {
+                                            const text = `I just valued my ${formData.year} ${formData.make} ${formData.model} at ₦${result.estimated_value.toLocaleString()} on Autogaard! Get yours here: ${window.location.origin}/valuation`;
+                                            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+                                        }}
+                                        className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-[#25D366] hover:border-[#25D366]/30 hover:bg-[#25D366]/5 transition-all shadow-sm"
+                                        title="Share on WhatsApp"
+                                    >
+                                        <Share2 size={20} />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            const text = `I just valued my ${formData.year} ${formData.make} ${formData.model} at ₦${result.estimated_value.toLocaleString()} on Autogaard!`;
+                                            const url = `${window.location.origin}/valuation`;
+                                            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+                                        }}
+                                        className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-[#1DA1F2] hover:border-[#1DA1F2]/30 hover:bg-[#1DA1F2]/5 transition-all shadow-sm"
+                                        title="Share on X"
+                                    >
+                                        <Twitter size={20} />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            const text = `I just valued my ${formData.year} ${formData.make} ${formData.model} at ₦${result.estimated_value.toLocaleString()} on Autogaard! Get yours here: ${window.location.origin}/valuation`;
+                                            navigator.clipboard.writeText(text);
+                                            alert('Valuation summary copied to clipboard!');
+                                        }}
+                                        className="w-12 h-12 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:text-burgundy hover:border-burgundy/30 hover:bg-burgundy/5 transition-all shadow-sm"
+                                        title="Copy Link"
+                                    >
+                                        <Copy size={20} />
+                                    </button>
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

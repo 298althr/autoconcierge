@@ -53,13 +53,7 @@ app.use((req, res, next) => {
     next();
 });
 
-const rateLimit = require('express-rate-limit');
-const globalLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 1000,
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+const { globalLimiter, authLimiter, aiLimiter } = require('./middleware/rateLimiter');
 
 app.use(morgan('dev'));
 app.use('/api', globalLimiter);
@@ -67,9 +61,9 @@ app.use('/uploads', express.static('uploads'));
 
 const { query } = require('./config/database');
 
-app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/auth', authLimiter, require('./routes/authRoutes'));
 app.use('/api/vehicles', require('./routes/vehicleRoutes'));
-app.use('/api/valuation', require('./routes/valuationRoutes'));
+app.use('/api/valuation', aiLimiter, require('./routes/valuationRoutes'));
 app.use('/api/wallet', require('./routes/walletRoutes'));
 app.use('/api/auctions', require('./routes/auctionRoutes'));
 app.use('/api/me', require('./routes/meRoutes'));
