@@ -74,7 +74,7 @@ class AuctionService {
 
     async getAuctionById(id) {
         const query = `
-            SELECT a.*, v.year, v.images, v.mileage_km, v.condition, v.location, c.make, c.model, c.specs
+            SELECT a.*, v.year, v.images, v.mileage_km, v.condition, v.location, c.make, c.model, c.specs, a.deposit_pct
             FROM auctions a
             JOIN vehicles v ON a.vehicle_id = v.id
             JOIN vehicle_catalog c ON v.catalog_id = c.id
@@ -100,8 +100,27 @@ class AuctionService {
             start_price: parseFloat(auction.start_price),
             current_price: parseFloat(auction.current_price),
             reserve_price: auction.reserve_price ? parseFloat(auction.reserve_price) : null,
+            buy_now_price: auction.buy_now_price ? parseFloat(auction.buy_now_price) : null,
             bid_increment: parseFloat(auction.bid_increment),
-            bids: bids.rows.map(b => ({ ...b, amount: parseFloat(b.amount) }))
+            deposit_pct: parseFloat(auction.deposit_pct),
+            bids: bids.rows.map(b => {
+                const name = b.display_name || 'Anonymous Bidder';
+                const parts = name.split(' ');
+                let maskedName = '';
+                if (parts.length > 1) {
+                    maskedName = `${parts[0].charAt(0)}. ${parts[parts.length - 1]}`;
+                    // Or even more masked:
+                    maskedName = `${parts[0]} ${parts[1].charAt(0)}***`;
+                } else {
+                    maskedName = parts[0].length > 4 ? `${parts[0].slice(0, 3)}***` : parts[0];
+                }
+
+                return {
+                    ...b,
+                    amount: parseFloat(b.amount),
+                    display_name: maskedName
+                };
+            })
         };
     }
 

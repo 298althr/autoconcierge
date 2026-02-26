@@ -44,10 +44,21 @@ class AuctionController {
             res.status(err.status || 500).json({ status: 'error', message: err.message });
         }
     }
+
     async getMyBids(req, res) {
         try {
             const { id: auctionId } = req.params;
             const data = await bidService.getUserBids(req.user.id, auctionId);
+            res.json({ status: 'success', data });
+        } catch (err) {
+            res.status(err.status || 500).json({ status: 'error', message: err.message });
+        }
+    }
+
+    async buyNow(req, res) {
+        try {
+            const { id: auctionId } = req.params;
+            const data = await bidService.buyNow(req.user.id, auctionId);
             res.json({ status: 'success', data });
         } catch (err) {
             res.status(err.status || 500).json({ status: 'error', message: err.message });
