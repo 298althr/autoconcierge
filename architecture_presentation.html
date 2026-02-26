@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autogaard | System Architecture Presentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #020617;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .burgundy-gradient {
+            background: linear-gradient(135deg, #600018 0%, #900024 100%);
+        }
+
+        .nav-btn-active {
+            background: #600018;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(96, 0, 24, 0.4);
+        }
+
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .kpi-border {
+            border-left: 4px solid #F43F5E;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+
+<body class="text-slate-300 min-h-screen">
+
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <div
+                class="inline-flex items-center space-x-3 bg-rose-500/10 px-5 py-2 rounded-full mb-8 border border-rose-500/20">
+                <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                <span class="text-[11px] font-black uppercase tracking-[0.4em] text-rose-500">System Blueprint</span>
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white mb-6 leading-none">
+                Full <span class="text-transparent bg-clip-text burgundy-gradient">Architecture.</span>
+            </h1>
+            <p class="text-slate-400 max-w-3xl mx-auto text-xl font-light leading-relaxed">
+                A comprehensive forensic map of the Client and Server ecosystem.
+            </p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="flex flex-wrap justify-center gap-4 mb-16">
+            <button onclick="showTab('client')" id="btn-client"
+                class="nav-btn-active px-10 py-4 rounded-2xl font-bold transition-all transform hover:scale-105">Client
+                Architecture</button>
+            <button onclick="showTab('server')" id="btn-server"
+                class="px-10 py-4 rounded-2xl font-bold transition-all bg-slate-900/50 text-slate-500 hover:text-white border border-white/5 transform hover:scale-105">Server
+                Architecture</button>
+        </nav>
+
+        <!-- Tab: Client Architecture -->
+        <div id="tab-client" class="space-y-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-1 glass-card p-10 rounded-[3rem]">
+                    <h2 class="text-3xl font-black text-white mb-6">Framework Detail</h2>
+                    <div class="p-6 bg-white/5 rounded-2xl border border-white/5 mb-6">
+                        <h4 class="text-rose-500 font-black text-xs uppercase tracking-widest mb-2">Primary Stack</h4>
+                        <p class="text-sm font-bold text-white mb-4">Next.js (App Router)</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Full-stack react framework with server-side rendering and static generation.
+                        </p>
+                    </div>
+                    <div class="p-6 bg-white/5 rounded-2xl border border-white/5">
+                        <h4 class="text-rose-500 font-black text-xs uppercase tracking-widest mb-2">Styling & UI</h4>
+                        <p class="text-sm font-bold text-white mb-4">Vanilla CSS / Tailwind</p>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Modern high-fidelity design system with premium typography and glassmorphic elements.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 glass-card p-10 rounded-[3rem]">
+                    <h2 class="text-3xl font-black text-white mb-8">Page Inventory</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <li
+                            class="list-none p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col group hover:bg-white/10 transition-all">
+                            <span class="text-white font-bold text-sm">/admin</span>
+                            <span class="text-[10px] text-slate-500 mt-1">Multi-module management portal with RBAC
+                                security.</span>
+                        </li>
+                        <li
+                            class="list-none p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col group hover:bg-white/10 transition-all">
+                            <span class="text-white font-bold text-sm">/auctions</span>
+                            <span class="text-[10px] text-slate-500 mt-1">Real-time bidding rooms powered by
+                                Socket.IO.</span>
+                        </li>
+                        <li
+                            class="list-none p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col group hover:bg-white/10 transition-all">
+                            <span class="text-white font-bold text-sm">/compare</span>
+                            <span class="text-[10px] text-slate-500 mt-1">Mobile-first side-by-side vehicle spec
+                                explorer.</span>
+                        </li>
+                        <li
+                            class="list-none p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col group hover:bg-white/10 transition-all">
+                            <span class="text-white font-bold text-sm">/valuation</span>
+                            <span class="text-[10px] text-slate-500 mt-1">AI appraisal engine generating narrative price
+                                insights.</span>
+                        </li>
+                        <li
+                            class="list-none p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col group hover:bg-white/10 transition-all">
+                            <span class="text-white font-bold text-sm">/wallet</span>
+                            <span class="text-[10px] text-slate-500 mt-1">Paystack-integrated balance and escrow
+                                management.</span>
+                        </li>
+                        <li
+                            class="list-none p-4 bg-white/5 rounded-2xl border border-white/5 flex flex-col group hover:bg-white/10 transition-all">
+                            <span class="text-white font-bold text-sm">/garage</span>
+                            <span class="text-[10px] text-slate-500 mt-1">Fleet tracking and vehicle service lifecycle
+                                management.</span>
+                        </li>
+                    </div>
+                    <button onclick="openModal('full-pages')"
+                        class="mt-8 text-xs font-bold text-rose-500 bg-rose-500/5 px-6 py-3 rounded-xl border border-rose-500/20 hover:bg-rose-500/10 transition-all">View
+                        All 15+ Subpages</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Server Architecture -->
+        <div id="tab-server" class="hidden space-y-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 glass-card p-10 rounded-[3rem]">
+                    <h2 class="text-3xl font-black text-white mb-8">Service Engine Matrix</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5 kpi-border">
+                            <h4 class="text-white font-bold text-sm mb-2">auctionService</h4>
+                            <p class="text-[10px] text-slate-500 leading-relaxed uppercase">Timed logic & anti-snipe
+                                extensions.</p>
+                        </div>
+                        <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5 kpi-border">
+                            <h4 class="text-white font-bold text-sm mb-2">bidService</h4>
+                            <p class="text-[10px] text-slate-500 leading-relaxed uppercase">High-velocity atomic
+                                transactions.</p>
+                        </div>
+                        <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5 kpi-border">
+                            <h4 class="text-white font-bold text-sm mb-2">conciergeService</h4>
+                            <p class="text-[10px] text-slate-500 leading-relaxed uppercase">AI Lead scoring & WhatsApp
+                                routing.</p>
+                        </div>
+                        <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5 kpi-border">
+                            <h4 class="text-white font-bold text-sm mb-2">walletService</h4>
+                            <p class="text-[10px] text-slate-500 leading-relaxed uppercase">Escrow mutations & Row-Level
+                                Locking.</p>
+                        </div>
+                        <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5 kpi-border">
+                            <h4 class="text-white font-bold text-sm mb-2">authService</h4>
+                            <p class="text-[10px] text-slate-500 leading-relaxed uppercase">JWT Rotation & social
+                                reconciliation.</p>
+                        </div>
+                        <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5 kpi-border">
+                            <h4 class="text-white font-bold text-sm mb-2">socketService</h4>
+                            <p class="text-[10px] text-slate-500 leading-relaxed uppercase">Real-time bi-directional
+                                transport.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-1 glass-card p-10 rounded-[3rem]">
+                    <h2 class="text-3xl font-black text-white mb-6">Backend Specs</h2>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/5 rounded-2xl border border-white/5">
+                            <h4 class="text-emerald-500 font-black text-[10px] uppercase mb-2">Database Engine</h4>
+                            <p class="text-xs text-slate-400">PostgreSQL managed with <strong
+                                    class="text-white">Knex.js</strong> for automated forensic migrations.</p>
+                        </div>
+                        <div class="p-6 bg-white/5 rounded-2xl border border-white/5">
+                            <h4 class="text-emerald-500 font-black text-[10px] uppercase mb-2">AI Node Routing</h4>
+                            <p class="text-xs text-slate-400">Direct integration with <strong class="text-white">Groq
+                                    Engine</strong> for ultra-low latency inference nodes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-20 text-center border-t border-white/5 pt-10">
+            <p class="text-slate-600 text-[10px] font-bold uppercase tracking-[0.5em]">Authauthored by Antigravity AI |
+                Privileged Access | 2026</p>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-container" class="fixed inset-0 z-50 flex items-center justify-center p-6 modal-backdrop hidden">
+        <div
+            class="glass-card max-w-4xl w-full p-10 rounded-[3rem] relative animate-in fade-in zoom-in duration-300 max-h-[85vh] overflow-y-auto">
+            <button onclick="closeModal()"
+                class="absolute top-8 right-8 text-slate-500 hover:text-white transition-colors">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const MODAL_DATA = {
+            'full-pages': `
+                <h2 class="text-3xl font-black text-white mb-6">Full Page Manifest</h2>
+                <div class="grid grid-cols-2 lg:grid-cols-3 gap-6 text-xs text-slate-400">
+                    <div>
+                        <p class="font-bold text-white mb-2 underline">Global Views</p>
+                        <p>• /dashboard: Overview</p>
+                        <p>• /onboarding: setup</p>
+                        <p>• /profile: account</p>
+                        <p>• /bids: history</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-white mb-2 underline">Auth & Legal</p>
+                        <p>• /login: entrance</p>
+                        <p>• /register: signup</p>
+                        <p>• /terms: policy</p>
+                        <p>• /contact: support</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-white mb-2 underline">Forensics</p>
+                        <p>• /vehicles: explorer</p>
+                        <p>• /valuation: AI appraiser</p>
+                        <p>• /compare: spec tool</p>
+                        <p>• /sell: listing guide</p>
+                    </div>
+                </div>
+            `
+        };
+
+        function showTab(id) {
+            const tabs = ['client', 'server'];
+            tabs.forEach(tab => {
+                document.getElementById('tab-' + tab).classList.add('hidden');
+                document.getElementById('btn-' + tab).className = 'px-10 py-4 rounded-2xl font-bold transition-all bg-slate-900/50 text-slate-500 hover:text-white border border-white/5 transform hover:scale-105';
+            });
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            document.getElementById('btn-' + id).className = 'nav-btn-active px-10 py-4 rounded-2xl font-bold transition-all transform hover:scale-105 shadow-xl';
+        }
+
+        function openModal(id) {
+            document.getElementById('modal-content').innerHTML = MODAL_DATA[id];
+            document.getElementById('modal-container').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal-container').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('modal-container')) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+
+</html>

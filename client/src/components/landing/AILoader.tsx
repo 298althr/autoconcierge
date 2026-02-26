@@ -5,12 +5,12 @@ import { motion } from 'framer-motion';
 
 const AILoader = () => {
     return (
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 h-6 w-8 justify-center">
             {[0, 1, 2, 3].map((i) => (
                 <motion.div
                     key={i}
                     animate={{
-                        height: [8, 24, 8],
+                        scaleY: [0.3, 1, 0.3],
                         opacity: [0.3, 1, 0.3],
                     }}
                     transition={{
@@ -19,7 +19,8 @@ const AILoader = () => {
                         delay: i * 0.1,
                         ease: "easeInOut"
                     }}
-                    className="w-1 bg-burgundy rounded-full"
+                    className="w-1 h-full bg-burgundy rounded-full origin-center"
+                    style={{ willChange: 'transform, opacity' }}
                 />
             ))}
         </div>

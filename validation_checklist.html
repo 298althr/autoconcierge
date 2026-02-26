@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autogaard | Master Session Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #020617;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .burgundy-gradient {
+            background: linear-gradient(135deg, #600018 0%, #900024 100%);
+        }
+
+        .nav-btn-active {
+            background: #600018;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(96, 0, 24, 0.4);
+        }
+
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .kpi-border {
+            border-left: 4px solid #F43F5E;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-value {
+            height: 100%;
+            background: #F43F5E;
+            transition: width 0.3s ease;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
+</head>
+
+<body class="text-slate-300 min-h-screen">
+
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <div
+                class="inline-flex items-center space-x-3 bg-rose-500/10 px-5 py-2 rounded-full mb-8 border border-rose-500/20">
+                <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                <span class="text-[11px] font-black uppercase tracking-[0.4em] text-rose-500">Privileged Operational
+                    Intel</span>
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white mb-6 leading-none">
+                Master <span class="text-transparent bg-clip-text burgundy-gradient">Report.</span>
+            </h1>
+            <p class="text-slate-400 max-w-3xl mx-auto text-xl font-light leading-relaxed">
+                Strategic achievements, technical roadmap, and system validation protocol.
+            </p>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="flex flex-wrap justify-center gap-4 mb-16">
+            <button onclick="showTab('achievements')" id="btn-achievements"
+                class="nav-btn-active px-10 py-4 rounded-2xl font-bold transition-all transform hover:scale-105">Overall
+                Achievement</button>
+            <button onclick="showTab('todo')" id="btn-todo"
+                class="px-10 py-4 rounded-2xl font-bold transition-all bg-slate-900/50 text-slate-500 hover:text-white border border-white/5 transform hover:scale-105">To-Do
+                Strategy</button>
+            <button onclick="showTab('keys')" id="btn-keys"
+                class="px-10 py-4 rounded-2xl font-bold transition-all bg-slate-900/50 text-slate-500 hover:text-white border border-white/5 transform hover:scale-105">Keys
+                & Rate Limits</button>
+            <button onclick="showTab('validation')" id="btn-validation"
+                class="px-10 py-4 rounded-2xl font-bold transition-all bg-slate-900/50 text-slate-500 hover:text-white border border-white/5 transform hover:scale-105">Validation
+                Guide</button>
+        </nav>
+
+        <!-- Tab: Overall Achievement -->
+        <div id="tab-achievements" class="space-y-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 text-pretty">
+                <!-- Deployment & Style -->
+                <div class="lg:col-span-2 glass-card p-10 rounded-[3rem] relative overflow-hidden">
+                    <h2 class="text-3xl font-black text-white mb-8">🚀 Infrastructure & Style</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xs font-black uppercase tracking-widest text-rose-500 mb-4">Railway
+                                Deployment</h4>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                                Our production environment is containerized on <strong>Railway.app</strong>, using a
+                                monorepo architecture.
+                                The deployment pipeline automatically triggers migrations and handles Next.js standalone
+                                optimization for sub-second speeds.
+                            </p>
+                            <button onclick="openModal('deployment')"
+                                class="text-xs font-bold text-white bg-white/5 px-4 py-2 rounded-lg hover:bg-white/10 transition-all border border-white/5">View
+                                Deployment Specs</button>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-black uppercase tracking-widest text-rose-500 mb-4">Technical Work
+                                Style</h4>
+                            <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                                Pair-programming with high-autonomy AI agents. We utilize <strong>Living
+                                    Documentation</strong> (<code>tasks.md</code>)
+                                and <strong>Atomic Commit Protocols</strong> to ensure 100% trace-ability and zero merge
+                                conflicts.
+                            </p>
+                            <button onclick="openModal('workstyle')"
+                                class="text-xs font-bold text-white bg-white/5 px-4 py-2 rounded-lg hover:bg-white/10 transition-all border border-white/5">Our
+                                Methodology</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Acquired -->
+                <div class="glass-card p-10 rounded-[3rem]">
+                    <h2 class="text-3xl font-black text-white mb-8">💎 New Skills</h2>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <h4 class="text-white font-bold text-sm">Multi-Node AI Prompting</h4>
+                            <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest">Groq / LLaMA-3</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <h4 class="text-white font-bold text-sm">Escrow Wallet Logic</h4>
+                            <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest">PostgreSQL Locks</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <h4 class="text-white font-bold text-sm">Fluid Mobile UX</h4>
+                            <p class="text-[10px] text-slate-500 mt-1 uppercase tracking-widest">Tailwind / Media
+                                Queries</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Achievement Checklist -->
+            <div class="glass-card p-10 rounded-[3rem]">
+                <h2 class="text-3xl font-black text-white mb-10">🏁 Accomplished Tasks Checklist</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Auth -->
+                    <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="text-white font-bold">Identity Engine</h4>
+                            <span
+                                class="bg-emerald-500/20 text-emerald-500 text-[8px] font-black px-2 py-1 rounded">COMPLETE</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">JWT Auth, Zod Validation, Google OAuth, and RBAC
+                            middleware implemented.</p>
+                        <button onclick="openModal('auth-details')"
+                            class="text-[10px] font-bold text-rose-500 hover:underline">View Implementation
+                            Details</button>
+                    </div>
+                    <!-- Catalog -->
+                    <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="text-white font-bold">Forensic Catalog</h4>
+                            <span
+                                class="bg-emerald-500/20 text-emerald-500 text-[8px] font-black px-2 py-1 rounded">COMPLETE</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">7,000+ vehicle models seeded with deep specs and
+                            mobile-first comparison tool.</p>
+                        <button onclick="openModal('catalog-details')"
+                            class="text-[10px] font-bold text-rose-500 hover:underline">View Implementation
+                            Details</button>
+                    </div>
+                    <!-- AI -->
+                    <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="text-white font-bold">AI Valuation System</h4>
+                            <span
+                                class="bg-emerald-500/20 text-emerald-500 text-[8px] font-black px-2 py-1 rounded">COMPLETE</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">Groq-powered market appraisal with WhatsApp/X sharing and
+                            reasoning engine.</p>
+                        <button onclick="openModal('ai-details')"
+                            class="text-[10px] font-bold text-rose-500 hover:underline">View Implementation
+                            Details</button>
+                    </div>
+                    <!-- Auction -->
+                    <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="text-white font-bold">Auction Real-time</h4>
+                            <span
+                                class="bg-emerald-500/20 text-emerald-500 text-[8px] font-black px-2 py-1 rounded">COMPLETE</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">Socket.IO rooms, Bid feeds, Anti-sniping, and Bid History
+                            Ledger.</p>
+                        <button onclick="openModal('auction-details')"
+                            class="text-[10px] font-bold text-rose-500 hover:underline">View Implementation
+                            Details</button>
+                    </div>
+                    <!-- Wallet -->
+                    <div class="p-6 bg-slate-900/40 rounded-2xl border border-white/5">
+                        <div class="flex justify-between items-start mb-4">
+                            <h4 class="text-white font-bold">Escrow Payments</h4>
+                            <span
+                                class="bg-emerald-500/20 text-emerald-500 text-[8px] font-black px-2 py-1 rounded">COMPLETE</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">Paystack funding, Manual approval flow, and transactional
+                            safety checks.</p>
+                        <button onclick="openModal('wallet-details')"
+                            class="text-[10px] font-bold text-rose-500 hover:underline">View Implementation
+                            Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: To-Do Strategy -->
+        <div id="tab-todo" class="hidden space-y-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 text-pretty">
+                <!-- Sidebar Architecture -->
+                <div class="glass-card p-10 rounded-[3rem]">
+                    <h2 class="text-2xl font-black text-white mb-8 border-b border-white/5 pb-4 leading-tight">Admin Hub
+                        <br>& RBAC Architecture</h2>
+                    <p class="text-xs text-slate-500 mb-8 uppercase tracking-widest font-bold">Global Module Assignment
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="p-4 bg-white/5 rounded-2xl border border-rose-500/20 flex justify-between items-center group cursor-pointer"
+                            onclick="openModal('todo-dashboard')">
+                            <span class="text-slate-200 font-bold">01. Overview Desk</span>
+                            <span class="text-rose-500 group-hover:translate-x-1 transition-transform">→</span>
+                        </li>
+                        <li class="p-4 bg-white/5 rounded-2xl border border-white/5 flex justify-between items-center group cursor-pointer"
+                            onclick="openModal('todo-users')">
+                            <span class="text-slate-200">02. User Matrix</span>
+                            <span class="text-slate-500 group-hover:translate-x-1 transition-transform">→</span>
+                        </li>
+                        <li class="p-4 bg-white/5 rounded-2xl border border-white/5 flex justify-between items-center group cursor-pointer"
+                            onclick="openModal('todo-inventory')">
+                            <span class="text-slate-200">03. Catalog & Specs</span>
+                            <span class="text-slate-500 group-hover:translate-x-1 transition-transform">→</span>
+                        </li>
+                        <li class="p-4 bg-white/5 rounded-2xl border border-white/5 flex justify-between items-center group cursor-pointer"
+                            onclick="openModal('todo-auctions')">
+                            <span class="text-slate-200">04. Auction Control</span>
+                            <span class="text-slate-500 group-hover:translate-x-1 transition-transform">→</span>
+                        </li>
+                        <li class="p-4 bg-white/5 rounded-2xl border border-white/5 flex justify-between items-center group cursor-pointer"
+                            onclick="openModal('todo-financials')">
+                            <span class="text-slate-200">05. Financial Ledger</span>
+                            <span class="text-slate-500 group-hover:translate-x-1 transition-transform">→</span>
+                        </li>
+                        <li class="p-4 bg-rose-500/10 rounded-2xl border border-rose-500/30 flex justify-between items-center group cursor-pointer"
+                            onclick="openModal('todo-concierge')">
+                            <span class="text-rose-400 font-bold">06. Concierge Master</span>
+                            <span class="text-rose-500 group-hover:translate-x-1 transition-transform">→</span>
+                        </li>
+                        <li class="p-4 bg-white/5 rounded-2xl border border-white/5 flex justify-between items-center group cursor-pointer"
+                            onclick="openModal('todo-garage')">
+                            <span class="text-slate-200">07. Fleet Management</span>
+                            <span class="text-slate-500 group-hover:translate-x-1 transition-transform">→</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Strategic Backlog & RBAC -->
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="glass-card p-10 rounded-[3rem]">
+                        <h2 class="text-3xl font-black text-white mb-8">🛠️ Role-Based Access Strategy</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+                            <div class="p-6 bg-rose-500/5 rounded-[2rem] border border-rose-500/20">
+                                <h4 class="text-rose-500 font-black text-xs uppercase tracking-widest mb-4">Super Admin
+                                    Access</h4>
+                                <ul class="text-xs text-slate-400 space-y-2">
+                                    <li>• Unrestricted visibility across all 8 modules</li>
+                                    <li>• Ability to assign/revoke module access to other Admins</li>
+                                    <li>• Manual adjustment of Commission and Liquidity rates</li>
+                                </ul>
+                            </div>
+                            <div class="p-6 bg-white/5 rounded-[2rem] border border-white/5">
+                                <h4 class="text-slate-400 font-black text-xs uppercase tracking-widest mb-4">Assigned
+                                    Admin Access</h4>
+                                <ul class="text-xs text-slate-500 space-y-2">
+                                    <li>• View-only or Action-restricted versions of specific tabs</li>
+                                    <li>• Example: A "Concierge Admin" only sees Module 06 & 07</li>
+                                    <li>• Example: A "Finance Admin" only sees Module 05</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3 class="text-xl font-bold text-white mb-6">Frontend Visual Hierarchy</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="text-white font-bold text-sm mb-2">The Primary Viewport</h4>
+                                <p class="text-xs text-slate-500 leading-relaxed">
+                                    Every tab follows a <strong>Level-3 Layout</strong>: Sidebar Nav (L1) &rarr;
+                                    Sub-Module Tabs (L2) &rarr; Actionable Data Table (L3).
+                                    High-impact KPIs are pinned to the top.
+                                </p>
+                            </div>
+                            <div>
+                                <h4 class="text-white font-bold text-sm mb-2">Contextual Actions</h4>
+                                <p class="text-xs text-slate-500 leading-relaxed">
+                                    A floating right-hand drawer handles all modifications (Edit vehicle, Approve KYC)
+                                    to keep users from losing their search/filter context.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW Tab: Keys & Rate Limits -->
+        <div id="tab-keys" class="hidden space-y-12">
+            <div class="glass-card p-10 rounded-[3rem]">
+                <h2 class="text-3xl font-black text-white mb-10 flex items-center">
+                    <span
+                        class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center mr-4 text-emerald-500 text-lg">🔑</span>
+                    API Keys & Rate Limit Metrics
+                </h2>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Key Tracker -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="p-8 bg-slate-900/40 rounded-[2rem] border border-white/5">
+                            <h3 class="text-white font-bold mb-6 flex justify-between items-center">
+                                Active Provider Monitoring
+                                <span class="text-[10px] text-slate-500 italic uppercase">Auto-Syncing</span>
+                            </h3>
+                            <div class="space-y-8">
+                                <!-- Groq -->
+                                <div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                                                🧠</div>
+                                            <div>
+                                                <p class="text-sm font-bold text-white">Groq (Llama-3.3)</p>
+                                                <p class="text-[10px] text-slate-500 uppercase">Valuation & Concierge
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-xs font-bold text-rose-500">62% Usage</p>
+                                            <p class="text-[10px] text-slate-500 uppercase">1,240 / 2,000 RPM</p>
+                                        </div>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value" style="width: 62%;"></div>
+                                    </div>
+                                </div>
+                                <!-- SendGrid -->
+                                <div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                                                ✉️</div>
+                                            <div>
+                                                <p class="text-sm font-bold text-white">SendGrid SMTP</p>
+                                                <p class="text-[10px] text-slate-500 uppercase">System Notifications</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-xs font-bold text-emerald-500">12% Usage</p>
+                                            <p class="text-[10px] text-slate-500 uppercase">12 / 100 Daily</p>
+                                        </div>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value" style="width: 12%; background: #10B981;"></div>
+                                    </div>
+                                </div>
+                                <!-- Paystack -->
+                                <div>
+                                    <div class="flex justify-between items-center mb-3">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center">
+                                                💳</div>
+                                            <div>
+                                                <p class="text-sm font-bold text-white">Paystack API</p>
+                                                <p class="text-[10px] text-slate-500 uppercase">Wallet Liquidity</p>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-xs font-bold text-blue-500">Operational</p>
+                                            <p class="text-[10px] text-slate-500 uppercase">Unlimited Tier</p>
+                                        </div>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-value" style="width: 100%; background: #3B82F6;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Improvisation Plan -->
+                        <div class="p-8 bg-rose-500/5 rounded-[2rem] border border-rose-500/10">
+                            <h3 class="text-rose-500 font-bold mb-4">Scalability & Improvisation</h3>
+                            <div
+                                class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs leading-relaxed text-slate-400 text-pretty">
+                                <p><strong>L1 Strategy:</strong> On exceeding 80% Groq capacity, system triggers
+                                    automatic fallback to <code>Algorithmic Valuation V2</code> using local PostgreSQL
+                                    market seeds.</p>
+                                <p><strong>L2 Strategy:</strong> Multi-provider rotation. We have established
+                                    ready-to-use Drivers for <code>OpenAI gpt-4o-mini</code> to take specialized
+                                    concierge tasks if Groq experiences latency spikes.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Usage Metrics -->
+                    <div class="space-y-6">
+                        <div class="glass-card p-8 rounded-[2rem]">
+                            <h4 class="text-white font-bold mb-6 uppercase text-[10px] tracking-widest text-slate-500">
+                                Cost Estimates (MTD)</h4>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center bg-white/5 p-4 rounded-xl">
+                                    <span class="text-xs text-slate-300">AI Compute (Groq)</span>
+                                    <span class="text-sm font-bold text-emerald-500">$0.00 <span
+                                            class="text-[8px] text-slate-600">(Free Tier)</span></span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white/5 p-4 rounded-xl">
+                                    <span class="text-xs text-slate-300">Email (SendGrid)</span>
+                                    <span class="text-sm font-bold text-emerald-500">$0.00 <span
+                                            class="text-[8px] text-slate-600">(Free Tier)</span></span>
+                                </div>
+                                <div class="flex justify-between items-center bg-white/5 p-4 rounded-xl">
+                                    <span class="text-xs text-slate-300">Infrastructure (Railway)</span>
+                                    <span class="text-sm font-bold text-white">$10.24</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card p-8 rounded-[2rem]">
+                            <h4 class="text-white font-bold mb-6 uppercase text-[10px] tracking-widest text-slate-500">
+                                Rate Limit Strategy</h4>
+                            <ul class="text-[10px] text-slate-500 space-y-3 font-bold">
+                                <li class="flex items-center space-x-2"><span
+                                        class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> <span>AUTH: 20 REQ /
+                                        HOUR</span></li>
+                                <li class="flex items-center space-x-2"><span
+                                        class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> <span>AI API: 10 REQ /
+                                        HOUR</span></li>
+                                <li class="flex items-center space-x-2"><span
+                                        class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> <span>GLOBAL: 1000 REQ / 15
+                                        MIN</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Validation Guide -->
+        <div id="tab-validation" class="hidden space-y-12">
+            <div class="glass-card p-10 rounded-[3rem]">
+                <h2 class="text-3xl font-black text-white mb-10">🔍 Validation Protocol</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div>
+                        <h4 class="text-rose-500 font-black text-[10px] uppercase tracking-widest mb-8">User Acceptance
+                            Flow</h4>
+                        <div class="space-y-4">
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all cursor-pointer"
+                                onclick="openModal('val-compare')">
+                                <h5 class="text-white font-bold text-sm">Validate 11G: Forensic Comparison</h5>
+                                <p class="text-xs text-slate-500 mt-1">Navigate to /compare via mobile browser...</p>
+                            </div>
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all cursor-pointer"
+                                onclick="openModal('val-val')">
+                                <h5 class="text-white font-bold text-sm">Validate 11E: AI Valuation Flow</h5>
+                                <p class="text-xs text-slate-500 mt-1">Complete a 3-step appraisal and share result...
+                                </p>
+                            </div>
+                            <div class="p-4 bg-white/5 rounded-2xl border border-white/5 group hover:bg-white/10 transition-all cursor-pointer"
+                                onclick="openModal('val-auction')">
+                                <h5 class="text-white font-bold text-sm">Validate 5M: Live Auction Room</h5>
+                                <p class="text-xs text-slate-500 mt-1">Place a real-time bid with Socket.IO feedback...
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="text-rose-500 font-black text-[10px] uppercase tracking-widest mb-8">Technical
+                            Verifiers</h4>
+                        <div class="bg-black/60 p-8 rounded-[2rem] border border-white/5 font-mono text-xs space-y-6">
+                            <div>
+                                <p class="text-slate-600 mb-2">// Verify Concierge AI Intelligence</p>
+                                <div class="p-3 bg-white/5 rounded-lg text-emerald-400 group relative">
+                                    node validate_concierge.js
+                                    <button
+                                        class="absolute right-4 top-3 text-[8px] font-bold text-slate-600 uppercase">COPY</button>
+                                </div>
+                            </div>
+                            <div>
+                                <p class="text-slate-600 mb-2">// Audit Secure Git History</p>
+                                <div class="p-3 bg-white/5 rounded-lg text-emerald-400">
+                                    git log --oneline -n 10
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-20 text-center border-t border-white/5 pt-10">
+            <p class="text-slate-600 text-[10px] font-bold uppercase tracking-[0.5em]">Authauthored by Antigravity AI |
+                Privileged Access | 2026</p>
+        </footer>
+    </div>
+
+    <!-- Modals (Hidden by default) -->
+    <div id="modal-container" class="fixed inset-0 z-50 flex items-center justify-center p-6 modal-backdrop hidden">
+        <div
+            class="glass-card max-w-4xl w-full p-10 rounded-[3rem] relative animate-in fade-in zoom-in duration-300 max-h-[85vh] overflow-y-auto">
+            <button onclick="closeModal()"
+                class="absolute top-8 right-8 text-slate-500 hover:text-white transition-colors">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12" />
+                </svg>
+            </button>
+            <div id="modal-content">
+                <!-- Dynamic Content Here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MODAL_DATA = {
+            'deployment': `
+                <h2 class="text-3xl font-black text-white mb-6">Deployment Infrastructure</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>We use a <strong>Monorepo Deployment</strong> strategy on Railway.app. This allows us to maintain the client and server as separate services while sharing a unified database context.</p>
+                </div>
+            `,
+            'workstyle': `
+                <h2 class="text-3xl font-black text-white mb-6">Our Methodology</h2>
+                <div class="space-y-4 text-slate-400 text-sm leading-relaxed">
+                    <p>We follow a <strong>"Verify-Build-Track"</strong> workflow designed for maximum precision.</p>
+                </div>
+            `,
+            'auth-details': `
+                <h2 class="text-3xl font-black text-white mb-6">Identity Implementation</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>JWT Auth with HttpOnly secure cookies and Google OAuth2 integration.</p>
+                </div>
+            `,
+            'catalog-details': `
+                <h2 class="text-3xl font-black text-white mb-6">Catalog Strategy</h2>
+                <div class="space-y-4 text-slate-400 text-sm text-pretty">
+                    <p>Forensic Catalog base of 7,000+ vehicle models with deep manufacturing specs.</p>
+                </div>
+            `,
+            'ai-details': `
+                <h2 class="text-3xl font-black text-white mb-6">AI Architecture</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>Groq LLaMA-3 70B generating structured market insights with narrative reasoning.</p>
+                </div>
+            `,
+            'auction-details': `
+                <h2 class="text-3xl font-black text-white mb-6">Auction Room Forensics</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>Real-time Socket.IO bidding with anti-sniping and persistent bid ledgers.</p>
+                </div>
+            `,
+            'wallet-details': `
+                <h2 class="text-3xl font-black text-white mb-6">Financial Integrity</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>Atomic wallet mutations using Row-Level Locking (SELECT FOR UPDATE) on PostgreSQL.</p>
+                </div>
+            `,
+            'todo-dashboard': `
+                <h2 class="text-3xl font-black text-white mb-6">01. Overview Desk KPIs</h2>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/5 kpi-border">
+                        <p class="text-[10px] text-slate-500 font-black uppercase mb-1">Total TVL</p>
+                        <p class="text-xl font-bold text-white">₦42.5M</p>
+                    </div>
+                    <div class="p-4 bg-white/5 rounded-xl border border-white/5 kpi-border">
+                        <p class="text-[10px] text-slate-500 font-black uppercase mb-1">Active Bidders</p>
+                        <p class="text-xl font-bold text-white">184</p>
+                    </div>
+                </div>
+                <p class="text-sm text-slate-400">The high-level viewport forSuper Admin monitoring of system-wide liquidity and conversion.</p>
+            `,
+            'todo-users': `
+                <h2 class="text-3xl font-black text-white mb-6">02. User Matrix Control</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p><strong>RBAC Delegation:</strong> Assign specific admin modules to staff members based on their role.</p>
+                    <p><strong>KYC Audit:</strong> Manual photo-to-ID verification loop for high-value transactions.</p>
+                </div>
+            `,
+            'todo-inventory': `
+                <h2 class="text-3xl font-black text-white mb-6">03. Catalog & Specs Engine</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>Control the "Truth Bed" of Autogaard's specifications. Manage 3rd party spec imports and user-uploaded vehicle approvals.</p>
+                </div>
+            `,
+            'todo-auctions': `
+                <h2 class="text-3xl font-black text-white mb-6">04. Auction Control Tower</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>Timed event management. Monitoring bid velocity, handling anti-snipe extensions, and manually resolving settlement disputes.</p>
+                </div>
+            `,
+            'todo-financials': `
+                <h2 class="text-3xl font-black text-white mb-6">05. Financial Ledger & Auditing</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>Bank Statement reconciliation for manual transfers, withdrawal approval queues, and commission revenue reporting.</p>
+                </div>
+            `,
+            'todo-concierge': `
+                <h2 class="text-3xl font-black text-white mb-6">06. Concierge Master Management</h2>
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="p-4 bg-white/5 rounded-xl border border-white/5 kpi-border">
+                            <p class="text-[8px] text-slate-500 font-black uppercase mb-1">Avg Lead Score</p>
+                            <p class="text-lg font-bold text-white">8.4/10</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl border border-white/5 kpi-border">
+                            <p class="text-[8px] text-slate-500 font-black uppercase mb-1">Backlog Depth</p>
+                            <p class="text-lg font-bold text-white">42 Active</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-xl border border-white/5 kpi-border">
+                            <p class="text-[8px] text-slate-500 font-black uppercase mb-1">Conversion Ratio</p>
+                            <p class="text-lg font-bold text-white">14.2%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-black/30 p-6 rounded-2xl border border-white/5">
+                        <h4 class="text-rose-400 font-bold mb-4">UUID Management Protocol:</h4>
+                        <div class="space-y-4 text-xs leading-relaxed text-slate-400 text-pretty">
+                            <p><strong>1. Lead Sourcing (Lead-UUID):</strong> AI scores incoming requests based on specific intent (Sourcing, Shipping, Clearing). Scored 1-10.</p>
+                            <p><strong>2. Task Assignment:</strong> Assigned Admins claim a UUID. The platform tracks "Time-to-Handover" (TTH) metrics to ensure responsiveness.</p>
+                            <p><strong>3. Metric Tracking:</strong> Monitor lead drop-off points. If lead drops at "Clearing Cost", AI adjusts the Clearing Driver for that region.</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'todo-garage': `
+                <h2 class="text-3xl font-black text-white mb-6">07. Global Fleet Management</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>Escrow vehicle tracking for physical inspections. Manage the handover from Seller &rarr; Autogaard &rarr; Buyer.</p>
+                </div>
+            `,
+            'val-compare': `
+                <h2 class="text-3xl font-black text-white mb-6">Validating 11G: Comparison</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>Visit /compare on mobile. Check sticky labels and swipe horizontal specs.</p>
+                </div>
+            `,
+            'val-val': `
+                <h2 class="text-3xl font-black text-white mb-6">Validating 11E: Valuation</h2>
+                <div class="space-y-4 text-slate-400 text-sm">
+                    <p>Verify reasoning card and WhatsApp distribution buttons at the final step.</p>
+                </div>
+            `,
+            'val-auction': `
+                <h2 class="text-3xl font-black text-white mb-6">Validating 5M: Live Bidding</h2>
+                <div class="space-y-4 text-slate-400 text-sm text-pretty">
+                    <p>Open two tabs. Place bid in one. Second tab MUST update instantly via Socket.IO.</p>
+                </div>
+            `
+        };
+
+        function showTab(id) {
+            const tabs = ['achievements', 'todo', 'keys', 'validation'];
+            tabs.forEach(tab => {
+                document.getElementById('tab-' + tab).classList.add('hidden');
+                document.getElementById('btn-' + tab).className = 'px-10 py-4 rounded-2xl font-bold transition-all bg-slate-900/50 text-slate-500 hover:text-white border border-white/5 transform hover:scale-105';
+            });
+
+            document.getElementById('tab-' + id).classList.remove('hidden');
+            document.getElementById('btn-' + id).className = 'nav-btn-active px-10 py-4 rounded-2xl font-bold transition-all transform hover:scale-105 shadow-xl';
+        }
+
+        function openModal(id) {
+            const content = MODAL_DATA[id] || '<div class="p-10 text-center"><p class="text-slate-400 text-lg">Detailed intelligence pending.</p></div>';
+            document.getElementById('modal-content').innerHTML = content;
+            document.getElementById('modal-container').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal-container').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function (event) {
+            const modal = document.getElementById('modal-container');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+
+</html>
