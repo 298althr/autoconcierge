@@ -1,0 +1,122 @@
+[
+    {
+        "rank": 1,
+        "car_model": "Toyota Corolla",
+        "buyers_per_100": 22,
+        "primary_market": "Used (Tokunbo) / Personal"
+    },
+    {
+        "rank": 2,
+        "car_model": "Toyota Camry",
+        "buyers_per_100": 15,
+        "primary_market": "Used (Tokunbo) / Personal"
+    },
+    {
+        "rank": 3,
+        "car_model": "Toyota Hilux",
+        "buyers_per_100": 12,
+        "primary_market": "Brand New / Corporate & Gov"
+    },
+    {
+        "rank": 4,
+        "car_model": "Lexus RX 350",
+        "buyers_per_100": 8,
+        "primary_market": "Used / Luxury SUV"
+    },
+    {
+        "rank": 5,
+        "car_model": "Toyota Sienna",
+        "buyers_per_100": 6,
+        "primary_market": "Used / Family & Commercial"
+    },
+    {
+        "rank": 6,
+        "car_model": "Honda Accord",
+        "buyers_per_100": 5,
+        "primary_market": "Used / Personal"
+    },
+    {
+        "rank": 7,
+        "car_model": "Toyota Prado",
+        "buyers_per_100": 4,
+        "primary_market": "Brand New / Elite SUV"
+    },
+    {
+        "rank": 8,
+        "car_model": "Toyota Highlander",
+        "buyers_per_100": 4,
+        "primary_market": "Used / Family SUV"
+    },
+    {
+        "rank": 9,
+        "car_model": "Lexus IS 250",
+        "buyers_per_100": 3,
+        "primary_market": "Used / Youth Luxury"
+    },
+    {
+        "rank": 10,
+        "car_model": "Mercedes-Benz C300",
+        "buyers_per_100": 3,
+        "primary_market": "Used / Premium Sedan"
+    },
+    {
+        "rank": 11,
+        "car_model": "Toyota Hiace",
+        "buyers_per_100": 3,
+        "primary_market": "New & Used / Commercial"
+    },
+    {
+        "rank": 12,
+        "car_model": "Toyota RAV4",
+        "buyers_per_100": 2,
+        "primary_market": "Used / Compact SUV"
+    },
+    {
+        "rank": 13,
+        "car_model": "Honda Civic",
+        "buyers_per_100": 2,
+        "primary_market": "Used / Youth Sedan"
+    },
+    {
+        "rank": 14,
+        "car_model": "Mercedes-Benz GLK",
+        "buyers_per_100": 2,
+        "primary_market": "Used / Luxury Compact SUV"
+    },
+    {
+        "rank": 15,
+        "car_model": "Toyota Rush",
+        "buyers_per_100": 2,
+        "primary_market": "Brand New / Compact SUV"
+    },
+    {
+        "rank": 16,
+        "car_model": "Hyundai Sonata",
+        "buyers_per_100": 2,
+        "primary_market": "Used / Corporate Sedan"
+    },
+    {
+        "rank": 17,
+        "car_model": "Innoson IVM Carrier",
+        "buyers_per_100": 1,
+        "primary_market": "Brand New / Local Manufacturing"
+    },
+    {
+        "rank": 18,
+        "car_model": "Kia Rio",
+        "buyers_per_100": 1,
+        "primary_market": "New & Used / Economy"
+    },
+    {
+        "rank": 19,
+        "car_model": "Toyota Land Cruiser",
+        "buyers_per_100": 1,
+        "primary_market": "Brand New / Luxury Off-Road"
+    },
+    {
+        "rank": 20,
+        "car_model": "Mercedes-AMG GLE",
+        "buyers_per_100": 1,
+        "primary_market": "Brand New / High-End Luxury"
+    }
+]

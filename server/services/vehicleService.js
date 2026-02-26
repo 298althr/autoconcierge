@@ -1,10 +1,10 @@
 const { query } = require('../config/database');
 
 class VehicleService {
-    async getAllVehicles({ make, model, condition, minPrice, maxPrice, status, sort = 'recommended' }) {
+    async getAllVehicles({ make, model, condition, minPrice, maxPrice, status, body_type, year, transmission, maxMileage, sort = 'recommended' }) {
         let sql = `
       SELECT v.*, 
-             vc.resell_rank, vc.popularity_index, 
+             vc.resell_rank, vc.popularity_index, vc.body_type, vc.transmission,
              a.id as auction_id, a.bid_count, a.bidder_count, a.current_price as auction_current_price
       FROM vehicles v
       LEFT JOIN vehicle_catalog vc ON v.catalog_id = vc.id
@@ -41,6 +41,36 @@ class VehicleService {
         if (maxPrice) {
             params.push(maxPrice);
             sql += ` AND v.price <= $${params.length}`;
+        }
+
+        if (body_type) {
+            params.push(body_type);
+            sql += ` AND vc.body_type = $${params.length}`;
+        }
+
+        if (year) {
+            params.push(year);
+            sql += ` AND v.year = $${params.length}`;
+        }
+
+        if (transmission) {
+            params.push(transmission);
+            sql += ` AND vc.transmission = $${params.length}`;
+        }
+
+        if (maxMileage) {
+            params.push(maxMileage);
+            sql += ` AND v.mileage_km <= $${params.length}`;
+        }
+
+        if (fuel_type) {
+            params.push(fuel_type);
+            sql += ` AND vc.fuel_type = $${params.length}`;
+        }
+
+        if (drivetrain) {
+            params.push(drivetrain);
+            sql += ` AND vc.drivetrain = $${params.length}`;
         }
 
         // Sorting Algorithm

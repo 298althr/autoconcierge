@@ -22,6 +22,12 @@ export default function BrowseVehicles() {
         condition: '',
         minPrice: '',
         maxPrice: '',
+        body_type: '',
+        year: '',
+        transmission: '',
+        maxMileage: '',
+        fuel_type: '',
+        drivetrain: '',
         status: '',
         sort: ''
     });
@@ -76,6 +82,12 @@ export default function BrowseVehicles() {
             condition: '',
             minPrice: '',
             maxPrice: '',
+            body_type: '',
+            year: '',
+            transmission: '',
+            maxMileage: '',
+            fuel_type: '',
+            drivetrain: '',
             status: status || '',
             sort: defaultSort
         });
@@ -212,6 +224,92 @@ export default function BrowseVehicles() {
                                                     onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
                                                     className="premium-input bg-slate-50"
                                                 />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <label className="premium-label ml-0">Body Type</label>
+                                            <select
+                                                value={filters.body_type}
+                                                onChange={(e) => setFilters({ ...filters, body_type: e.target.value })}
+                                                className="premium-input bg-slate-50 appearance-none"
+                                            >
+                                                <option value="">Any Body Type</option>
+                                                <option value="Sedan">Sedan</option>
+                                                <option value="SUV">SUV</option>
+                                                <option value="Truck">Truck</option>
+                                                <option value="Coupe">Coupe</option>
+                                                <option value="Hatchback">Hatchback</option>
+                                                <option value="Crossover">Crossover</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-3">
+                                                <label className="premium-label ml-0">Year</label>
+                                                <input
+                                                    type="number"
+                                                    placeholder="e.g. 2020"
+                                                    value={filters.year}
+                                                    onChange={(e) => setFilters({ ...filters, year: e.target.value })}
+                                                    className="premium-input bg-slate-50"
+                                                />
+                                            </div>
+                                            <div className="space-y-3">
+                                                <label className="premium-label ml-0">Max Mileage (km)</label>
+                                                <input
+                                                    type="number"
+                                                    placeholder="e.g. 100000"
+                                                    value={filters.maxMileage}
+                                                    onChange={(e) => setFilters({ ...filters, maxMileage: e.target.value })}
+                                                    className="premium-input bg-slate-50"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            <label className="premium-label ml-0">Transmission</label>
+                                            <div className="grid grid-cols-2 gap-3">
+                                                {['Automatic', 'Manual'].map((t) => (
+                                                    <button
+                                                        key={t}
+                                                        onClick={() => setFilters({ ...filters, transmission: filters.transmission === t ? '' : t })}
+                                                        className={`py-3 rounded-2xl border font-subheading font-bold text-xs bg-white capitalize transition-all ${filters.transmission === t ? 'border-burgundy bg-burgundy/5 text-burgundy shadow-sm' : 'border-slate-200 text-slate-500 hover:border-slate-300 hover:bg-slate-50'}`}
+                                                    >
+                                                        {t}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-3">
+                                                <label className="premium-label ml-0">Fuel Type</label>
+                                                <select
+                                                    value={filters.fuel_type}
+                                                    onChange={(e) => setFilters({ ...filters, fuel_type: e.target.value })}
+                                                    className="premium-input bg-slate-50 appearance-none"
+                                                >
+                                                    <option value="">Any Fuel</option>
+                                                    <option value="Gasoline">Gasoline</option>
+                                                    <option value="Diesel">Diesel</option>
+                                                    <option value="Electric">Electric</option>
+                                                    <option value="Hybrid">Hybrid</option>
+                                                </select>
+                                            </div>
+                                            <div className="space-y-3">
+                                                <label className="premium-label ml-0">Drivetrain</label>
+                                                <select
+                                                    value={filters.drivetrain}
+                                                    onChange={(e) => setFilters({ ...filters, drivetrain: e.target.value })}
+                                                    className="premium-input bg-slate-50 appearance-none"
+                                                >
+                                                    <option value="">Any Drive</option>
+                                                    <option value="AWD">AWD</option>
+                                                    <option value="FWD">FWD</option>
+                                                    <option value="RWD">RWD</option>
+                                                    <option value="4WD">4WD</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>

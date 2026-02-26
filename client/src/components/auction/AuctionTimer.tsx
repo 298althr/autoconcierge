@@ -19,12 +19,13 @@ export const AuctionTimer: React.FC<Props> = ({ endTime, onEnd }) => {
                 return;
             }
 
-            const h = Math.floor(diff / 3600000);
-            const m = Math.floor((diff % 3600000) / 60000);
-            const s = Math.floor((diff % 60000) / 1000);
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
 
-            setIsLow(diff < 300000); // Less than 5 mins
-            setTimeLeft(`${h}h ${m}m ${s}s`);
+            setIsLow(diff < 3600000); // Highlight in red when less than 1 hour left
+            setTimeLeft(`${d}d ${h}h ${m}m ${s}s`);
         };
 
         const timer = setInterval(calculate, 1000);

@@ -38,6 +38,9 @@ class AuthService {
                 }
             }
 
+            // Update last login (Crucial Fix for DB Tracking)
+            await query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [user.id]);
+
             const accessToken = generateAccessToken(user);
             const refreshToken = generateRefreshToken(user);
 
@@ -82,6 +85,9 @@ class AuthService {
         if (!isMatch) {
             throw { status: 401, message: 'Invalid credentials' };
         }
+
+        // Update last login (Fix for Image 2)
+        await query('UPDATE users SET last_login_at = NOW() WHERE id = $1', [user.id]);
 
         const accessToken = generateAccessToken(user);
         const refreshToken = generateRefreshToken(user);
