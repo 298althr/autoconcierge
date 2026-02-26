@@ -21,37 +21,38 @@ export function useAuction(auctionId: string, token: string | null) {
 
     useEffect(() => {
         fetchAuction();
-        joinAuction(auctionId);
+        joinAuction?.(auctionId);
 
         if (socket) {
-            socket.on('new_bid', (bidData) => {
+            socket.on('new_bid', (bidData: any) => {
                 setAuction((prev: any) => {
                     if (!prev) return prev;
+                    if (prev.bids?.find((b: any) => b.id === bidData.id)) return prev;
                     return {
                         ...prev,
                         current_price: bidData.amount,
-                        bid_count: bidData.bid_count,
-                        end_time: bidData.end_time,
-                        bids: [bidData, ...prev.bids].slice(0, 50)
+                        bid_count: bidData.bid_count || (prev.bid_count + 1),
+                        end_time: bidData.end_time || prev.end_time,
+                        bids: [bidData, ...(prev.bids || [])].slice(0, 50)
                     };
                 });
             });
 
-            socket.on('auction_status_update', (data) => {
+            socket.on('auction_status_update', (data: any) => {
                 if (data.status === 'extended') {
                     setAuction((prev: any) => ({ ...prev, end_time: data.end_time }));
                 } else {
-                    fetchAuction(); // Refetch on major status changes
+                    fetchAuction();
                 }
             });
         }
 
         return () => {
-            leaveAuction(auctionId);
+            leaveAuction?.(auctionId);
             socket?.off('new_bid');
             socket?.off('auction_status_update');
         };
-    }, [auctionId, socket, fetchAuction]);
+    }, [auctionId, socket, fetchAuction, joinAuction, leaveAuction]);
 
     const placeBid = async (amount: number) => {
         if (!token) throw new Error('Not logged in');
@@ -63,5 +64,15 @@ export function useAuction(auctionId: string, token: string | null) {
         return res.data;
     };
 
-    return { auction, loading, error, placeBid, refetch: fetchAuction };
+    const buyNow = async () => {
+        if (!token) throw new Error('Not logged in');
+        const res = await apiFetch(`/auctions/${auctionId}/buy-now`, {
+            method: 'POST',
+            token
+        });
+        await fetchAuction();
+        return res.data;
+    };
+
+    return { auction, loading, error, placeBid, buyNow, refetch: fetchAuction };
 }

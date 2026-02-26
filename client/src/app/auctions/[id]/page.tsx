@@ -30,7 +30,7 @@ import { motion } from 'framer-motion';
 export default function AuctionRoomPage() {
     const { id } = useParams();
     const { user, token } = useAuth();
-    const { auction, loading, error, placeBid } = useAuction(id as string, token);
+    const { auction, loading, error, placeBid, buyNow } = useAuction(id as string, token);
     const { wallet } = useWallet();
     const [showHistoryModal, setShowHistoryModal] = React.useState(false);
 
@@ -159,7 +159,7 @@ export default function AuctionRoomPage() {
                                     <div className="p-8 bg-slate-50/50 rounded-[2rem] border border-slate-100 text-xs font-medium text-slate-500 leading-relaxed space-y-6">
                                         <div className="flex items-start space-x-4">
                                             <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
-                                            <p className="font-body"><strong>Capital Requirement:</strong> 20% refundable liquid capital required to initiate market position.</p>
+                                            <p className="font-body"><strong>Capital Requirement:</strong> 10% refundable liquid capital required to initiate market position.</p>
                                         </div>
                                         <div className="flex items-start space-x-4">
                                             <div className="w-1.5 h-1.5 rounded-full bg-slate-300 mt-1.5 shrink-0" />
@@ -183,8 +183,10 @@ export default function AuctionRoomPage() {
                                 bidIncrement={auction.bid_increment}
                                 depositPct={auction.deposit_pct}
                                 walletBalance={wallet?.available || 0}
+                                buyNowPrice={auction.buy_now_price}
                                 kycStatus={user?.kyc_status}
                                 onBid={placeBid}
+                                onBuyNow={buyNow}
                                 onViewHistory={() => setShowHistoryModal(true)}
                                 disabled={auction.status !== 'live'}
                             />

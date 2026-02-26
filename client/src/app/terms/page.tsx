@@ -62,7 +62,7 @@ export default function TermsPage() {
                                 <strong>4.1 Network Margin:</strong> Autogaard levies a non-negotiable, flat commission of 5% on the final clearing price of any vehicle traded successfully across the platform. This fee is instantly deducted during the Escrow Settlement Protocol.
                             </p>
                             <p className="text-slate-600 font-body leading-relaxed text-sm">
-                                <strong>4.2 Bidding Capital:</strong> To participate in live auctions, a Client must inject and maintain liquid capital (Wallet Balance) equal to at least 20% of their intended maximum bid, or hold an A-tier authorization token.
+                                <strong>4.2 Bidding Capital:</strong> To participate in live auctions, a Client must inject and maintain liquid capital (Wallet Balance) equal to at least 10% of their intended maximum bid, or hold an A-tier authorization token.
                             </p>
                         </section>
 
