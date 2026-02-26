@@ -35,6 +35,39 @@ export default function ValuationPage() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    const [brands, setBrands] = useState<any[]>([]);
+    const [models, setModels] = useState<any[]>([]);
+    const [engines, setEngines] = useState<any[]>([]);
+
+    const [selectedMakeId, setSelectedMakeId] = useState<string | null>(null);
+    const [selectedModelId, setSelectedModelId] = useState<string | null>(null);
+
+    React.useEffect(() => {
+        apiFetch('/catalog/brands').then(res => {
+            if (res.data) setBrands(res.data);
+        }).catch(console.error);
+    }, []);
+
+    React.useEffect(() => {
+        if (!selectedMakeId) return;
+        setModels([]);
+        setEngines([]);
+        setFormData(prev => ({ ...prev, model: '', trim: '' }));
+        setSelectedModelId(null);
+        apiFetch(`/catalog/models?makeId=${selectedMakeId}`).then(res => {
+            if (res.data) setModels(res.data);
+        }).catch(console.error);
+    }, [selectedMakeId]);
+
+    React.useEffect(() => {
+        if (!selectedModelId) return;
+        setEngines([]);
+        setFormData(prev => ({ ...prev, trim: '' }));
+        apiFetch(`/catalog/engines?modelId=${selectedModelId}`).then(res => {
+            if (res.data) setEngines(res.data);
+        }).catch(console.error);
+    }, [selectedModelId]);
+
     const nextStep = () => setStep(s => s + 1);
     const prevStep = () => setStep(s => s - 1);
 
@@ -106,15 +139,48 @@ export default function ValuationPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="premium-label">Make</label>
-                                    <input type="text" placeholder="e.g. Toyota" value={formData.make} onChange={e => setFormData({ ...formData, make: e.target.value })} className="premium-input" />
+                                    <select
+                                        value={selectedMakeId || ''}
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            setSelectedMakeId(val);
+                                            const bName = brands.find(b => b.id.toString() === val)?.name || '';
+                                            setFormData({ ...formData, make: bName });
+                                        }}
+                                        className="premium-input"
+                                    >
+                                        <option value="">Select Make</option>
+                                        {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                                    </select>
                                 </div>
                                 <div>
                                     <label className="premium-label">Model</label>
-                                    <input type="text" placeholder="e.g. Camry" value={formData.model} onChange={e => setFormData({ ...formData, model: e.target.value })} className="premium-input" />
+                                    <select
+                                        value={selectedModelId || ''}
+                                        onChange={e => {
+                                            const val = e.target.value;
+                                            setSelectedModelId(val);
+                                            const mName = models.find(m => m.id.toString() === val)?.name || '';
+                                            setFormData({ ...formData, model: mName });
+                                        }}
+                                        className="premium-input"
+                                        disabled={!selectedMakeId || models.length === 0}
+                                    >
+                                        <option value="">Select Model</option>
+                                        {models.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                                    </select>
                                 </div>
                                 <div>
-                                    <label className="premium-label">Trim / Variant</label>
-                                    <input type="text" placeholder="e.g. XSE, XLE, SE" value={formData.trim} onChange={e => setFormData({ ...formData, trim: e.target.value })} className="premium-input" />
+                                    <label className="premium-label">Trim / Engine</label>
+                                    <select
+                                        value={formData.trim}
+                                        onChange={e => setFormData({ ...formData, trim: e.target.value })}
+                                        className="premium-input"
+                                        disabled={!selectedModelId || engines.length === 0}
+                                    >
+                                        <option value="">Select Edition</option>
+                                        {engines.map(e => <option key={e.id} value={e.name}>{e.name} {e.specs && `(${e.specs})`}</option>)}
+                                    </select>
                                 </div>
                                 <div>
                                     <label className="premium-label">Year</label>

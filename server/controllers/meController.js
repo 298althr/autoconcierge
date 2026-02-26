@@ -65,15 +65,12 @@ class MeController {
                  SET display_name = COALESCE($1, display_name), 
                      phone = COALESCE($2, phone), 
                      avatar_url = COALESCE($3, avatar_url),
-                     kyc_data = $4
+                     kyc_data = $4,
+                     kyc_status = CASE WHEN kyc_status = 'none' THEN 'verified' ELSE kyc_status END
                  WHERE id = $5
-                 RETURNING id, email, display_name, phone, avatar_url, role, kyc_data`,
+                 RETURNING id, email, display_name, phone, avatar_url, role, kyc_status, kyc_data`,
                 [display_name, phone, avatar_url, JSON.stringify(updatedKycData), req.user.id]
             );
-            res.status(200).json({
-                success: true,
-                data: result.rows[0]
-            });
             res.status(200).json({
                 success: true,
                 data: result.rows[0]

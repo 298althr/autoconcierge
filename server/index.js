@@ -75,6 +75,7 @@ app.use('/api/auctions', require('./routes/auctionRoutes'));
 app.use('/api/me', require('./routes/meRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/catalog', require('./routes/catalogRoutes'));
 
 app.get('/health', async (req, res) => {
     try {
