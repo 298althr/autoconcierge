@@ -3,9 +3,9 @@ const env = require('./env');
 
 const pool = new Pool({
     connectionString: env.DATABASE_URL,
-    max: 20,
+    max: 100, // Scaled for high-concurrency auction bidding
     idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 2000,
+    connectionTimeoutMillis: 10000, // Wait longer for a free client under load
 });
 
 pool.on('error', (err) => {

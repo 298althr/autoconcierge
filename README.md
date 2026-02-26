@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 # Autogaard
-=======
-# AutoConcierge
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 
 Nigeria's most transparent, AI-powered used car marketplace. Real-time auctions, AI market valuations, escrow wallet, and zero trust games.
 
@@ -17,13 +13,8 @@ Nigeria's most transparent, AI-powered used car marketplace. Real-time auctions,
 
 ### 1. Clone the Repository
 ```bash
-<<<<<<< HEAD
 git clone https://github.com/298althr/Autogaard.git
 cd Autogaard
-=======
-git clone https://github.com/298althr/autoconcierge.git
-cd autoconcierge
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 ```
 
 ### 2. Set Up Environment Variables
@@ -49,11 +40,7 @@ npm run seed      # Load vehicle catalog + demo data
 ```
 
 ### 5. Verify Setup
-<<<<<<< HEAD
 - Open `http://localhost:3000` — should see Autogaard landing page
-=======
-- Open `http://localhost:3000` — should see AutoConcierge landing page
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 - Open `http://localhost:4000/health` — should return `{ "status": "ok", "db": "connected" }`
 
 ---
@@ -67,19 +54,15 @@ npm run seed      # Load vehicle catalog + demo data
 | Database | PostgreSQL 16 |
 | Real-time | Socket.IO |
 | Payments | Paystack |
-| AI | Groq (Llama 3.1 70B) |
+| AI | Groq (Llama 3.3 70B) |
 | Images | Cloudinary |
 | Email | SendGrid |
-| Hosting | Render.com |
+| Hosting | Railway.app |
 
 ## Project Structure
 
 ```
-<<<<<<< HEAD
 Autogaard/
-=======
-AutoConcierge/
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28
 ├── client/         # Next.js 14 frontend (TypeScript)
 ├── server/         # Express.js backend (JavaScript)
 ├── docs/           # All documentation
@@ -94,15 +77,12 @@ All documentation lives in `/docs`:
 
 | File | Content |
 |------|---------|
-| `requirements.md` | Problem, users, MVP scope, business rules |
-| `stack.md` | Tech decisions, exclusions, justifications |
-| `pages.md` | All 15 pages, flows, modals, interactions |
+| `tasks.md` | Every task with status + Session history |
+| `validation_checklist.json` | Master Session Intelligence & Achievements |
 | `api.md` | Every API endpoint with request/response contracts |
 | `architecture.md` | System design, DB schema, state machines |
-| `plans.md` | Full implementation plan (9 phases) |
-| `tasks.md` | Every task with status and dependencies |
-| `deployment.md` | Environment variables, Docker, Render deployment |
-| `ai-logs.md` | AI session decision log |
+| `MEMORY.md` | Single source of truth for project state |
+| `HANDOVER.md` | Engineering context for new developers |
 
 ## Available Scripts
 
@@ -114,14 +94,8 @@ npm run dev
 npm run migrate         # Run all migrations
 npm run seed            # Load all seed data
 
-# Testing
-npm run test            # Run all tests
-npm run test:backend    # Backend only
-npm run test:frontend   # Frontend only
-
-# Production build
-npm run build
-npm start
+# Performance Testing
+npm run test:perf       # High-concurrency auction bidding test
 ```
 
 ## Environment Variables
@@ -134,25 +108,8 @@ Copy `.env.example` to `server/.env`. Required keys:
 - `CLOUDINARY_*` — from Cloudinary console
 - `SENDGRID_API_KEY` — from SendGrid
 
-See `docs/deployment.md` for full instructions.
-
-## Contributing / Handover
-
-This project uses **GitHub Issues** for task tracking. Before starting any work:
-1. Check Issues for existing tasks
-2. Read `/docs/tasks.md` for the current status
-3. Check `/docs/plans.md` for the implementation sequence
-4. Review `/docs/ai-logs.md` for architectural decisions
-
-Each Issue references: feature description, linked docs, edge cases, code references.
-
 ---
 
 ## License
 
-<<<<<<< HEAD
 Private. All rights reserved — Autogaard 2026.
-
-=======
-Private. All rights reserved — AutoConcierge 2026.
->>>>>>> fa1aab56098cf80f671cab12a8f3994cad407b28

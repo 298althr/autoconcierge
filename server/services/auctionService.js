@@ -133,6 +133,15 @@ class AuctionService {
                 if ((auction.reserve_price && parseFloat(auction.current_price) < parseFloat(auction.reserve_price)) || !auction.winner_id) {
                     await pool.query("UPDATE auctions SET status = 'unsold' WHERE id = $1", [auction.id]);
                 } else if (auction.winner_id) {
+                    // Start Escrow Process
+                    try {
+                        const escrowService = require('./escrowService');
+                        await escrowService.initiateEscrow(auction.id, auction.winner_id, parseFloat(auction.current_price));
+                        await pool.query("UPDATE auctions SET status = 'sold_pending_70' WHERE id = $1", [auction.id]);
+                    } catch (err) {
+                        console.error('[Escrow Init Error]:', err.message);
+                    }
+
                     // Notify winner
                     try {
                         const winnerRes = await pool.query('SELECT email, display_name FROM users WHERE id = $1', [auction.winner_id]);

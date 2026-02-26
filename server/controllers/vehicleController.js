@@ -40,6 +40,19 @@ class VehicleController {
             next(err);
         }
     }
+
+    async certifyVehicle(req, res, next) {
+        try {
+            const certificationService = require('../services/certificationService');
+            const result = await certificationService.processCertification(req.params.id, req.body);
+            res.status(200).json({
+                success: true,
+                data: result
+            });
+        } catch (err) {
+            next(err);
+        }
+    }
 }
 
 module.exports = new VehicleController();

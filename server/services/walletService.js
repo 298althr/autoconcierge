@@ -18,21 +18,23 @@ class WalletService {
         return result.rows.map(tx => ({ ...tx, amount: parseFloat(tx.amount) }));
     }
 
-    async executeTransaction(userId, { type, amount, status = 'completed', description, paystack_ref }) {
+    async executeTransaction(userId, { type, amount, status = 'completed', description, paystack_ref, escrow_id }, externalClient = null) {
         // Enforce KYC for outgoing or funding transactions above threshold
-        if (['funding', 'bid_hold', 'purchase'].includes(type)) {
+        if (['funding', 'bid_hold', 'purchase', 'escrow_hold'].includes(type)) {
             await kycService.enforceKYC(userId, amount);
         }
 
-        const client = await pool.connect();
+        const client = externalClient || await pool.connect();
+        const shouldHandleTransaction = !externalClient;
+
         try {
-            await client.query('BEGIN');
+            if (shouldHandleTransaction) await client.query('BEGIN');
             let newBalance;
             if (status === 'processing') {
                 const userRes = await client.query('SELECT wallet_balance FROM users WHERE id = $1', [userId]);
                 newBalance = parseFloat(userRes.rows[0].wallet_balance);
                 const txRes = await client.query('INSERT INTO transactions (user_id, type, amount, balance_after, status, description, paystack_ref) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [userId, type, amount, newBalance, status, description, paystack_ref]);
-                await client.query('COMMIT');
+                if (shouldHandleTransaction) await client.query('COMMIT');
                 return txRes.rows[0];
             } else {
                 const userRes = await client.query('SELECT wallet_balance, held_amount FROM users WHERE id = $1 FOR UPDATE', [userId]);
@@ -41,22 +43,31 @@ class WalletService {
                 newBalance = curBal;
                 let newHeld = curHeld;
                 if (type === 'funding') newBalance += amount;
-                else if (type === 'bid_hold') {
+                else if (type === 'bid_hold' || type === 'escrow_hold') {
                     if (curBal < amount) throw { status: 400, message: 'Insufficient balance' };
                     newBalance -= amount;
                     newHeld += amount;
                 }
-                else if (type === 'bid_release') {
+                else if (type === 'bid_release' || type === 'escrow_release' || type === 'escrow_refund') {
                     if (curHeld < amount) throw { status: 400, message: 'Insufficient held funds' };
+                    // If release, the money goes to the account balance
                     newBalance += amount;
                     newHeld -= amount;
                 }
                 await client.query('UPDATE users SET wallet_balance = $1, held_amount = $2 WHERE id = $3', [newBalance, newHeld, userId]);
-                const txRes = await client.query('INSERT INTO transactions (user_id, type, amount, balance_after, status, description, paystack_ref) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *', [userId, type, amount, newBalance, status, description, paystack_ref]);
-                await client.query('COMMIT');
+                const txRes = await client.query(
+                    'INSERT INTO transactions (user_id, type, amount, balance_after, status, description, paystack_ref, escrow_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+                    [userId, type, amount, newBalance, status, description, paystack_ref, escrow_id]
+                );
+                if (shouldHandleTransaction) await client.query('COMMIT');
                 return txRes.rows[0];
             }
-        } catch (err) { await client.query('ROLLBACK'); throw err; } finally { client.release(); }
+        } catch (err) {
+            if (shouldHandleTransaction) await client.query('ROLLBACK');
+            throw err;
+        } finally {
+            if (shouldHandleTransaction) client.release();
+        }
     }
 
     async updateManualFunding(id, status) {

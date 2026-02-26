@@ -6,7 +6,16 @@ const connectionString = "postgresql://postgres:pSqGlclZvUKMLiQXQeiccKYhanHzeRys
 const pool = new Pool({ connectionString });
 
 async function runMaintenance() {
-    console.log('--- Reseeding with 20 Unique Auctions (No Duplicate Photos) ---');
+    // List of target models for the seed
+    const targetModels = [
+        { make: 'Toyota', models: ['Camry', 'Corolla', 'RAV4', 'Hilux', 'Highlander', 'Sienna'] },
+        { make: 'Honda', models: ['Accord', 'Civic'] },
+        { make: 'Lexus', models: ['IS', 'RX', 'ES', 'GX'] },
+        { make: 'Mercedes-Benz', models: ['C-Class', 'GLE', 'GLK', 'ML'] },
+        { make: 'Hyundai', models: ['Sonata', 'Elantra'] }
+    ];
+
+    console.log('--- Reseeding with 20 Targeted Market-Relevant Auctions ---');
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
@@ -18,69 +27,104 @@ async function runMaintenance() {
 
         // 2. Clear Existing Demo Data
         console.log('  -> Clearing previous demo data...');
-        // Delete all auctions and vehicles created by Super Admin to reset
         await client.query('DELETE FROM auctions WHERE created_by = $1', [saId]);
         await client.query('DELETE FROM vehicles WHERE listed_by = $1', [saId]);
 
-        // 3. Search for 20 Unique Vehicles with Distinct Photos
-        console.log('  -> Querying automobiles for 20 unique cars with unique photos...');
+        // 3. Find Targeted Vehicles
+        console.log('  -> Extracting targeted models with unique photos from automobiles table...');
 
-        // This query finds vehicles with distinct photos.
-        // We use split_part or similar if photos is a string, but here it seems to be stored consistently.
-        const vehicleSet = await client.query(`
-            SELECT DISTINCT ON (a.photos) 
-                a.id, a.name, a.photos, b.name as make, e.specs
-            FROM automobiles a
-            JOIN brands b ON a.brand_id = b.id
-            LEFT JOIN engines e ON a.id = e.automobile_id
-            WHERE a.photos IS NOT NULL 
-              AND a.photos != '[]' 
-              AND a.photos != ''
-              AND a.photos != '[""]'
-            ORDER BY a.photos, a.id
-            LIMIT 20
-        `);
+        let allUniqueRows = [];
+        let usedPhotos = new Set();
 
-        if (vehicleSet.rows.length < 20) {
-            console.warn(`Only found ${vehicleSet.rows.length} unique records. Seeding what we have.`);
+        for (const brand of targetModels) {
+            for (const modelName of brand.models) {
+                const res = await client.query(`
+                    SELECT a.id, a.name, a.photos, b.name as brand_name, e.specs
+                    FROM automobiles a
+                    JOIN brands b ON a.brand_id = b.id
+                    LEFT JOIN engines e ON a.id = e.automobile_id
+                    WHERE b.name ILIKE $1 
+                      AND a.name ILIKE $2
+                      AND a.photos IS NOT NULL 
+                      AND a.photos != '[]' 
+                      AND a.photos != ''
+                    ORDER BY a.photos, a.id
+                `, [brand.make, `%${modelName}%`]);
+
+                for (const row of res.rows) {
+                    if (allUniqueRows.length >= 20) break;
+                    if (!usedPhotos.has(row.photos)) {
+                        allUniqueRows.push(row);
+                        usedPhotos.add(row.photos);
+                        break; // Grab one unique instance per model if possible
+                    }
+                }
+                if (allUniqueRows.length >= 20) break;
+            }
+            if (allUniqueRows.length >= 20) break;
+        }
+
+        // Fallback: If we don't have enough, grab some generic ones
+        if (allUniqueRows.length < 20) {
+            const fallback = await client.query(`
+                SELECT DISTINCT ON (a.photos) a.id, a.name, a.photos, b.name as brand_name, e.specs
+                FROM automobiles a
+                JOIN brands b ON a.brand_id = b.id
+                LEFT JOIN engines e ON a.id = e.automobile_id
+                WHERE a.photos IS NOT NULL AND a.photos != '[]' AND a.photos != ''
+                ORDER BY a.photos, a.id
+                LIMIT $1
+            `, [20 - allUniqueRows.length]);
+            allUniqueRows.push(...fallback.rows);
+        }
+
+        // 2b. Create Dummy Sellers
+        console.log('  -> Creating dummy sellers...');
+        const sellers = [];
+        const sellerEmails = ['premium_imports@dealer.com', 'lagos_luxury@dealer.com', 'auto_concierge_ng@dealer.com', 'heritage_motors@dealer.com', 'sigma_auto@dealer.com'];
+        for (const email of sellerEmails) {
+            let sRes = await client.query("SELECT id FROM users WHERE email = $1", [email]);
+            if (sRes.rows.length === 0) {
+                const dummyHash = '$2a$10$Xm8O.DovBntP.qD.Yv.mO.Yv.mO.Yv.mO.Yv.mO.Yv.mO.Yv.m'; // Dummy hash
+                sRes = await client.query("INSERT INTO users (email, display_name, role, kyc_status, password_hash) VALUES ($1, $2, 'user', 'verified', $3) RETURNING id", [email, email.split('@')[0].toUpperCase(), dummyHash]);
+            }
+            sellers.push(sRes.rows[0].id);
         }
 
         const now = new Date();
-        const end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
+        const end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-        for (let i = 0; i < vehicleSet.rows.length; i++) {
-            const row = vehicleSet.rows[i];
-            const make = row.make;
+        for (let i = 0; i < allUniqueRows.length; i++) {
+            const row = allUniqueRows[i];
+            const make = row.brand_name;
             const model = row.name;
+            const ownerId = sellers[i % sellers.length];
 
-            // 1. Get or Create Catalog Entry
+            // Get/Create Catalog
             let catRes = await client.query("SELECT id FROM vehicle_catalog WHERE make ILIKE $1 AND model ILIKE $2 LIMIT 1", [make, `%${model}%`]);
             let catId;
-
             if (catRes.rows.length > 0) {
                 catId = catRes.rows[0].id;
             } else {
-                // Insert into catalog if missing
                 const insertCat = await client.query(`
                     INSERT INTO vehicle_catalog (make, model, year_start, year_end, body_type, transmission, fuel_type)
                     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id
-                `, [make, model, 2015, 2024, 'Sedan', 'Automatic', 'Gasoline']);
+                `, [make, model, 2018, 2024, 'Sedan/SUV', 'Automatic', 'Gasoline/Petrol']);
                 catId = insertCat.rows[0].id;
             }
 
-            // 2. Parse Photos
+            // Photo Parsing
             let images = [];
             try {
-                const parsed = JSON.parse(row.photos);
-                images = Array.isArray(parsed) ? parsed : [parsed];
+                images = JSON.parse(row.photos);
+                if (!Array.isArray(images)) images = [images];
             } catch (e) {
                 images = row.photos.split(',').map(u => u.trim().replace(/^"|"$/g, '').replace(/\\/g, ''));
             }
-            // Ensure photos are valid URLs
             images = images.filter(img => img.startsWith('http')).slice(0, 10);
-            if (images.length === 0) images = ['https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800'];
+            if (images.length === 0) images = ['https://images.unsplash.com/photo-1542362567-b055002b91f4?w=800'];
 
-            // 3. Flatten Specs
+            // Spec Flattening
             let specs = {};
             if (row.specs) {
                 const s = (typeof row.specs === 'string') ? JSON.parse(row.specs) : row.specs;
@@ -89,39 +133,32 @@ async function runMaintenance() {
                 if (s["Transmission Specs"]) Object.assign(flattened, s["Transmission Specs"]);
                 if (s["General Specs"]) Object.assign(flattened, s["General Specs"]);
 
-                // Keep only a few key specs for "Asset Overview"
-                const keysToKeep = ["Cylinders:", "Displacement:", "Horsepower:", "Torque:", "Gearbox:", "Drive Type:", "Top Speed:"];
-                for (const k of keysToKeep) {
-                    if (flattened[k]) specs[k.replace(':', '')] = flattened[k];
-                }
+                const keys = ["Cylinders:", "Displacement:", "Horsepower:", "Torque:", "Gearbox:", "Drive Type:"];
+                for (const k of keys) { if (flattened[k]) specs[k.replace(':', '')] = flattened[k]; }
             }
-            if (Object.keys(specs).length === 0) {
-                specs = { "Engine": "V6 Turbo", "Transmission": "8-Speed Auto", "Drivetrain": "AWD" };
-            }
-
-            // Update Catalog with these specific specs
+            if (Object.keys(specs).length === 0) specs = { "Engine": "V6", "Transmission": "Auto", "Drivetrain": "FWD" };
             await client.query("UPDATE vehicle_catalog SET specs = $1 WHERE id = $2", [JSON.stringify(specs), catId]);
 
-            const price = (Math.floor(Math.random() * 40) + 10) * 1000000;
+            const price = (Math.floor(Math.random() * 30) + 12) * 1000000;
             const vin = Math.random().toString(36).substring(2, 17).toUpperCase();
 
-            // 4. Insert Vehicle
+            // Insert Vehicle
             const veh = await client.query(
-                `INSERT INTO vehicles (catalog_id, listed_by, vin, year, make, model, condition, mileage_km, price, status, location, images) 
-                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`,
-                [catId, saId, vin, 2018 + (i % 6), make, model, 'foreign_used', 15000 + (i * 2000), price, 'in_auction', 'Lagos Hub', JSON.stringify(images)]
+                `INSERT INTO vehicles (catalog_id, listed_by, owner_id, vin, year, make, model, condition, mileage_km, price, status, location, images) 
+                 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`,
+                [catId, saId, ownerId, vin, 2019 + (i % 5), make, model, 'foreign_used', 25000 + (i * 1500), price, 'in_auction', 'Lagos Hub', JSON.stringify(images)]
             );
 
-            // 5. Insert Auction (Remove specs column insertion as it doesn't exist in auctions table)
+            // Insert Auction
             await client.query(
                 `INSERT INTO auctions (vehicle_id, created_by, start_price, reserve_price, current_price, status, start_time, end_time, bid_count) 
                  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-                [veh.rows[0].id, saId, price, price * 0.9, price, 'live', now, end, Math.floor(Math.random() * 5)]
+                [veh.rows[0].id, ownerId, price, price * 0.9, price, 'live', now, end, Math.floor(Math.random() * 8)]
             );
         }
 
         await client.query('COMMIT');
-        console.log(`✅ Successfully seeded ${vehicleSet.rows.length} unique auctions with different cars and distinct photos.`);
+        console.log(`✅ Successfully reseeded with 20 targeted, high-demand auctions.`);
     } catch (err) {
         await client.query('ROLLBACK');
         console.error('❌ Error:', err);

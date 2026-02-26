@@ -72,6 +72,7 @@ app.use('/api/upload', require('./routes/uploadRoutes'));
 app.use('/api/catalog', require('./routes/catalogRoutes'));
 app.use('/api/concierge', require('./routes/conciergeRoutes'));
 app.use('/api/blog', require('./routes/blogRoutes'));
+app.use('/api/escrow', require('./routes/escrowRoutes'));
 
 app.get('/health', async (req, res) => {
     try {
@@ -117,7 +118,11 @@ setInterval(async () => {
 
 app.use(errorHandler);
 
-const PORT = env.PORT;
-server.listen(PORT, () => {
-    console.log('Server running on port ' + PORT);
-});
+if (process.env.NODE_ENV !== 'test') {
+    const PORT = env.PORT || 4000;
+    server.listen(PORT, () => {
+        console.log('Server running on port ' + PORT);
+    });
+}
+
+module.exports = app;

@@ -31,8 +31,8 @@ class BidService {
             const minBid = currentPrice + parseFloat(auction.bid_increment);
             if (amount < minBid) throw { status: 400, message: `Min bid is ₦${minBid.toLocaleString()}` };
 
-            // 3. Handle Wallet Hold (20% deposit)
-            const depositAmount = amount * (parseFloat(auction.deposit_pct) / 100);
+            // 3. Handle Wallet Hold (10% commitment hold)
+            const depositAmount = amount * 0.10;
 
             // Check if this user already has a pending hold for this auction
             const prevBidRes = await client.query('SELECT amount FROM bids WHERE auction_id = $1 AND user_id = $2 AND is_winning = true', [auctionId, userId]);
@@ -44,7 +44,7 @@ class BidService {
                 type: 'bid_hold',
                 amount: depositAmount,
                 description: `Bid deposit for Auction #${auctionId.slice(0, 8)}`
-            });
+            }, client);
 
             // 4. If there was a previous winner, release their hold and notify them
             if (auction.winner_id && auction.winner_id !== userId) {
@@ -58,7 +58,7 @@ class BidService {
                         type: 'bid_release',
                         amount: prevHold,
                         description: `Deposit release (Outbid) for Auction #${auctionId.slice(0, 8)}`
-                    });
+                    }, client);
 
                     // Notify previous winner
                     if (prevWinnerEmail) {
