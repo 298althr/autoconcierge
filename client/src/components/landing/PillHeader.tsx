@@ -25,9 +25,9 @@ const PillHeader = () => {
                         <Image
                             src="/autogaard-logo.png"
                             alt="Autogaard"
-                            width={220}
-                            height={60}
-                            className="h-8 sm:h-10 w-auto object-contain"
+                            width={240}
+                            height={65}
+                            className="h-10 sm:h-12 w-auto object-contain"
                             priority
                         />
                     </Link>
