@@ -21,8 +21,6 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import PremiumButton from '@/components/ui/PremiumButton';
-import PillHeader from '@/components/landing/PillHeader';
-import MotionBackground from '@/components/landing/MotionBackground';
 
 const upgrades = [
     {
@@ -91,9 +89,7 @@ export default function PerformanceHub() {
     const roiResult = calculateROI();
 
     return (
-        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-32 pb-20 px-6">
-            <MotionBackground />
-            <PillHeader />
+        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-8 pb-20 px-6">
 
             <div className="max-w-4xl mx-auto relative z-10">
                 <header className="mb-12">

@@ -25,8 +25,6 @@ import Link from 'next/link';
 import { useNotifications } from '@/context/NotificationContext';
 import { useAuth } from '@/context/AuthContext';
 import { formatDistanceToNow } from 'date-fns';
-import PillHeader from '@/components/landing/PillHeader';
-import MotionBackground from '@/components/landing/MotionBackground';
 
 const getIcon = (type: string) => {
     switch (type) {
@@ -69,9 +67,7 @@ export default function NotificationsPage() {
     });
 
     return (
-        <main className="relative min-h-screen bg-canvas selection:bg-burgundy selection:text-white pb-32 pt-24 md:pt-32">
-            <MotionBackground />
-            <PillHeader />
+        <main className="relative min-h-screen bg-canvas selection:bg-burgundy selection:text-white pb-32 pt-8">
 
             <div className="max-w-4xl mx-auto px-6 relative z-10">
                 <header className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -102,8 +98,8 @@ export default function NotificationsPage() {
                                 key={tab}
                                 onClick={() => setFilter(tab)}
                                 className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${filter === tab
-                                        ? 'bg-slate-900 text-white shadow-lg shadow-black/10'
-                                        : 'text-slate-400 hover:text-slate-900 hover:bg-white'
+                                    ? 'bg-slate-900 text-white shadow-lg shadow-black/10'
+                                    : 'text-slate-400 hover:text-slate-900 hover:bg-white'
                                     }`}
                             >
                                 {tab}

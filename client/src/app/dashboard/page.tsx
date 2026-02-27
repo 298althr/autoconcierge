@@ -108,7 +108,7 @@ export default function DashboardHome() {
 
             {/* Quick Actions */}
             <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
-                <Link href="/valuation" className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-burgundy/30 group transition-all flex flex-col justify-between min-h-[120px]">
+                <Link href="/valuation/wizard" className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-burgundy/30 group transition-all flex flex-col justify-between min-h-[120px]">
                     <div className="w-10 h-10 rounded-full bg-burgundy/5 flex items-center justify-center mb-4 group-hover:bg-burgundy group-hover:scale-110 transition-all">
                         <Zap size={20} className="text-burgundy group-hover:text-white transition-colors" />
                     </div>

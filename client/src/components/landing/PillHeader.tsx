@@ -7,9 +7,16 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 
+import { usePathname } from 'next/navigation';
+
 const PillHeader = () => {
+    const pathname = usePathname();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { user, isLoading } = useAuth();
+
+    // Do not show PillHeader on dashboard pages as they have their own specialized navbar
+    // Also, per user requirement, PillHeader should only be visible for non-logged-in users
+    if (pathname?.startsWith('/dashboard') || (!isLoading && user)) return null;
 
     return (
         <>

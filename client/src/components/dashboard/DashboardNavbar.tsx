@@ -23,15 +23,15 @@ export default function DashboardNavbar() {
         <>
             {/* Desktop Top Navbar & Mobile Top Header */}
             <header className="fixed top-0 left-0 w-full bg-white/10 backdrop-blur-xl border-b border-white/20 z-50 md:sticky">
-                <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between relative">
+                <div className="max-w-7xl mx-auto px-4 md:px-8 h-20 flex items-center justify-between relative">
                     {/* Brand Logo */}
                     <Link href="/dashboard" className="relative z-10 flex items-center">
                         <Image
                             src="/autogaard-logo.png"
                             alt="Autogaard"
-                            width={220}
-                            height={55}
-                            className="h-12 w-auto object-contain"
+                            width={320}
+                            height={80}
+                            className="h-20 w-auto object-contain"
                             priority
                         />
                     </Link>
@@ -49,7 +49,7 @@ export default function DashboardNavbar() {
                                     <Link
                                         key={item.href}
                                         href={item.href}
-                                        className={`relative flex items-center px-4 h-16 transition-all duration-300 group ${isActive ? 'text-burgundy' : 'text-onyx-light hover:text-onyx'}`}
+                                        className={`relative flex items-center px-4 h-20 transition-all duration-300 group ${isActive ? 'text-burgundy' : 'text-onyx-light hover:text-onyx'}`}
                                     >
                                         <Icon size={18} className="mr-2" />
                                         <span className="text-sm font-bold">{item.label}</span>
@@ -107,7 +107,7 @@ export default function DashboardNavbar() {
             </nav>
 
             {/* Spacer for fixed top header on mobile */}
-            <div className="h-16 md:hidden" />
+            <div className="h-20 md:hidden" />
         </>
     );
 }
