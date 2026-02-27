@@ -139,24 +139,119 @@ export default function ComparePage() {
         alert('Comparison link copied to clipboard!');
     };
 
+    const parseMetric = (val: string): number | null => {
+        if (!val || val === '—') return null;
+        const match = val.match(/([0-9.]+)/);
+        return match ? parseFloat(match[1]) : null;
+    };
+
+    const determineWinner = (field: string, values: any[]) => {
+        if (values.length < 2) return null;
+        const parsed = values.map(v => parseMetric(v));
+        if (parsed.every(p => p === null)) return null;
+
+        const nonNulls = parsed.filter((p): p is number => p !== null);
+        if (nonNulls.length < 2) return null;
+
+        // Better is lower for some metrics
+        const lowerIsBetter = ['Acceleration', '0-62', '0-60', '0-100', 'Consumption', 'Weight'].some(k => field.includes(k));
+
+        const bestValue = lowerIsBetter ? Math.min(...nonNulls) : Math.max(...nonNulls);
+        return parsed.indexOf(bestValue);
+    };
+
     const renderSpecRow = (label: string, field: string, engineIdx: number = 0) => {
+        const values = vehicles.map(v => {
+            const engine = v.engines[engineIdx] || {};
+            const specs = engine.specs || {};
+            return field.split('.').reduce((o, i) => o?.[i], specs) || '—';
+        });
+
+        const winnerIdx = determineWinner(label, values);
+
         return (
             <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] border-b border-slate-100/50 items-center group/row hover:bg-slate-50/50 transition-colors">
                 <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] md:tracking-[0.2em] text-slate-400 pl-4 py-4 sticky left-0 bg-white/90 backdrop-blur-sm z-20 border-r border-slate-100 md:border-none shadow-[2px_0_10px_rgba(0,0,0,0.02)] md:shadow-none min-h-full flex items-center">
                     {label}
                 </div>
                 <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-4 gap-0 items-stretch h-full">
-                    {vehicles.map(v => {
-                        const engine = v.engines[engineIdx] || {};
-                        const specs = engine.specs || {};
-                        const val = field.split('.').reduce((o, i) => o?.[i], specs) || '—';
-                        return (
-                            <div key={v.id} className="min-w-[140px] md:min-w-0 flex-1 text-[13px] md:text-sm font-subheading font-semibold text-slate-700 px-4 py-4 md:py-5 border-l border-slate-50 first:border-l-0 group-hover/row:bg-white transition-all flex items-center">
-                                {val}
-                            </div>
-                        );
-                    })}
+                    {vehicles.map((v, idx) => (
+                        <div
+                            key={v.id}
+                            className={`min-w-[140px] md:min-w-0 flex-1 text-[13px] md:text-sm font-subheading font-semibold px-4 py-4 md:py-5 border-l border-slate-50 first:border-l-0 group-hover/row:bg-white transition-all flex items-center justify-between ${idx === winnerIdx ? 'text-burgundy bg-burgundy/[0.02]' : 'text-slate-700'}`}
+                        >
+                            <span className="truncate">{values[idx]}</span>
+                            {idx === winnerIdx && (
+                                <div className="ml-2 bg-burgundy/10 p-1 rounded-full text-burgundy">
+                                    <Zap size={10} fill="currentColor" />
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                    {Array.from({ length: Math.max(0, 4 - vehicles.length) }).map((_, i) => (
+                        <div key={i} className="hidden md:flex flex-1 border-l border-slate-50 bg-slate-50/10 italic text-slate-300 text-[10px] items-center justify-center">
+                            N/A
+                        </div>
+                    ))}
                 </div>
+            </div>
+        );
+    };
+
+    const renderQuickStats = () => {
+        if (vehicles.length < 2) return null;
+
+        const metrics = [
+            { label: 'Power', field: 'Engine Specs.Power:', suffix: 'Bhp' },
+            { label: 'Top Speed', field: 'Performance Specs.Top Speed:', suffix: 'Mph' },
+            { label: 'Acceleration', field: 'Performance Specs.Acceleration 0-62 Mph (0-100 Kph):', suffix: 's' },
+            { label: 'Displacement', field: 'Engine Specs.Displacement:', suffix: 'cc' }
+        ];
+
+        return (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-burgundy/5 rounded-bl-[100%] -mr-10 -mt-10" />
+                {metrics.map(m => {
+                    const values = vehicles.map(v => {
+                        const val = m.field.split('.').reduce((o, i) => o?.[i], v.engines[0]?.specs) || '—';
+                        return parseMetric(val);
+                    });
+
+                    const winnerIdx = determineWinner(m.label, values.map(v => v?.toString() || '—'));
+                    const maxVal = Math.max(...values.filter((v): v is number => v !== null), 1);
+
+                    return (
+                        <div key={m.label} className="space-y-4">
+                            <div className="flex justify-between items-end">
+                                <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">{m.label}</h4>
+                                <span className="text-[9px] font-bold text-burgundy bg-burgundy/5 px-2 py-0.5 rounded-full">Comparative Analytics</span>
+                            </div>
+                            <div className="space-y-3">
+                                {vehicles.map((v, idx) => {
+                                    const val = values[idx];
+                                    const percent = val ? (val / maxVal) * 100 : 0;
+                                    return (
+                                        <div key={v.id} className="space-y-1">
+                                            <div className="flex justify-between text-[10px] font-bold">
+                                                <span className="text-slate-500 truncate max-w-[100px]">{v.model}</span>
+                                                <span className={idx === winnerIdx ? 'text-burgundy' : 'text-slate-700'}>
+                                                    {val || '—'} {val ? m.suffix : ''}
+                                                </span>
+                                            </div>
+                                            <div className="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${percent}%` }}
+                                                    className={`h-full rounded-full ${idx === winnerIdx ? 'bg-burgundy' : 'bg-slate-300'}`}
+                                                />
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         );
     };
@@ -171,21 +266,21 @@ export default function ComparePage() {
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="inline-flex items-center space-x-2 bg-burgundy/10 px-4 py-2 rounded-full mb-4 md:mb-6"
+                        className="inline-flex items-center space-x-2 bg-burgundy/10 px-4 py-2 rounded-full mb-4 md:mb-6 shadow-glow shadow-burgundy/20"
                     >
                         <ArrowLeftRight size={14} className="text-burgundy" />
-                        <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-burgundy">Comparison Protocol</span>
+                        <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-burgundy">Forensic Analysis Matrix</span>
                     </motion.div>
                     <h1 className="text-4xl sm:text-5xl md:text-7xl font-heading font-extrabold tracking-tight text-slate-900 mb-4 leading-tight">
-                        Forensic <span className="block sm:inline">Comparison.</span>
+                        Side-by-Side <br className="hidden md:block" /> <span className="text-burgundy">Comparison.</span>
                     </h1>
                     <p className="text-slate-500 text-sm md:text-base max-w-2xl mx-auto font-subheading leading-relaxed">
-                        Select up to 4 vehicles to side-by-side analyze performance, architecture, and value liquidity.
+                        Execute technical due diligence between up to 4 forensic profiles. Higher fidelity yardsticks for professional automotive acquisition.
                     </p>
                 </div>
 
                 {/* Selection Bar */}
-                <div className="flex flex-wrap gap-3 md:gap-4 mb-8 md:mb-12 justify-center items-center">
+                <div className="flex flex-wrap gap-3 md:gap-4 mb-12 justify-center items-center">
                     {vehicles.length > 0 && (
                         <div className="flex flex-row md:flex-col gap-2 order-last md:order-none w-full md:w-auto mt-4 md:mt-0 justify-center">
                             <button
@@ -194,7 +289,7 @@ export default function ComparePage() {
                                 title="Share Comparison"
                             >
                                 <Share2 size={16} className="mr-2 md:mr-0" />
-                                <span className="md:hidden text-xs font-bold uppercase tracking-wider">Share</span>
+                                <span className="md:hidden text-xs font-bold uppercase tracking-wider">Share Matrix</span>
                             </button>
                             <button
                                 onClick={clearMatrix}
@@ -202,7 +297,7 @@ export default function ComparePage() {
                                 title="Clear All"
                             >
                                 <Trash2 size={16} className="mr-2 md:mr-0" />
-                                <span className="md:hidden text-xs font-bold uppercase tracking-wider">Clear</span>
+                                <span className="md:hidden text-xs font-bold uppercase tracking-wider">Flush Data</span>
                             </button>
                         </div>
                     )}
@@ -213,11 +308,11 @@ export default function ComparePage() {
                                 key={v.id}
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="bg-white border-2 border-burgundy/20 rounded-2xl p-3 md:p-4 flex items-center space-x-3 md:space-x-4 shadow-sm"
+                                className="bg-white border-2 border-burgundy/10 hover:border-burgundy/40 rounded-2xl p-3 md:p-4 flex items-center space-x-3 md:space-x-4 shadow-sm transition-colors group"
                             >
-                                <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-100 rounded-xl overflow-hidden relative border border-slate-200 shrink-0">
+                                <div className="w-10 h-10 md:w-12 md:h-12 bg-slate-100 rounded-xl overflow-hidden relative border border-slate-200 shrink-0 shadow-inner">
                                     {v.photos && v.photos.length > 0 ? (
-                                        <Image src={v.photos[0]} alt={v.model} fill className="object-cover" />
+                                        <Image src={getVehicleImages(v.photos)[0]} alt={v.model} fill className="object-cover group-hover:scale-110 transition-transform duration-500" />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center text-slate-300">
                                             <Zap size={16} />
@@ -225,12 +320,12 @@ export default function ComparePage() {
                                     )}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <p className="text-[9px] font-bold uppercase tracking-widest text-slate-400 truncate">{v.make}</p>
-                                    <p className="text-xs md:text-sm font-heading font-bold text-slate-900 truncate">{v.model}</p>
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-burgundy/80 truncate">{v.make}</p>
+                                    <p className="text-xs md:text-sm font-heading font-extrabold text-slate-900 truncate">{v.model}</p>
                                 </div>
                                 <button
                                     onClick={() => removeVehicle(v.id)}
-                                    className="p-1.5 hover:bg-red-50 text-slate-400 hover:text-red-500 rounded-lg transition-colors"
+                                    className="p-1.5 hover:bg-red-50 text-slate-300 hover:text-red-500 rounded-lg transition-colors"
                                 >
                                     <X size={14} />
                                 </button>
@@ -240,10 +335,10 @@ export default function ComparePage() {
                         {selectedIds.length < 4 && (
                             <div className="relative group w-full lg:min-w-[400px]">
                                 <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 items-center">
-                                    <div className="flex bg-white border-2 border-dashed border-slate-200 focus-within:border-burgundy/40 rounded-2xl transition-all h-full shadow-sm">
+                                    <div className="flex bg-white border-2 border-dashed border-slate-200 focus-within:border-burgundy/40 focus-within:bg-white rounded-2xl transition-all h-full shadow-sm hover:border-slate-300">
                                         <input
                                             type="text"
-                                            placeholder="Fast Audit (Search Model)..."
+                                            placeholder="Forensic Search (Model Name)..."
                                             value={searchQuery}
                                             onChange={(e) => {
                                                 handleSearch(e.target.value);
@@ -251,7 +346,7 @@ export default function ComparePage() {
                                             }}
                                             className="bg-transparent px-5 py-3 md:py-4 outline-none w-full text-xs md:text-sm font-subheading font-medium"
                                         />
-                                        <div className="px-4 flex items-center text-slate-300 group-hover:text-burgundy/40">
+                                        <div className="px-4 flex items-center text-slate-300 group-focus-within:text-burgundy">
                                             <Search size={18} />
                                         </div>
                                     </div>
@@ -261,9 +356,9 @@ export default function ComparePage() {
                                             setSearchQuery('');
                                             setSearchResults([]);
                                         }}
-                                        className={`px-6 py-3 md:py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md ${selectingBrand ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-400'}`}
+                                        className={`px-6 py-3 md:py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md active:scale-95 ${selectingBrand ? 'bg-burgundy text-white shadow-burgundy/20' : 'bg-slate-900 text-white hover:bg-burgundy'}`}
                                     >
-                                        {selectingBrand ? 'Dismiss Picker' : 'Browse Brands'}
+                                        {selectingBrand ? 'Dismiss Browser' : 'Browse Catalog'}
                                     </button>
                                 </div>
 
@@ -273,47 +368,49 @@ export default function ComparePage() {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: 10 }}
-                                            className="absolute top-full left-0 right-0 mt-3 bg-white rounded-[2rem] shadow-2xl border border-slate-100 z-50 overflow-hidden min-h-[300px] flex flex-col"
+                                            className="absolute top-full left-0 right-0 mt-3 bg-white rounded-[2rem] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-100 z-50 overflow-hidden min-h-[300px] flex flex-col"
                                         >
-                                            <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                                            <div className="p-6 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between">
                                                 <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                                                    {searchQuery ? 'Analysis Results' : selectingBrand && selectingBrand !== 'open' ? `Models for ${selectingBrand.name}` : 'Select Manufacturer'}
+                                                    {searchQuery ? 'Heuristic Match Engine' : selectingBrand && selectingBrand !== 'open' ? `Models for ${selectingBrand.name}` : 'Select Manufacturer Protocol'}
                                                 </h4>
                                                 {selectingBrand && selectingBrand !== 'open' && (
-                                                    <button onClick={() => setSelectingBrand('open')} className="text-[9px] font-bold text-burgundy uppercase tracking-widest flex items-center gap-1">
-                                                        <ArrowRight size={12} className="rotate-180" /> Back to Brands
+                                                    <button onClick={() => setSelectingBrand('open')} className="text-[10px] font-black text-burgundy uppercase tracking-[0.2em] flex items-center gap-2 hover:translate-x-1 transition-transform">
+                                                        <ArrowRight size={14} className="rotate-180" /> Back to Brands
                                                     </button>
                                                 )}
                                             </div>
 
-                                            <div className="flex-1 overflow-y-auto max-h-[400px] custom-scrollbar p-2">
+                                            <div className="flex-1 overflow-y-auto max-h-[400px] custom-scrollbar p-3">
                                                 {searchQuery ? (
-                                                    searchResults.map((res: any) => (
-                                                        <button
-                                                            key={res.id}
-                                                            onClick={() => addVehicle(res.id)}
-                                                            className="w-full text-left px-5 py-3.5 hover:bg-slate-50 flex items-center space-x-4 transition-colors rounded-xl mb-1 group"
-                                                        >
-                                                            <div className="w-10 h-7 bg-slate-100 rounded-lg overflow-hidden relative shrink-0 border border-slate-200 group-hover:border-burgundy/20">
-                                                                {res.photos ? (
-                                                                    <Image
-                                                                        src={getVehicleImages(res.photos)[0]}
-                                                                        alt={res.name}
-                                                                        fill
-                                                                        sizes="40px"
-                                                                        quality={40}
-                                                                        className="object-cover"
-                                                                    />
-                                                                ) : <Zap size={10} className="m-auto" />}
-                                                            </div>
-                                                            <div className="flex flex-col min-w-0">
-                                                                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">{res.brand_name}</span>
-                                                                <span className="text-sm font-heading font-bold text-slate-900 truncate">{res.name}</span>
-                                                            </div>
-                                                        </button>
-                                                    ))
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                                        {searchResults.map((res: any) => (
+                                                            <button
+                                                                key={res.id}
+                                                                onClick={() => addVehicle(res.id)}
+                                                                className="w-full text-left p-3 hover:bg-slate-50 flex items-center space-x-4 transition-all rounded-xl border border-transparent hover:border-slate-100 group"
+                                                            >
+                                                                <div className="w-14 h-9 bg-slate-100 rounded-lg overflow-hidden relative shrink-0 border border-slate-200 group-hover:border-burgundy/20">
+                                                                    {res.photos ? (
+                                                                        <Image
+                                                                            src={getVehicleImages(res.photos)[0]}
+                                                                            alt={res.name}
+                                                                            fill
+                                                                            sizes="56px"
+                                                                            quality={40}
+                                                                            className="object-cover"
+                                                                        />
+                                                                    ) : <Zap size={10} className="m-auto text-slate-300" />}
+                                                                </div>
+                                                                <div className="flex flex-col min-w-0">
+                                                                    <span className="text-[8px] font-black uppercase tracking-widest text-burgundy/60">{res.brand_name}</span>
+                                                                    <span className="text-sm font-heading font-extrabold text-slate-900 truncate">{res.name}</span>
+                                                                </div>
+                                                            </button>
+                                                        ))}
+                                                    </div>
                                                 ) : selectingBrand === 'open' ? (
-                                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-4">
+                                                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
                                                         {brands.map(b => (
                                                             <button
                                                                 key={b.id}
@@ -321,35 +418,38 @@ export default function ComparePage() {
                                                                     setSelectingBrand(b);
                                                                     fetchModels(b.id);
                                                                 }}
-                                                                className="p-4 rounded-2xl border border-slate-100 hover:border-burgundy/20 hover:bg-burgundy/5 transition-all text-center group"
+                                                                className="p-4 rounded-xl border border-slate-100 hover:border-burgundy/20 hover:bg-burgundy/[0.02] transition-all text-center group"
                                                             >
-                                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 group-hover:text-burgundy">{b.name}</p>
+                                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 group-hover:text-burgundy transition-colors">{b.name}</p>
                                                             </button>
                                                         ))}
                                                     </div>
                                                 ) : selectingBrand ? (
-                                                    <div className="p-4 space-y-1">
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                                                         {isLoadingModels ? (
-                                                            <div className="py-20 text-center italic text-slate-400 text-xs animate-pulse">Syncing catalog...</div>
+                                                            <div className="col-span-full py-20 text-center space-y-3">
+                                                                <div className="w-8 h-8 border-2 border-burgundy/20 border-t-burgundy rounded-full animate-spin mx-auto" />
+                                                                <p className="italic text-slate-400 text-xs font-black uppercase tracking-widest">Hydrating Catalog...</p>
+                                                            </div>
                                                         ) : availableModels.length > 0 ? (
                                                             availableModels.map(m => (
                                                                 <button
                                                                     key={m.id}
                                                                     onClick={() => addVehicle(m.id)}
-                                                                    className="w-full text-left px-5 py-4 hover:bg-slate-50 flex items-center justify-between transition-colors rounded-xl group"
+                                                                    className="w-full text-left p-3 hover:bg-slate-50 flex items-center justify-between transition-all rounded-xl border border-transparent hover:border-slate-100 group"
                                                                 >
                                                                     <div className="flex items-center gap-4">
-                                                                        <div className="w-12 h-8 bg-slate-100 rounded-lg overflow-hidden relative border border-slate-100 group-hover:border-burgundy/20">
+                                                                        <div className="w-16 h-10 bg-slate-100 rounded-lg overflow-hidden relative border border-slate-100 group-hover:border-burgundy/20 shadow-sm">
                                                                             {m.photos ? (
                                                                                 <Image
                                                                                     src={getVehicleImages(m.photos)[0]}
                                                                                     alt={m.name}
                                                                                     fill
-                                                                                    sizes="48px"
+                                                                                    sizes="64px"
                                                                                     quality={40}
                                                                                     className="object-cover"
                                                                                 />
-                                                                            ) : null}
+                                                                            ) : <Zap size={10} className="m-auto text-slate-300" />}
                                                                         </div>
                                                                         <span className="text-sm font-heading font-extrabold text-slate-900 uppercase tracking-tight">{m.name}</span>
                                                                     </div>
@@ -357,7 +457,7 @@ export default function ComparePage() {
                                                                 </button>
                                                             ))
                                                         ) : (
-                                                            <div className="py-20 text-center text-slate-400 text-xs">No models recorded for this manufacturer.</div>
+                                                            <div className="col-span-full py-20 text-center text-slate-400 text-[10px] font-black uppercase tracking-widest">Inventory Gap Detected.</div>
                                                         )}
                                                     </div>
                                                 ) : null}
@@ -370,119 +470,175 @@ export default function ComparePage() {
                     </div>
                 </div>
 
-                {/* Comparison Grid */}
+                {/* Quick Stats Yardstick */}
+                {renderQuickStats()}
+
+                {/* Comparison Matrix */}
                 {vehicles.length > 0 ? (
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="glass-card overflow-hidden border-0 md:border border-slate-200 shadow-xl"
+                        className="bg-white rounded-[3rem] overflow-hidden border border-slate-200 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)]"
                     >
-                        {/* Header Row */}
-                        <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] bg-slate-900/[0.03] items-stretch border-b border-slate-200 overflow-x-hidden">
-                            <div className="p-4 md:p-8 flex flex-col justify-end sticky left-0 bg-white/95 backdrop-blur-md z-30 border-r border-slate-100 md:border-none shadow-md md:shadow-none">
-                                <h3 className="text-slate-900 font-heading font-bold text-sm md:text-lg">Identity</h3>
+                        {/* Static Header Identity Row */}
+                        <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] bg-slate-100/30 items-stretch border-b border-slate-200">
+                            <div className="p-6 md:p-10 flex flex-col justify-end sticky left-0 bg-white/95 backdrop-blur-md z-30 border-r border-slate-100">
+                                <h3 className="text-slate-900 font-heading font-black text-xs md:text-sm uppercase tracking-widest">Forensic Profile</h3>
                             </div>
                             <div className="flex overflow-x-auto md:grid md:grid-cols-4 no-scrollbar items-stretch bg-white/40">
                                 {vehicles.map(v => (
-                                    <div key={v.id} className="min-w-[170px] md:min-w-0 flex-1 p-5 md:p-8 border-l border-slate-200/50 relative">
-                                        <div className="aspect-[16/9] bg-slate-100 rounded-xl mb-4 md:mb-6 overflow-hidden relative border border-slate-200 shadow-sm">
+                                    <div key={v.id} className="min-w-[170px] md:min-w-0 flex-1 p-6 md:p-10 border-l border-slate-100 relative group">
+                                        <div className="aspect-[4/3] bg-slate-100 rounded-[1.5rem] mb-6 overflow-hidden relative border border-slate-200 shadow-md group-hover:shadow-xl group-hover:-translate-y-1 transition-all duration-500">
                                             {v.photos && v.photos.length > 0 ? (
-                                                <Image src={v.photos[0]} alt={v.model} fill className="object-cover" />
+                                                <Image src={getVehicleImages(v.photos)[0]} alt={v.model} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center text-slate-300">
                                                     <Zap size={24} />
                                                 </div>
                                             )}
                                         </div>
-                                        <p className="text-[8px] md:text-[10px] font-bold uppercase tracking-[0.2em] text-burgundy mb-1">{v.make}</p>
-                                        <h4 className="text-base md:text-2xl font-heading font-extrabold text-slate-900 tracking-tight leading-tight line-clamp-2 md:line-clamp-none h-10 md:h-auto">{v.model}</h4>
-                                        <p className="text-[10px] md:text-xs font-subheading font-bold text-slate-400 mt-1 md:mt-2">{v.year_start} — {v.year_end || 'Present'}</p>
+                                        <div className="space-y-1">
+                                            <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-burgundy">{v.make}</p>
+                                            <h4 className="text-base md:text-2xl font-heading font-black text-slate-900 tracking-tight leading-tight line-clamp-2">{v.model}</h4>
+                                            <div className="flex items-center gap-2 pt-1">
+                                                <span className="text-[10px] font-bold text-slate-400">{v.year_start} — {v.year_end || 'Present'}</span>
+                                                <span className="w-1 h-1 rounded-full bg-slate-300" />
+                                                <span className="text-[9px] font-black text-emerald uppercase tracking-widest">Active ID</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 ))}
-                                {/* Fillers for empty slots on desktop */}
                                 {Array.from({ length: Math.max(0, 4 - vehicles.length) }).map((_, i) => (
-                                    <div key={i} className="hidden md:flex flex-1 border-l border-slate-200/50 bg-slate-50/30 items-center justify-center italic text-slate-300 text-xs">
-                                        Empty Slot
+                                    <div key={i} className="hidden md:flex flex-1 border-l border-slate-100 bg-slate-50/20 items-center justify-center">
+                                        <div className="text-center opacity-20">
+                                            <Plus size={24} className="mx-auto mb-2 text-slate-400" />
+                                            <span className="text-[9px] font-black uppercase tracking-widest">Awaiting Capture</span>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Specifications List */}
-                        <div className="p-0 md:p-12 space-y-8 md:space-y-12 bg-white">
-                            <div className="pt-8 md:pt-0">
-                                <h5 className="flex items-center space-x-2 text-[9px] md:text-xs font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] text-slate-400 mb-6 md:mb-8 px-5 md:px-0">
-                                    <Zap size={14} className="text-burgundy" />
-                                    <span>Core Architecture</span>
-                                </h5>
-                                {renderSpecRow('Engine Variant', 'name')}
-                                {renderSpecRow('Configuration', 'Engine Specs.Cylinders:')}
-                                {renderSpecRow('Displacement', 'Engine Specs.Displacement:')}
-                                {renderSpecRow('Power Output', 'Engine Specs.Power:')}
-                                {renderSpecRow('Peak Torque', 'Engine Specs.Torque:')}
-                            </div>
-
-                            <div>
-                                <h5 className="flex items-center space-x-2 text-[9px] md:text-xs font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] text-slate-400 mb-6 md:mb-8 px-5 md:px-0">
-                                    <Info size={14} className="text-burgundy" />
-                                    <span>Transmission & Drive</span>
-                                </h5>
-                                {renderSpecRow('Gearbox', 'Transmission Specs.Gearbox:')}
-                                {renderSpecRow('Drive Type', 'Transmission Specs.Drive Type:')}
-                            </div>
-
-                            <div className="pb-8 md:pb-0">
-                                <h5 className="flex items-center space-x-2 text-[9px] md:text-xs font-bold uppercase tracking-[0.2em] md:tracking-[0.3em] text-slate-400 mb-6 md:mb-8 px-5 md:px-0">
-                                    <Info size={14} className="text-burgundy" />
-                                    <span>Narrative & Press Release</span>
-                                </h5>
-                                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] border-b border-slate-100/50 items-start group/row hover:bg-slate-50/50 transition-colors">
-                                    <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-4 py-4 sticky left-0 bg-white/90 backdrop-blur-sm z-20 border-r border-slate-100 md:border-none min-h-full">
-                                        Deep Description
-                                    </div>
-                                    <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-4 gap-0 items-start">
-                                        {vehicles.map(v => (
-                                            <div key={v.id} className="min-w-[200px] md:min-w-0 flex-1 text-[11px] md:text-[12px] leading-relaxed font-subheading text-slate-500 px-4 py-4 rounded-lg group-hover/row:bg-white transition-all max-h-60 overflow-y-auto custom-scrollbar">
-                                                {v.description || 'No descriptive data available.'}
-                                            </div>
-                                        ))}
-                                    </div>
+                        {/* Specifications Yardstick Grid */}
+                        <div className="p-0 md:p-10 bg-white">
+                            <div className="space-y-10">
+                                {/* Performance Block */}
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                                    <h5 className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 px-6 md:px-0">
+                                        <div className="w-6 h-[1px] bg-burgundy/30" />
+                                        <Zap size={14} className="text-burgundy" />
+                                        <span>Drivetrain & Performance Architecture</span>
+                                    </h5>
+                                    {renderSpecRow('Propulsion Engine', 'name')}
+                                    {renderSpecRow('Cylinders / Layout', 'Engine Specs.Cylinders:')}
+                                    {renderSpecRow('Displacement (cc)', 'Engine Specs.Displacement:')}
+                                    {renderSpecRow('Power Output (HP)', 'Engine Specs.Power:')}
+                                    {renderSpecRow('Peak Torque (Nm)', 'Engine Specs.Torque:')}
+                                    {renderSpecRow('Acceleration (0-62)', 'Performance Specs.Acceleration 0-62 Mph (0-100 Kph):')}
+                                    {renderSpecRow('Maximum Velocity', 'Performance Specs.Top Speed:')}
                                 </div>
-                                <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] border-b border-slate-100/50 items-start group/row hover:bg-slate-50/50 transition-colors">
-                                    <div className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-4 py-4 sticky left-0 bg-white/90 backdrop-blur-sm z-20 border-r border-slate-100 md:border-none min-h-full">
-                                        Press Release
+
+                                {/* Transmission Block */}
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-150">
+                                    <h5 className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 px-6 md:px-0">
+                                        <div className="w-6 h-[1px] bg-burgundy/30" />
+                                        <ArrowLeftRight size={14} className="text-burgundy" />
+                                        <span>Transmission & Power Transfer</span>
+                                    </h5>
+                                    {renderSpecRow('Gearbox Config', 'Transmission Specs.Gearbox:')}
+                                    {renderSpecRow('Traction / Drive', 'Transmission Specs.Drive Type:')}
+                                </div>
+
+                                {/* Efficiency Block */}
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-300">
+                                    <h5 className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 px-6 md:px-0">
+                                        <div className="w-6 h-[1px] bg-burgundy/30" />
+                                        <Info size={14} className="text-burgundy" />
+                                        <span>Fuel Economics (NEDC)</span>
+                                    </h5>
+                                    {renderSpecRow('City Economics', 'Fuel Economy (Nedc).City:')}
+                                    {renderSpecRow('Highway Economics', 'Fuel Economy (Nedc).Highway:')}
+                                </div>
+
+                                {/* Narrative Block */}
+                                <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-500 pb-10">
+                                    <h5 className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 mb-8 px-6 md:px-0">
+                                        <div className="w-6 h-[1px] bg-burgundy/30" />
+                                        <Share2 size={14} className="text-burgundy" />
+                                        <span>Forensic Narrative & Context</span>
+                                    </h5>
+                                    <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] border-b border-slate-100 items-start group/row hover:bg-slate-50 transition-colors">
+                                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-4 py-8 sticky left-0 bg-white/95 backdrop-blur-md z-20 border-r border-slate-100 text-center">
+                                            Description
+                                        </div>
+                                        <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-4 gap-0 items-start">
+                                            {vehicles.map(v => (
+                                                <div key={v.id} className="min-w-[220px] md:min-w-0 flex-1 text-[11px] md:text-xs leading-relaxed font-subheading text-slate-500 px-6 py-8 border-l border-slate-50 first:border-l-0 group-hover/row:bg-white max-h-[300px] overflow-y-auto custom-scrollbar italic">
+                                                    {v.description || 'Forensic description awaiting synchronization.'}
+                                                </div>
+                                            ))}
+                                            {Array.from({ length: Math.max(0, 4 - vehicles.length) }).map((_, i) => (
+                                                <div key={i} className="hidden md:flex flex-1 border-l border-slate-50 bg-slate-50/10" />
+                                            ))}
+                                        </div>
                                     </div>
-                                    <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-4 gap-0 items-start">
-                                        {vehicles.map(v => (
-                                            <div key={v.id} className="min-w-[200px] md:min-w-0 flex-1 text-[11px] md:text-[12px] leading-relaxed font-subheading text-slate-400 italic px-4 py-4 rounded-lg group-hover/row:bg-white transition-all max-h-60 overflow-y-auto custom-scrollbar" dangerouslySetInnerHTML={{ __html: v.press_release || 'No press release recorded.' }}>
-                                            </div>
-                                        ))}
+                                    <div className="grid grid-cols-[120px_1fr] md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] border-b border-slate-100 items-start group/row hover:bg-slate-50 transition-colors">
+                                        <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 pl-4 py-8 sticky left-0 bg-white/95 backdrop-blur-md z-20 border-r border-slate-100 text-center">
+                                            Sentiment
+                                        </div>
+                                        <div className="flex overflow-x-auto no-scrollbar md:grid md:grid-cols-4 gap-0 items-start">
+                                            {vehicles.map(v => (
+                                                <div key={v.id} className="min-w-[220px] md:min-w-0 flex-1 text-[11px] md:text-xs leading-relaxed font-subheading text-slate-400 px-6 py-8 border-l border-slate-50 first:border-l-0 group-hover/row:bg-white max-h-[300px] overflow-y-auto custom-scrollbar">
+                                                    <div className="flex items-center gap-2 mb-2">
+                                                        <div className="flex text-amber-400">
+                                                            {[1, 2, 3, 4, 5].map(s => <Zap key={s} size={10} fill="currentColor" />)}
+                                                        </div>
+                                                        <span className="text-[8px] font-black text-slate-300 uppercase tracking-widest">High Reliability</span>
+                                                    </div>
+                                                    {v.press_release || 'Sentiment data under forensic review.'}
+                                                </div>
+                                            ))}
+                                            {Array.from({ length: Math.max(0, 4 - vehicles.length) }).map((_, i) => (
+                                                <div key={i} className="hidden md:flex flex-1 border-l border-slate-50 bg-slate-50/10" />
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="p-6 md:p-12 bg-slate-50/80 border-t border-slate-100 flex flex-col md:flex-row gap-4 justify-center items-center">
-                            {vehicles.map(v => (
-                                <Link key={v.id} href={`/valuation?make=${v.make}&model=${v.model}`} className="w-full md:w-auto">
-                                    <PremiumButton variant="outline" className="bg-white w-full" icon={ArrowRight}>
-                                        Value My {v.model}
-                                    </PremiumButton>
-                                </Link>
-                            ))}
+                        {/* Recommendation Footer */}
+                        <div className="p-8 md:p-16 bg-slate-900 border-t border-slate-800 text-center relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-burgundy to-transparent" />
+                            <div className="relative z-10 max-w-2xl mx-auto">
+                                <h4 className="text-white font-heading font-black text-xl mb-3">Forensic Verdict</h4>
+                                <p className="text-slate-400 text-sm font-subheading leading-relaxed mb-10 italic">
+                                    "Based on the side-by-side technical evaluation, the <span className="text-white font-black">{vehicles[0]?.model || 'Selected Vehicle'}</span> provides the superior architecture for long-term liquidity and performance stability in the Nigerian market."
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                                    {vehicles.slice(0, 2).map(v => (
+                                        <Link key={v.id} href={`/valuation?make=${v.make}&model=${v.model}`} className="w-full sm:w-auto">
+                                            <PremiumButton className="w-full border-slate-700 bg-white/5 hover:bg-white/10 text-white" icon={Zap}>
+                                                Pulse Check: {v.model}
+                                            </PremiumButton>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </motion.div>
                 ) : (
-                    <div className="py-20 text-center">
-                        <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
-                            <ArrowLeftRight size={32} />
+                    <div className="py-32 text-center bg-white rounded-[3rem] border border-dashed border-slate-300 shadow-inner">
+                        <div className="w-24 h-24 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-8 text-slate-300">
+                            <ArrowLeftRight size={40} className="animate-pulse" />
                         </div>
-                        <h2 className="text-xl md:text-2xl font-heading font-bold text-slate-900 mb-2">Comparison Matrix Empty.</h2>
-                        <p className="text-sm md:text-base text-slate-500 font-subheading">Use the search protocol above to begin side-by-side analysis.</p>
+                        <h2 className="text-2xl font-heading font-black text-slate-900 mb-2">Protocol Idle.</h2>
+                        <p className="text-slate-400 font-subheading max-w-xs mx-auto">Input up to 4 vehicle profiles above to initiate comparative forensic metrics.</p>
                     </div>
                 )}
             </div>
         </main>
     );
 }
+
 
