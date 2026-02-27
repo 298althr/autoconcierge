@@ -10,7 +10,8 @@ import {
     Zap,
     Paintbrush,
     Wrench,
-    History
+    History,
+    ChevronRight
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -22,7 +23,7 @@ const hubs = [
         icon: Activity,
         color: 'text-blue-500',
         bg: 'bg-blue-50',
-        link: '/garage/services/diagnostics'
+        link: '/dashboard/garage/services/diagnostics'
     },
     {
         id: 'registration',
@@ -31,7 +32,7 @@ const hubs = [
         icon: FileText,
         color: 'text-emerald-500',
         bg: 'bg-emerald-50',
-        link: '/garage/services/registration'
+        link: '/dashboard/garage/services/registration'
     },
     {
         id: 'insurance',
@@ -40,7 +41,7 @@ const hubs = [
         icon: ShieldCheck,
         color: 'text-burgundy',
         bg: 'bg-burgundy/5',
-        link: '/garage/services/insurance'
+        link: '/dashboard/garage/services/insurance'
     },
     {
         id: 'logistics',
@@ -49,7 +50,7 @@ const hubs = [
         icon: Truck,
         color: 'text-orange-500',
         bg: 'bg-orange-50',
-        link: '/garage/services/logistics'
+        link: '/dashboard/garage/services/logistics'
     },
     {
         id: 'performance',
@@ -58,7 +59,7 @@ const hubs = [
         icon: Zap,
         color: 'text-yellow-600',
         bg: 'bg-yellow-50',
-        link: '/garage/services/performance'
+        link: '/dashboard/garage/services/performance'
     },
     {
         id: 'refurbishment',
@@ -67,59 +68,58 @@ const hubs = [
         icon: Paintbrush,
         color: 'text-purple-500',
         bg: 'bg-purple-50',
-        link: '/garage/services/refurbishment'
+        link: '/dashboard/garage/services/refurbishment'
     }
 ];
 
 export default function WorkshopHubs() {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {hubs.map((hub, index) => (
                 <motion.div
                     key={hub.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="group"
+                    transition={{ delay: index * 0.03 }}
                 >
                     <Link href={hub.link}>
-                        <div className="glass-card !bg-white/5 !backdrop-blur-2xl p-8 h-full border border-white/10 hover:border-burgundy/40 hover:shadow-[0_0_30px_rgba(159,18,57,0.1)] transition-all duration-500 flex flex-col items-start text-left group">
-                            <div className={`w-16 h-16 ${hub.bg.replace('bg-', 'bg-transparent border border-')} rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-burgundy group-hover:text-white transition-all duration-500 shadow-xl`}>
-                                <hub.icon size={32} className={hub.color} />
+                        <div className="glass-card group relative p-5 md:p-6 h-full border border-slate-100 hover:border-burgundy/20 hover:shadow-2xl hover:shadow-burgundy/5 transition-all duration-300 flex flex-col items-center text-center overflow-hidden active:scale-95 !bg-white">
+                            <div className={`w-12 h-12 md:w-14 md:h-14 ${hub.bg} rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-500 shadow-sm shadow-black/5`}>
+                                <hub.icon size={24} className={hub.color} />
                             </div>
-                            <h3 className="text-xl font-heading font-extrabold text-white mb-3 tracking-tight uppercase">{hub.title}</h3>
-                            <p className="text-slate-400 text-sm leading-relaxed mb-8 font-medium">{hub.description}</p>
 
-                            <div className="mt-auto flex items-center text-[10px] font-black uppercase tracking-[0.2em] text-burgundy group-hover:gap-3 transition-all">
+                            <h3 className="text-sm md:text-base font-heading font-extrabold text-slate-900 mb-2 leading-tight tracking-tight uppercase">
+                                {hub.title}
+                            </h3>
+
+                            <p className="text-[10px] md:text-xs text-slate-500 leading-tight font-medium mb-4">
+                                {hub.description}
+                            </p>
+
+                            <div className="mt-auto flex items-center text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-burgundy group-hover:gap-2 transition-all">
                                 <span>Deploy Protocol</span>
-                                <div className="w-8 h-px bg-burgundy/30 group-hover:w-12 transition-all" />
-                                <Wrench size={14} className="group-hover:rotate-45 transition-transform" />
+                                <Wrench size={12} className="opacity-0 group-hover:opacity-100 transition-all ml-1" />
                             </div>
                         </div>
                     </Link>
                 </motion.div>
             ))}
 
-            {/* Service History Shortcut */}
+            {/* Service History Shortcut - Compact Card */}
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
-                className="col-span-full mt-8"
+                transition={{ delay: hubs.length * 0.03 }}
             >
-                <Link href="/garage/services/history">
-                    <div className="bg-slate-900 rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center justify-between gap-6 hover:bg-slate-800 transition-colors shadow-2xl shadow-slate-900/20">
-                        <div className="flex items-center gap-6">
-                            <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-white">
-                                <History size={32} />
-                            </div>
-                            <div>
-                                <h3 className="text-2xl font-heading font-extrabold text-white tracking-tight italic">Service Dossier.</h3>
-                                <p className="text-slate-400 text-sm font-medium">Review past interventions and vehicle health scores.</p>
-                            </div>
+                <Link href="/dashboard/garage/services/history">
+                    <div className="bg-slate-900 rounded-[2rem] p-5 md:p-6 h-full flex flex-col items-center justify-center text-center hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 active:scale-95 border border-slate-800">
+                        <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-4">
+                            <History size={24} className="text-white" />
                         </div>
-                        <div className="px-8 py-3 bg-white text-slate-900 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-transform active:scale-95">
-                            View Universal History
+                        <h3 className="text-sm md:text-base font-heading font-bold text-white mb-2 uppercase tracking-tight">Dossier</h3>
+                        <p className="text-[10px] md:text-xs text-slate-400 font-medium leading-tight">Past interventions & health scores.</p>
+                        <div className="mt-4 text-[8px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/60 flex items-center">
+                            Archive <ChevronRight size={10} className="ml-1" />
                         </div>
                     </div>
                 </Link>

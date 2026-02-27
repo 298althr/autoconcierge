@@ -67,11 +67,11 @@ export default function InsuranceHub() {
     useEffect(() => {
         if (token) {
             apiFetch('/me/garage', { token })
-                .then(res => {
+                .then((res: any) => {
                     setVehicles(res.data || []);
                     setLoading(false);
                 })
-                .catch(err => {
+                .catch((err: any) => {
                     console.error('Error fetching vehicles:', err);
                     setLoading(false);
                 });
@@ -102,7 +102,7 @@ export default function InsuranceHub() {
             <div className="max-w-4xl mx-auto relative z-10">
                 <header className="mb-12">
                     <Link
-                        href="/garage"
+                        href="/dashboard/garage"
                         className="flex items-center space-x-2 text-slate-400 hover:text-slate-900 font-bold uppercase tracking-widest text-[10px] mb-4 transition-colors group"
                     >
                         <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />

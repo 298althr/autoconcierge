@@ -63,11 +63,11 @@ export default function DiagnosticsHub() {
     useEffect(() => {
         if (token) {
             apiFetch('/me/garage', { token })
-                .then(res => {
+                .then((res: any) => {
                     setVehicles(res.data || []);
                     setLoading(false);
                 })
-                .catch(err => {
+                .catch((err: any) => {
                     console.error('Error fetching vehicles:', err);
                     setLoading(false);
                 });
@@ -82,7 +82,7 @@ export default function DiagnosticsHub() {
             <div className="max-w-4xl mx-auto relative z-10">
                 <header className="mb-12">
                     <Link
-                        href="/garage"
+                        href="/dashboard/garage"
                         className="flex items-center space-x-2 text-slate-400 hover:text-slate-900 font-bold uppercase tracking-widest text-[10px] mb-4 transition-colors group"
                     >
                         <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
@@ -130,7 +130,7 @@ export default function DiagnosticsHub() {
                             <div className="bg-white/60 p-12 rounded-[2.5rem] border border-slate-100 text-center">
                                 <ShieldAlert className="mx-auto text-slate-300 mb-4" size={48} />
                                 <p className="text-slate-500 font-medium italic">No assets found in your vault to scan.</p>
-                                <Link href="/garage" className="text-blue-500 font-bold uppercase tracking-widest text-[10px] mt-4 block hover:underline">
+                                <Link href="/dashboard/garage" className="text-blue-500 font-bold uppercase tracking-widest text-[10px] mt-4 block hover:underline">
                                     Register a Vehicle First
                                 </Link>
                             </div>

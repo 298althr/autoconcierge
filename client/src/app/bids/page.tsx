@@ -61,7 +61,7 @@ export default function BidsPage() {
                         transition={{ duration: 0.5, delay: 0.1 }}
                         className="flex bg-white/60 backdrop-blur-md p-1.5 rounded-full shadow-sm border border-slate-200"
                     >
-                        <Link href="/garage" className="px-6 py-2.5 text-slate-500 hover:text-slate-900 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors">Acquired</Link>
+                        <Link href="/dashboard/garage" className="px-6 py-2.5 text-slate-500 hover:text-slate-900 rounded-full text-[10px] font-bold uppercase tracking-widest transition-colors">Acquired</Link>
                         <button className="px-6 py-2.5 bg-slate-900 text-white rounded-full text-[10px] font-bold uppercase tracking-widest shadow-md">Active Bids</button>
                     </motion.div>
                 </header>

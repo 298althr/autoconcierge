@@ -107,7 +107,7 @@ export default function ServiceHistory() {
             <div className="max-w-5xl mx-auto relative z-10">
                 <header className="mb-12">
                     <Link
-                        href="/garage"
+                        href="/dashboard/garage"
                         className="flex items-center space-x-2 text-slate-400 hover:text-slate-900 font-bold uppercase tracking-widest text-[10px] mb-4 transition-colors group"
                     >
                         <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />

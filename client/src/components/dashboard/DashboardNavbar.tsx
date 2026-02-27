@@ -12,7 +12,7 @@ export default function DashboardNavbar() {
     const navItems = [
         { label: 'Home', href: '/dashboard', icon: Home, exact: true },
         { label: 'Market', href: '/dashboard/market', icon: Car },
-        { label: 'Garage', href: '/garage', icon: Warehouse },
+        { label: 'Garage', href: '/dashboard/garage', icon: Warehouse },
         { label: 'Wallet', href: '/dashboard/wallet', icon: Wallet },
         { label: 'Profile', href: '/dashboard/profile', icon: User },
     ];
