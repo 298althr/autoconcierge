@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Digital Contract | Dealer360 Workshop</title>
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)', 'primary-dark': 'var(--primary-dark)',
+                        'bg-body': 'var(--bg-body)', 'bg-surface': 'var(--bg-surface)',
+                        'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)', 'text-secondary': 'var(--text-secondary)',
+                        'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: { bebas: ['Bebas Neue', 'sans-serif'], display: ['Rajdhani', 'sans-serif'], body: ['Inter', 'sans-serif'], }
+                }
+            }
+        }
+    </script>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+    <style>
+        #signature-pad {
+            border: 2px dashed var(--border-color);
+            border-radius: 1rem;
+            background: var(--bg-surface);
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .contract-terms {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 11px;
+            line-height: 1.6;
+            padding: 1rem;
+            background: var(--bg-surface);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .contract-terms::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .contract-terms::-webkit-scrollbar-track {
+            background: var(--bg-body);
+            border-radius: 10px;
+        }
+
+        .contract-terms::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+    <div class="page-wrapper container pb-32">
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2">
+                <span class="material-symbols-outlined text-text-primary">arrow_back</span>
+            </button>
+            <h1 class="header-title uppercase tracking-widest">DIGITAL CONTRACT</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+            <!-- Service Summary -->
+            <div class="bg-primary/5 border border-primary/20 rounded-3xl p-5 mb-6 mt-4">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-symbols-outlined text-primary text-2xl">description</span>
+                    <div>
+                        <h2 class="font-[var(--font-bebas)] text-xl tracking-widest" id="service-title">Loading...</h2>
+                        <p class="text-[9px] text-text-secondary uppercase tracking-widest" id="service-partner">Partner
+                            Workshop</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between pt-3 border-t border-primary/10">
+                    <span class="text-[8px] font-black uppercase tracking-widest text-text-secondary">Total
+                        Amount</span>
+                    <span class="text-2xl font-bold text-primary" id="service-total">₦0</span>
+                </div>
+            </div>
+
+            <!-- Contract Terms -->
+            <div class="mb-6">
+                <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-3">Service Agreement
+                    Terms</p>
+                <div class="contract-terms">
+                    <h3 class="font-bold mb-2">DEALER360 WORKSHOP SERVICE AGREEMENT</h3>
+                    <p class="mb-3">This Service Agreement ("Agreement") is entered into between Dealer360 Platform
+                        ("Platform") and the Customer ("You") for the provision of automotive workshop services.</p>
+
+                    <h4 class="font-bold mt-4 mb-2">1. SERVICE SCOPE</h4>
+                    <p class="mb-2">The Platform will coordinate the provision of the selected workshop services through
+                        verified partner workshops. Services include diagnostics, repairs, upgrades, and maintenance as
+                        specified in the service invoice.</p>
+
+                    <h4 class="font-bold mt-4 mb-2">2. PAYMENT TERMS</h4>
+                    <p class="mb-2">• Payment must be completed within 3 (three) days of signing this agreement.</p>
+                    <p class="mb-2">• Failure to pay within the deadline will result in automatic cancellation of the
+                        service request.</p>
+                    <p class="mb-2">• All payments are processed through secure escrow until service completion.</p>
+                    <p class="mb-2">• Refunds are subject to the Platform's refund policy and partner workshop terms.
+                    </p>
+
+                    <h4 class="font-bold mt-4 mb-2">3. SERVICE DELIVERY</h4>
+                    <p class="mb-2">• The partner workshop will contact you within 24 hours to schedule service.</p>
+                    <p class="mb-2">• Estimated turnaround times are provided as guidance and may vary based on parts
+                        availability and service complexity.</p>
+                    <p class="mb-2">• You will receive real-time updates on service progress through the Platform.</p>
+
+                    <h4 class="font-bold mt-4 mb-2">4. WARRANTIES & GUARANTEES</h4>
+                    <p class="mb-2">• All services come with a standard 90-day workmanship warranty.</p>
+                    <p class="mb-2">• Parts warranties are provided by the manufacturer and vary by component.</p>
+                    <p class="mb-2">• The Platform guarantees quality verification of all partner workshops.</p>
+
+                    <h4 class="font-bold mt-4 mb-2">5. LIABILITY</h4>
+                    <p class="mb-2">• The Platform acts as an intermediary and is not liable for workshop service
+                        quality beyond verification standards.</p>
+                    <p class="mb-2">• Disputes with partner workshops should be reported through the Platform's dispute
+                        resolution system.</p>
+                    <p class="mb-2">• The Platform's liability is limited to the service fee paid.</p>
+
+                    <h4 class="font-bold mt-4 mb-2">6. CANCELLATION</h4>
+                    <p class="mb-2">• You may cancel within 24 hours of signing for a full refund.</p>
+                    <p class="mb-2">• Cancellations after service commencement may incur fees based on work completed.
+                    </p>
+                    <p class="mb-2">• The Platform reserves the right to cancel if payment is not received within 3
+                        days.</p>
+
+                    <h4 class="font-bold mt-4 mb-2">7. DATA & PRIVACY</h4>
+                    <p class="mb-2">• Your vehicle and service data will be shared with the partner workshop for service
+                        delivery.</p>
+                    <p class="mb-2">• All data is handled in accordance with the Platform's Privacy Policy.</p>
+                    <p class="mb-2">• Service records are stored securely and accessible through your Garage dashboard.
+                    </p>
+
+                    <p class="mt-4 text-xs opacity-60">By signing below, you acknowledge that you have read, understood,
+                        and agree to be bound by these terms and conditions.</p>
+                </div>
+            </div>
+
+            <!-- Agreement Checkbox -->
+            <div class="mb-6">
+                <label class="flex items-start gap-3 cursor-pointer">
+                    <input type="checkbox" id="agree-checkbox" class="mt-1" onchange="toggleSignButton()">
+                    <span class="text-[10px] leading-tight">I have read and agree to the terms and conditions of this
+                        Service Agreement. I authorize Dealer360 to coordinate the specified services with the partner
+                        workshop.</span>
+                </label>
+            </div>
+
+            <!-- Signature Section -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary">Your Signature</p>
+                    <button onclick="clearSignature()"
+                        class="text-[9px] font-bold uppercase tracking-widest text-primary">Clear</button>
+                </div>
+                <canvas id="signature-pad" width="350" height="150"></canvas>
+                <p class="text-[8px] text-text-secondary uppercase tracking-widest mt-2 opacity-60">Sign above using
+                    your finger or mouse</p>
+            </div>
+
+            <!-- Submit Button -->
+            <button id="submit-btn" onclick="submitSignature()" disabled
+                class="w-full py-4 bg-bg-surface border border-border-color rounded-xl text-[11px] font-black uppercase tracking-widest opacity-50 cursor-not-allowed">
+                Submit Signature
+            </button>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span class="nav-label">Home</span>
+            </a>
+            <a href="../fleet.html" class="nav-item">
+                <span class="material-symbols-outlined">explore</span>
+                <span class="nav-label">Fleet</span>
+            </a>
+            <a href="../garage.html" class="nav-item active">
+                <span class="material-symbols-outlined">directions_car</span>
+                <span class="nav-label">Garage</span>
+            </a>
+            <a href="../inquiries.html" class="nav-item">
+                <span class="material-symbols-outlined">forum</span>
+                <span class="nav-label">Concierge</span>
+            </a>
+            <a href="../settings.html" class="nav-item">
+                <span class="material-symbols-outlined">tune</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        let serviceRecord = null;
+        let canvas, ctx;
+        let drawing = false;
+        let hasSignature = false;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sid = urlParams.get('sid');
+
+            if (!sid) {
+                alert('Invalid service ID');
+                window.location.href = '../garage.html?tab=workshop';
+                return;
+            }
+
+            serviceRecord = GarageData.getServiceById(sid);
+            if (!serviceRecord) {
+                alert('Service not found');
+                window.location.href = '../garage.html?tab=workshop';
+                return;
+            }
+
+            // Populate service details
+            document.getElementById('service-title').textContent = serviceRecord.title;
+            document.getElementById('service-partner').textContent = serviceRecord.partnerName;
+            document.getElementById('service-total').textContent = GarageData.formatCurrency(serviceRecord.invoiceTotal);
+
+            // Initialize signature pad
+            canvas = document.getElementById('signature-pad');
+            ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+
+            canvas.addEventListener('pointerdown', startDrawing);
+            canvas.addEventListener('pointermove', draw);
+            canvas.addEventListener('pointerup', stopDrawing);
+            canvas.addEventListener('pointerout', stopDrawing);
+        });
+
+        function startDrawing(e) {
+            drawing = true;
+            const rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!drawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            hasSignature = true;
+            toggleSignButton();
+        }
+
+        function stopDrawing() {
+            drawing = false;
+        }
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hasSignature = false;
+            toggleSignButton();
+        }
+
+        function toggleSignButton() {
+            const agreed = document.getElementById('agree-checkbox').checked;
+            const btn = document.getElementById('submit-btn');
+
+            if (agreed && hasSignature) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-bg-surface', 'border-border-color');
+                btn.classList.add('bg-primary', 'text-white', 'shadow-lg', 'shadow-primary/20');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-bg-surface', 'border-border-color');
+                btn.classList.remove('bg-primary', 'text-white', 'shadow-lg', 'shadow-primary/20');
+            }
+        }
+
+        function submitSignature() {
+            const signatureData = canvas.toDataURL('image/png');
+            GarageData.signContract(serviceRecord.id, signatureData);
+            window.location.href = `payment.html?sid=${serviceRecord.id}`;
+        }
+    </script>
+</body>
+
+</html>

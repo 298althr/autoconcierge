@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Review Paint Service | Dealer360 Workshop</title>
+
+    <!-- CSS SYSTEM -->
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+
+    <!-- Tailwind CDN + Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)',
+                        'primary-dark': 'var(--primary-dark)',
+                        'bg-body': 'var(--bg-body)',
+                        'bg-surface': 'var(--bg-surface)',
+                        'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)',
+                        'text-secondary': 'var(--text-secondary)',
+                        'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: {
+                        bebas: ['Bebas Neue', 'sans-serif'],
+                        display: ['Rajdhani', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+
+    <style>
+        .sla-option-card {
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sla-option-card.selected {
+            border-color: var(--primary);
+            background: var(--primary)/5;
+        }
+
+        .sla-option-card:hover:not(.selected) {
+            border-color: var(--primary)/50;
+        }
+
+        /* Custom Modal */
+        .custom-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .custom-modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 1.5rem;
+            max-width: 400px;
+            width: 100%;
+            overflow: hidden;
+            animation: modalSlideUp 0.3s ease-out;
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .part-color-preview {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 4px;
+            border: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+
+    <div class="page-wrapper container pb-32">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2">
+                <span class="material-symbols-outlined text-text-primary">arrow_back</span>
+            </button>
+            <h1 class="header-title uppercase tracking-widest">Review Service</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+
+            <!-- PROGRESS INDICATOR -->
+            <div class="flex items-center justify-center gap-2 mb-6 mt-4">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                        ✓
+                    </div>
+                    <span class="text-[9px] uppercase tracking-widest text-text-secondary">Configure</span>
+                </div>
+                <div class="w-12 h-0.5 bg-primary"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                        2
+                    </div>
+                    <span class="text-[9px] uppercase tracking-widest text-primary font-bold">Review</span>
+                </div>
+                <div class="w-12 h-0.5 bg-border-color"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-bg-surface border border-border-color flex items-center justify-center text-xs">
+                        3
+                    </div>
+                    <span class="text-[9px] uppercase tracking-widest text-text-secondary">Submit</span>
+                </div>
+            </div>
+
+            <!-- VEHICLE INFO -->
+            <div id="vehicle-card" class="bg-bg-surface border border-border-color rounded-2xl overflow-hidden mb-6">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- CONFIGURATION SUMMARY -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Your Configuration</h3>
+
+                <div class="space-y-4">
+                    <!-- Paint Type -->
+                    <div class="pb-4 border-b border-border-color">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-text-secondary mb-2">Paint Type
+                        </p>
+                        <p class="text-xs font-bold" id="paint-type-display">-</p>
+                    </div>
+
+                    <!-- Colors Selected -->
+                    <div class="pb-4 border-b border-border-color">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-text-secondary mb-2">Colors</p>
+                        <div id="colors-display" class="space-y-1">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Special Requests -->
+                    <div id="special-requests-display">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- SLA OPTIONS -->
+            <div class="mb-6">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Select Service Level</h3>
+                <div class="space-y-3" id="sla-options">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- PRICING SUMMARY -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Estimated Pricing</h3>
+                <div id="price-breakdown">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="mt-4 pt-4 border-t border-border-color flex items-center justify-between">
+                    <p class="text-sm font-bold uppercase tracking-widest">Total Estimate</p>
+                    <p class="text-2xl font-bold text-primary" id="total-price">₦0</p>
+                </div>
+                <div class="mt-4 p-3 bg-orange-500/5 border border-orange-500/20 rounded-xl">
+                    <p class="text-[9px] text-orange-500 font-bold uppercase tracking-widest mb-1">
+                        ⚠️ Pricing Notice
+                    </p>
+                    <p class="text-[9px] text-text-secondary leading-relaxed">
+                        This is an estimated price. Final quote will be provided by our partner after reviewing your
+                        request.
+                    </p>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="flex gap-3">
+                <button onclick="window.history.back()"
+                    class="flex-1 py-4 bg-bg-surface border border-border-color rounded-xl text-[11px] font-black uppercase tracking-widest hover:border-primary transition-all">
+                    Back to Edit
+                </button>
+                <button onclick="proceedToSubmit()"
+                    class="flex-1 py-4 bg-primary text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all">
+                    Proceed to Submit
+                </button>
+            </div>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span class="nav-label">Home</span>
+            </a>
+            <a href="../fleet.html" class="nav-item">
+                <span class="material-symbols-outlined">explore</span>
+                <span class="nav-label">Fleet</span>
+            </a>
+            <a href="../garage.html" class="nav-item active">
+                <span class="material-symbols-outlined">directions_car</span>
+                <span class="nav-label">Garage</span>
+            </a>
+            <a href="../inquiries.html" class="nav-item">
+                <span class="material-symbols-outlined">forum</span>
+                <span class="nav-label">Concierge</span>
+            </a>
+            <a href="../settings.html" class="nav-item">
+                <span class="material-symbols-outlined">tune</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- CUSTOM MODAL -->
+    <div class="custom-modal" id="custom-modal">
+        <div class="modal-content">
+            <div class="p-6 border-b border-border-color">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center"
+                        id="modal-icon-container">
+                        <span class="material-symbols-outlined text-primary text-2xl" id="modal-icon">info</span>
+                    </div>
+                    <h3 class="text-lg font-[var(--font-bebas)] tracking-widest uppercase" id="modal-title">Notice</h3>
+                </div>
+                <p class="text-xs text-text-secondary leading-relaxed" id="modal-message">Message</p>
+            </div>
+            <div class="p-4 flex gap-3" id="modal-actions">
+                <!-- Buttons populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let configData = null;
+        let selectedSLA = 'standard';
+        let activeVehicle = null;
+
+        // SLA Options
+        const SLA_OPTIONS = {
+            standard: {
+                name: 'Standard Service',
+                duration: '10-14 business days',
+                multiplier: 1.0,
+                features: ['Quality assured', 'Partner warranty', 'Progress updates']
+            },
+            express: {
+                name: 'Express Service',
+                duration: '7-10 business days',
+                multiplier: 1.15,
+                features: ['Priority scheduling', 'Faster turnaround', 'Daily updates', 'Partner warranty']
+            },
+            premium: {
+                name: 'Premium Service',
+                duration: '7-10 business days',
+                multiplier: 1.30,
+                features: ['VIP treatment', 'Premium materials', 'Dedicated manager', 'Real-time updates', 'Extended warranty']
+            }
+        };
+
+        // Initialize
+        function init() {
+            // Get configuration from localStorage
+            const savedConfig = localStorage.getItem('paint_service_config');
+            if (!savedConfig) {
+                showModal('error', 'Configuration Not Found', 'Please complete the configuration first.', [
+                    { text: 'Go Back', action: () => window.location.href = 'paint-service.html', primary: false }
+                ]);
+                return;
+            }
+
+            configData = JSON.parse(savedConfig);
+            activeVehicle = GarageData.getVehicleById(configData.vehicleId);
+
+            if (!activeVehicle) {
+                showModal('error', 'Vehicle Not Found', 'The selected vehicle could not be found.', [
+                    { text: 'Go Back', action: () => window.location.href = '../garage.html', primary: false }
+                ]);
+                return;
+            }
+
+            renderVehicleCard();
+            renderConfigSummary();
+            renderSLAOptions();
+            calculatePrice();
+        }
+
+        function renderVehicleCard() {
+            const v = activeVehicle;
+            document.getElementById('vehicle-card').innerHTML = `
+                <div class="relative h-32 overflow-hidden">
+                    <img src="${v.image}" class="w-full h-full object-cover" alt="">
+                    <div class="absolute inset-0 bg-gradient-to-t from-bg-surface via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-4">
+                        <h3 class="text-lg font-[var(--font-bebas)] text-white tracking-widest">${v.year} ${v.make.toUpperCase()} ${v.model.toUpperCase()}</h3>
+                        <p class="text-[8px] text-white/60 uppercase tracking-widest font-bold mt-0.5">VIN: ${v.vin.slice(-8)}</p>
+                    </div>
+                </div>`;
+        }
+
+        function renderConfigSummary() {
+            // Paint type
+            const paintTypes = {
+                solid: 'Solid Color',
+                metallic: 'Metallic',
+                pearl: 'Pearl',
+                matte: 'Matte',
+                chrome: 'Chrome/Wrap'
+            };
+            document.getElementById('paint-type-display').textContent = paintTypes[configData.paintType] || configData.paintType;
+
+            // Colors
+            const uniqueColors = new Set(Object.values(configData.partColors));
+            const colorsDisplay = document.getElementById('colors-display');
+
+            if (uniqueColors.size === 1) {
+                const colorId = Array.from(uniqueColors)[0];
+                const colorName = getColorName(colorId);
+                colorsDisplay.innerHTML = `<p class="text-xs">Single color: <span class="font-bold">${colorName}</span></p>`;
+            } else {
+                colorsDisplay.innerHTML = `
+                    <p class="text-xs mb-2">Multi-color (${uniqueColors.size} colors)</p>
+                    <button onclick="showColorBreakdown()" class="text-[9px] text-primary uppercase tracking-widest font-bold hover:underline">
+                        View Color Breakdown →
+                    </button>
+                `;
+            }
+
+            // Special requests
+            if (configData.specialRequests && configData.specialRequests.trim()) {
+                document.getElementById('special-requests-display').innerHTML = `
+                    <div class="pb-4 border-b border-border-color">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-text-secondary mb-2">Special Requests</p>
+                        <p class="text-xs text-text-secondary italic">"${configData.specialRequests}"</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderSLAOptions() {
+            const container = document.getElementById('sla-options');
+            container.innerHTML = Object.entries(SLA_OPTIONS).map(([key, sla]) => `
+                <div class="sla-option-card ${key === selectedSLA ? 'selected' : ''}" onclick="selectSLA('${key}')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-widest mb-1">${sla.name}</p>
+                            <p class="text-[9px] text-text-secondary uppercase tracking-widest">${sla.duration}</p>
+                        </div>
+                        <p class="text-sm font-bold text-primary">${sla.multiplier === 1.0 ? 'Standard' : '+' + Math.round((sla.multiplier - 1) * 100) + '%'}</p>
+                    </div>
+                    <div class="space-y-1">
+                        ${sla.features.map(f => `<p class="text-[9px] text-text-secondary">• ${f}</p>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectSLA(slaKey) {
+            selectedSLA = slaKey;
+            renderSLAOptions();
+            calculatePrice();
+        }
+
+        function calculatePrice() {
+            const basePrices = {
+                solid: 550000,
+                metallic: 700000,
+                pearl: 925000,
+                matte: 1125000,
+                chrome: 2100000
+            };
+
+            const basePrice = basePrices[configData.paintType] || 550000;
+            const uniqueColors = new Set(Object.values(configData.partColors));
+            const colorCount = uniqueColors.size;
+
+            let colorMultiplier = 1;
+            if (colorCount === 1) colorMultiplier = 1;
+            else if (colorCount <= 3) colorMultiplier = 1.15;
+            else colorMultiplier = 1.30;
+
+            if (uniqueColors.has('custom')) colorMultiplier += 0.1;
+
+            const slaMultiplier = SLA_OPTIONS[selectedSLA].multiplier;
+            const totalPrice = Math.round(basePrice * colorMultiplier * slaMultiplier);
+
+            // Update UI
+            const breakdown = document.getElementById('price-breakdown');
+            breakdown.innerHTML = `
+                <div class="flex justify-between py-2 border-b border-border-color">
+                    <span class="text-[10px] text-text-secondary uppercase tracking-widest">Base Price</span>
+                    <span class="text-xs font-bold">${GarageData.formatCurrency(basePrice)}</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-border-color">
+                    <span class="text-[10px] text-text-secondary uppercase tracking-widest">Color Complexity (${colorCount} color${colorCount > 1 ? 's' : ''})</span>
+                    <span class="text-xs font-bold">${colorMultiplier > 1 ? '+' : ''}${Math.round((colorMultiplier - 1) * 100)}%</span>
+                </div>
+                <div class="flex justify-between py-2">
+                    <span class="text-[10px] text-text-secondary uppercase tracking-widest">Service Level (${SLA_OPTIONS[selectedSLA].name})</span>
+                    <span class="text-xs font-bold">${slaMultiplier > 1 ? '+' : ''}${Math.round((slaMultiplier - 1) * 100)}%</span>
+                </div>
+            `;
+
+            document.getElementById('total-price').textContent = GarageData.formatCurrency(totalPrice);
+
+            // Save to config
+            configData.selectedSLA = selectedSLA;
+            configData.estimatedPrice = totalPrice;
+        }
+
+        function getColorName(colorId) {
+            // This would ideally reference the same color data from paint-service.html
+            // For now, return the ID formatted
+            return colorId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+
+        function showColorBreakdown() {
+            const parts = Object.entries(configData.partColors);
+            const content = parts.map(([partId, colorId]) => {
+                const partName = partId.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+                const colorName = getColorName(colorId);
+                return `<p class="text-xs py-1"><span class="font-bold">${partName}:</span> ${colorName}</p>`;
+            }).join('');
+
+            showModal('info', 'Color Breakdown', `<div class="max-h-64 overflow-y-auto">${content}</div>`, [
+                { text: 'Close', action: closeModal, primary: true }
+            ]);
+        }
+
+        function proceedToSubmit() {
+            // Save final config
+            localStorage.setItem('paint_service_config', JSON.stringify(configData));
+
+            // Navigate to submission page
+            window.location.href = 'paint-service-request.html';
+        }
+
+        // Custom Modal System
+        function showModal(type, title, message, actions) {
+            const modal = document.getElementById('custom-modal');
+            const iconMap = {
+                success: { icon: 'check_circle', color: 'text-green-500', bg: 'bg-green-500/10' },
+                error: { icon: 'error', color: 'text-red-500', bg: 'bg-red-500/10' },
+                warning: { icon: 'warning', color: 'text-orange-500', bg: 'bg-orange-500/10' },
+                info: { icon: 'info', color: 'text-primary', bg: 'bg-primary/10' }
+            };
+
+            const config = iconMap[type] || iconMap.info;
+
+            document.getElementById('modal-icon').textContent = config.icon;
+            document.getElementById('modal-icon').className = `material-symbols-outlined ${config.color} text-2xl`;
+            document.getElementById('modal-icon-container').className = `w-12 h-12 rounded-xl ${config.bg} flex items-center justify-center`;
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').innerHTML = message;
+
+            const actionsContainer = document.getElementById('modal-actions');
+            actionsContainer.innerHTML = actions.map(action => `
+                <button onclick="${action.action.name}()" 
+                    class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
+                    ${action.primary
+                    ? 'bg-primary text-white hover:bg-primary-dark'
+                    : 'bg-bg-body border border-border-color hover:border-primary'}">
+                    ${action.text}
+                </button>
+            `).join('');
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').classList.remove('active');
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+
+</html>

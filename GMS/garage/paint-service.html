@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Paint Service Configuration | Dealer360 Workshop</title>
+
+    <!-- CSS SYSTEM -->
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+
+    <!-- Tailwind CDN + Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)',
+                        'primary-dark': 'var(--primary-dark)',
+                        'bg-body': 'var(--bg-body)',
+                        'bg-surface': 'var(--bg-surface)',
+                        'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)',
+                        'text-secondary': 'var(--text-secondary)',
+                        'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: {
+                        bebas: ['Bebas Neue', 'sans-serif'],
+                        display: ['Rajdhani', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+
+    <style>
+        .body-part-card {
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            border-radius: 1rem;
+            padding: 1rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .body-part-card.selected {
+            border-color: var(--primary);
+            background: var(--primary)/10;
+        }
+
+        .color-swatch {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .color-swatch.selected {
+            border-color: var(--primary);
+            border-width: 3px;
+            transform: scale(1.1);
+        }
+
+        .color-swatch.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+        }
+
+        .paint-type-card {
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            border-radius: 1rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .paint-type-card.selected {
+            border-color: var(--primary);
+            border-width: 2px;
+            background: var(--primary)/5;
+        }
+
+        .price-breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .price-breakdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .car-diagram {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .car-part {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .car-part:hover {
+            opacity: 0.8;
+        }
+
+        .car-part.selected {
+            stroke: var(--primary);
+            stroke-width: 3;
+        }
+
+        .color-category-tab {
+            padding: 0.5rem 1rem;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .color-category-tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .color-category-tab:hover:not(.active) {
+            border-color: var(--primary);
+        }
+
+        /* Color Picker Modal */
+        .color-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9999;
+            display: none;
+            overflow-y: auto;
+        }
+
+        .color-modal.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+
+    <div class="page-wrapper container pb-32">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2">
+                <span class="material-symbols-outlined text-text-primary">arrow_back</span>
+            </button>
+            <h1 class="header-title uppercase tracking-widest">Paint Service</h1>
+            <button class="p-2" onclick="saveProgress()">
+                <span class="material-symbols-outlined text-text-secondary">save</span>
+            </button>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+
+            <!-- SERVICE INFO -->
+            <div
+                class="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-5 mb-6 mt-4">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-symbols-outlined text-primary text-3xl">palette</span>
+                    <div>
+                        <h2 class="text-lg font-[var(--font-bebas)] tracking-widest uppercase">Full Vehicle Repaint</h2>
+                        <p class="text-[9px] text-text-secondary uppercase tracking-widest">SLA: 7-14 Business Days</p>
+                    </div>
+                </div>
+                <p class="text-[10px] text-text-secondary leading-relaxed">
+                    Customize every detail of your vehicle's paint job. Select colors for each body part, choose paint
+                    type, and add special instructions.
+                </p>
+            </div>
+
+            <!-- STEP 1: PAINT TYPE -->
+            <div class="mb-8">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <span
+                        class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs">1</span>
+                    Select Paint Type
+                </h3>
+                <div class="grid grid-cols-1 gap-3">
+                    <div class="paint-type-card" onclick="selectPaintType('solid')">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-xs font-bold uppercase tracking-widest">Solid Color</p>
+                            <p class="text-sm font-bold text-primary">₦450,000 - ₦650,000</p>
+                        </div>
+                        <p class="text-[9px] text-text-secondary">Classic single-tone finish. Durable and
+                            cost-effective.</p>
+                    </div>
+                    <div class="paint-type-card" onclick="selectPaintType('metallic')">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-xs font-bold uppercase tracking-widest">Metallic</p>
+                            <p class="text-sm font-bold text-primary">₦550,000 - ₦850,000</p>
+                        </div>
+                        <p class="text-[9px] text-text-secondary">Shimmering finish with metal flakes. Premium
+                            appearance.</p>
+                    </div>
+                    <div class="paint-type-card" onclick="selectPaintType('pearl')">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-xs font-bold uppercase tracking-widest">Pearl</p>
+                            <p class="text-sm font-bold text-primary">₦650,000 - ₦1,200,000</p>
+                        </div>
+                        <p class="text-[9px] text-text-secondary">Iridescent finish that changes in different light.
+                            Luxury option.</p>
+                    </div>
+                    <div class="paint-type-card" onclick="selectPaintType('matte')">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-xs font-bold uppercase tracking-widest">Matte</p>
+                            <p class="text-sm font-bold text-primary">₦750,000 - ₦1,500,000</p>
+                        </div>
+                        <p class="text-[9px] text-text-secondary">Non-reflective finish. Modern and distinctive.
+                            Requires special care.</p>
+                    </div>
+                    <div class="paint-type-card" onclick="selectPaintType('chrome')">
+                        <div class="flex items-center justify-between mb-2">
+                            <p class="text-xs font-bold uppercase tracking-widest">Chrome/Wrap</p>
+                            <p class="text-sm font-bold text-primary">₦1,200,000 - ₦3,000,000</p>
+                        </div>
+                        <p class="text-[9px] text-text-secondary">Mirror-like finish or vinyl wrap. Ultimate statement
+                            piece.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: COLOR SELECTION -->
+            <div class="mb-8" id="color-selection-section" style="display: none;">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <span
+                        class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs">2</span>
+                    Choose Colors
+                </h3>
+
+                <!-- Quick Apply Option -->
+                <div class="bg-bg-surface border border-border-color rounded-2xl p-4 mb-4">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-text-secondary mb-3">Quick Apply (One
+                        Color for All Parts)</p>
+
+                    <!-- Color Category Tabs -->
+                    <div class="flex gap-2 mb-3 overflow-x-auto pb-2">
+                        <button onclick="showColorCategory('blacks-greys')" class="color-category-tab active"
+                            data-category="blacks-greys">
+                            <span
+                                class="text-[8px] font-bold uppercase tracking-widest whitespace-nowrap">Blacks/Greys</span>
+                        </button>
+                        <button onclick="showColorCategory('whites-creams')" class="color-category-tab"
+                            data-category="whites-creams">
+                            <span
+                                class="text-[8px] font-bold uppercase tracking-widest whitespace-nowrap">Whites/Creams</span>
+                        </button>
+                        <button onclick="showColorCategory('blues')" class="color-category-tab" data-category="blues">
+                            <span class="text-[8px] font-bold uppercase tracking-widest whitespace-nowrap">Blues</span>
+                        </button>
+                        <button onclick="showColorCategory('reds-burgundy')" class="color-category-tab"
+                            data-category="reds-burgundy">
+                            <span class="text-[8px] font-bold uppercase tracking-widest whitespace-nowrap">Reds</span>
+                        </button>
+                        <button onclick="showColorCategory('greens')" class="color-category-tab" data-category="greens">
+                            <span class="text-[8px] font-bold uppercase tracking-widest whitespace-nowrap">Greens</span>
+                        </button>
+                        <button onclick="showColorCategory('golds-browns')" class="color-category-tab"
+                            data-category="golds-browns">
+                            <span
+                                class="text-[8px] font-bold uppercase tracking-widest whitespace-nowrap">Golds/Browns</span>
+                        </button>
+                        <button onclick="showColorCategory('silvers')" class="color-category-tab"
+                            data-category="silvers">
+                            <span
+                                class="text-[8px] font-bold uppercase tracking-widest whitespace-nowrap">Silvers</span>
+                        </button>
+                        <button onclick="showColorCategory('special')" class="color-category-tab"
+                            data-category="special">
+                            <span
+                                class="text-[8px] font-bold uppercase tracking-widest whitespace-nowrap">Special</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-5 gap-2 mb-3" id="quick-colors">
+                        <!-- Populated by JS -->
+                    </div>
+                    <button onclick="applyColorToAll()"
+                        class="w-full px-4 py-2 bg-primary/10 text-primary rounded-xl text-[9px] font-bold uppercase tracking-widest border border-primary/20 hover:bg-primary hover:text-white transition-all">
+                        Apply Selected Color to All Parts
+                    </button>
+                </div>
+
+                <!-- Individual Part Selection -->
+                <div class="bg-bg-surface border border-border-color rounded-2xl p-4">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-text-secondary mb-3">Customize
+                        Individual Parts</p>
+                    <div class="space-y-3" id="body-parts-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: SPECIAL REQUESTS -->
+            <div class="mb-8" id="special-requests-section" style="display: none;">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <span
+                        class="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs">3</span>
+                    Special Requests
+                </h3>
+                <div class="bg-bg-surface border border-border-color rounded-2xl p-4">
+                    <p class="text-[9px] text-text-secondary mb-3">
+                        Add any specific instructions, preferences, or concerns (max 500 characters)
+                    </p>
+                    <textarea id="special-requests" rows="4" maxlength="500"
+                        class="w-full bg-bg-body border border-border-color rounded-xl p-3 text-xs text-text-primary resize-none focus:border-primary focus:outline-none"
+                        placeholder="Example: Please use low-VOC paint due to allergies. Need work completed by March 1st for an event."></textarea>
+                    <p class="text-[8px] text-text-secondary text-right mt-1">
+                        <span id="char-count">0</span>/500 characters
+                    </p>
+                </div>
+            </div>
+
+            <!-- PRICE SUMMARY -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6" id="price-summary"
+                style="display: none;">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Estimated Price</h3>
+                <div id="price-breakdown">
+                    <!-- Populated by JS -->
+                </div>
+                <div class="mt-4 pt-4 border-t border-border-color flex items-center justify-between">
+                    <p class="text-sm font-bold uppercase tracking-widest">Total Estimate</p>
+                    <p class="text-2xl font-bold text-primary" id="total-price">₦0</p>
+                </div>
+                <div class="mt-4 p-3 bg-orange-500/5 border border-orange-500/20 rounded-xl">
+                    <p class="text-[9px] text-orange-500 font-bold uppercase tracking-widest mb-1">
+                        ⚠️ Pricing Notice
+                    </p>
+                    <p class="text-[9px] text-text-secondary leading-relaxed">
+                        This is an estimated price. Final quote will be provided by our partner after reviewing your
+                        request.
+                    </p>
+                </div>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <button onclick="proceedToReview()" id="submit-btn" style="display: none;"
+                class="w-full px-6 py-4 bg-primary text-white rounded-2xl text-sm font-bold uppercase tracking-widest hover:bg-primary-dark transition-all flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined">arrow_forward</span>
+                Review & Continue
+            </button>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span class="nav-label">Home</span>
+            </a>
+            <a href="../fleet.html" class="nav-item">
+                <span class="material-symbols-outlined">explore</span>
+                <span class="nav-label">Fleet</span>
+            </a>
+            <a href="../garage.html" class="nav-item active">
+                <span class="material-symbols-outlined">directions_car</span>
+                <span class="nav-label">Garage</span>
+            </a>
+            <a href="../inquiries.html" class="nav-item">
+                <span class="material-symbols-outlined">forum</span>
+                <span class="nav-label">Concierge</span>
+            </a>
+            <a href="../settings.html" class="nav-item">
+                <span class="material-symbols-outlined">tune</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Configuration Data
+        // Expanded Color Palette (50+ colors like real Nigerian paint shops)
+        const COLORS = {
+            'blacks-greys': [
+                { id: 'jet-black', name: 'Jet Black', hex: '#000000' },
+                { id: 'midnight-black', name: 'Midnight Black', hex: '#0a0a0a' },
+                { id: 'carbon-black', name: 'Carbon Black', hex: '#1a1a1a' },
+                { id: 'charcoal', name: 'Charcoal Grey', hex: '#36454f' },
+                { id: 'gunmetal', name: 'Gunmetal Grey', hex: '#2a3439' },
+                { id: 'slate-grey', name: 'Slate Grey', hex: '#708090' },
+                { id: 'titanium', name: 'Titanium Grey', hex: '#878681' },
+                { id: 'ash-grey', name: 'Ash Grey', hex: '#b2beb5' }
+            ],
+            'whites-creams': [
+                { id: 'pure-white', name: 'Pure White', hex: '#ffffff' },
+                { id: 'pearl-white', name: 'Pearl White', hex: '#f8f8f8' },
+                { id: 'ivory-white', name: 'Ivory White', hex: '#fffff0' },
+                { id: 'cream-white', name: 'Cream White', hex: '#fffdd0' },
+                { id: 'champagne', name: 'Champagne', hex: '#f7e7ce' },
+                { id: 'beige', name: 'Beige', hex: '#f5f5dc' },
+                { id: 'off-white', name: 'Off White', hex: '#faf9f6' }
+            ],
+            'blues': [
+                { id: 'navy-blue', name: 'Navy Blue', hex: '#000080' },
+                { id: 'royal-blue', name: 'Royal Blue', hex: '#4169e1' },
+                { id: 'deep-blue', name: 'Deep Blue Metallic', hex: '#1e3a8a' },
+                { id: 'ocean-blue', name: 'Ocean Blue', hex: '#0077be' },
+                { id: 'sky-blue', name: 'Sky Blue', hex: '#87ceeb' },
+                { id: 'teal-blue', name: 'Teal Blue', hex: '#008080' },
+                { id: 'electric-blue', name: 'Electric Blue', hex: '#7df9ff' },
+                { id: 'midnight-blue', name: 'Midnight Blue', hex: '#191970' }
+            ],
+            'reds-burgundy': [
+                { id: 'crimson-red', name: 'Crimson Red', hex: '#990011' },
+                { id: 'cherry-red', name: 'Cherry Red', hex: '#de3163' },
+                { id: 'ruby-red', name: 'Ruby Red', hex: '#e0115f' },
+                { id: 'burgundy', name: 'Burgundy Red', hex: '#800020' },
+                { id: 'wine-red', name: 'Wine Red', hex: '#722f37' },
+                { id: 'maroon', name: 'Maroon', hex: '#800000' },
+                { id: 'candy-red', name: 'Candy Apple Red', hex: '#ff0800' }
+            ],
+            'greens': [
+                { id: 'forest-green', name: 'Forest Green', hex: '#228b22' },
+                { id: 'emerald-green', name: 'Emerald Green', hex: '#50c878' },
+                { id: 'olive-green', name: 'Olive Green', hex: '#808000' },
+                { id: 'racing-green', name: 'British Racing Green', hex: '#004225' },
+                { id: 'lime-green', name: 'Lime Green', hex: '#32cd32' },
+                { id: 'mint-green', name: 'Mint Green', hex: '#98ff98' }
+            ],
+            'golds-browns': [
+                { id: 'champagne-gold', name: 'Champagne Gold', hex: '#d4af37' },
+                { id: 'bronze-gold', name: 'Bronze Gold', hex: '#cd7f32' },
+                { id: 'rose-gold', name: 'Rose Gold', hex: '#b76e79' },
+                { id: 'copper', name: 'Copper', hex: '#b87333' },
+                { id: 'brown', name: 'Chocolate Brown', hex: '#7b3f00' },
+                { id: 'tan-brown', name: 'Tan Brown', hex: '#d2b48c' },
+                { id: 'sand-beige', name: 'Sand Beige', hex: '#c2b280' }
+            ],
+            'silvers': [
+                { id: 'silver', name: 'Silver Metallic', hex: '#c0c0c0' },
+                { id: 'platinum', name: 'Platinum Silver', hex: '#e5e4e2' },
+                { id: 'chrome-silver', name: 'Chrome Silver', hex: '#d3d3d3' },
+                { id: 'aluminum', name: 'Aluminum', hex: '#a8a9ad' }
+            ],
+            'special': [
+                { id: 'orange', name: 'Sunset Orange', hex: '#ff4500' },
+                { id: 'yellow', name: 'Canary Yellow', hex: '#ffef00' },
+                { id: 'purple', name: 'Royal Purple', hex: '#7851a9' },
+                { id: 'pink', name: 'Hot Pink', hex: '#ff69b4' },
+                { id: 'custom', name: 'Custom Color (Specify Code)', hex: '#6b7280' }
+            ]
+        };
+
+        // Flatten for quick access
+        const ALL_COLORS = Object.values(COLORS).flat();
+
+        const BODY_PARTS = [
+            { id: 'hood', name: 'Hood' },
+            { id: 'front-bumper', name: 'Front Bumper' },
+            { id: 'rear-bumper', name: 'Rear Bumper' },
+            { id: 'left-front-door', name: 'Left Front Door' },
+            { id: 'right-front-door', name: 'Right Front Door' },
+            { id: 'left-rear-door', name: 'Left Rear Door' },
+            { id: 'right-rear-door', name: 'Right Rear Door' },
+            { id: 'roof', name: 'Roof' },
+            { id: 'trunk', name: 'Trunk/Boot' },
+            { id: 'left-fender', name: 'Left Front Fender' },
+            { id: 'right-fender', name: 'Right Front Fender' },
+            { id: 'left-skirt', name: 'Left Side Skirt' },
+            { id: 'right-skirt', name: 'Right Side Skirt' },
+            { id: 'left-mirror', name: 'Left Mirror' },
+            { id: 'right-mirror', name: 'Right Mirror' },
+            { id: 'rims', name: 'Rims (All 4)' }
+        ];
+
+        const PAINT_TYPES = {
+            solid: { name: 'Solid Color', basePrice: 550000 },
+            metallic: { name: 'Metallic', basePrice: 700000 },
+            pearl: { name: 'Pearl', basePrice: 925000 },
+            matte: { name: 'Matte', basePrice: 1125000 },
+            chrome: { name: 'Chrome/Wrap', basePrice: 2100000 }
+        };
+
+        // State
+        let selectedPaintType = null;
+        let selectedQuickColor = null;
+        let partColors = {};
+        let activeVehicleId = null;
+        let activeColorCategory = 'blacks-greys'; // Default category
+
+        // Initialize
+        function init() {
+            // Get active vehicle from URL or localStorage
+            const urlParams = new URLSearchParams(window.location.search);
+            activeVehicleId = urlParams.get('vid') || GarageData.getActiveVehicle()?.id;
+
+            // Render quick color swatches
+            renderQuickColors();
+
+            // Render body parts list
+            renderBodyParts();
+
+            // Character counter
+            document.getElementById('special-requests').addEventListener('input', (e) => {
+                document.getElementById('char-count').textContent = e.target.value.length;
+            });
+        }
+
+        function showColorCategory(category) {
+            activeColorCategory = category;
+
+            // Update tab UI
+            document.querySelectorAll('.color-category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.closest('.color-category-tab').classList.add('active');
+
+            // Re-render colors
+            renderQuickColors();
+        }
+
+        function renderQuickColors() {
+            const container = document.getElementById('quick-colors');
+            const colors = COLORS[activeColorCategory];
+            container.innerHTML = colors.map(color => `
+                <div class="color-swatch" 
+                     style="background-color: ${color.hex}"
+                     onclick="selectQuickColor('${color.id}')"
+                     title="${color.name}">
+                </div>
+            `).join('');
+        }
+
+        function renderBodyParts() {
+            const container = document.getElementById('body-parts-list');
+            // Show popular colors (first 5 from blacks-greys)
+            const popularColors = COLORS['blacks-greys'].slice(0, 3)
+                .concat(COLORS['whites-creams'].slice(0, 1))
+                .concat(COLORS['silvers'].slice(0, 1));
+
+            container.innerHTML = BODY_PARTS.map(part => `
+                <div class="bg-bg-body border border-border-color rounded-xl p-3">
+                    <div class="flex items-center justify-between mb-2">
+                        <p class="text-[10px] font-bold uppercase tracking-widest">${part.name}</p>
+                        <div class="flex gap-2" id="part-${part.id}-colors">
+                            ${popularColors.map(color => `
+                                <div class="w-6 h-6 rounded-lg border border-border-color cursor-pointer transition-all hover:scale-110"
+                                     style="background-color: ${color.hex}"
+                                     onclick="selectPartColor('${part.id}', '${color.id}')"
+                                     title="${color.name}">
+                                </div>
+                            `).join('')}
+                            <button onclick="showAllColorsForPart('${part.id}')" 
+                                    class="w-6 h-6 rounded-lg border border-border-color bg-bg-surface flex items-center justify-center text-[10px] hover:border-primary transition-all">
+                                +
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-[8px] text-text-secondary" id="part-${part.id}-selected">
+                        No color selected
+                    </p>
+                </div>
+            `).join('');
+        }
+
+        function selectPaintType(type) {
+            selectedPaintType = type;
+
+            // Update UI
+            document.querySelectorAll('.paint-type-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.paint-type-card').classList.add('selected');
+
+            // Show next section
+            document.getElementById('color-selection-section').style.display = 'block';
+
+            // Scroll to next section
+            document.getElementById('color-selection-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function selectQuickColor(colorId) {
+            selectedQuickColor = colorId;
+
+            // Update UI
+            document.querySelectorAll('#quick-colors .color-swatch').forEach(swatch => {
+                swatch.classList.remove('selected');
+            });
+            event.target.classList.add('selected');
+        }
+
+        function applyColorToAll() {
+            if (!selectedQuickColor) {
+                alert('Please select a color first');
+                return;
+            }
+
+            // Apply to all parts
+            BODY_PARTS.forEach(part => {
+                partColors[part.id] = selectedQuickColor;
+                updatePartColorDisplay(part.id);
+            });
+
+            // Show next sections
+            document.getElementById('special-requests-section').style.display = 'block';
+            document.getElementById('price-summary').style.display = 'block';
+            document.getElementById('submit-btn').style.display = 'block';
+
+            // Calculate price
+            calculatePrice();
+
+            // Scroll to special requests
+            document.getElementById('special-requests-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function selectPartColor(partId, colorId) {
+            partColors[partId] = colorId;
+            updatePartColorDisplay(partId);
+
+            // Check if all parts have colors
+            if (Object.keys(partColors).length === BODY_PARTS.length) {
+                document.getElementById('special-requests-section').style.display = 'block';
+                document.getElementById('price-summary').style.display = 'block';
+                document.getElementById('submit-btn').style.display = 'block';
+                calculatePrice();
+            }
+        }
+
+        function updatePartColorDisplay(partId) {
+            const colorId = partColors[partId];
+            // Search across all categories
+            const color = ALL_COLORS.find(c => c.id === colorId);
+            const display = document.getElementById(`part-${partId}-selected`);
+
+            if (color) {
+                display.innerHTML = `<span style="color: ${color.hex}">●</span> ${color.name}`;
+            }
+        }
+
+        function showAllColorsForPart(partId) {
+            // Store current part for modal
+            window.currentPartForColor = partId;
+
+            // For now, show alert. In production, open a full-screen modal with all 50+ colors organized by category
+            alert(`Full color picker coming soon!\n\nFor now:\n1. Use the category tabs in "Quick Apply" to browse all ${ALL_COLORS.length} colors\n2. Select a color\n3. Click "Apply Selected Color to All Parts"\n\nOr choose from the 5 popular colors shown for each part.`);
+        }
+
+        function calculatePrice() {
+            if (!selectedPaintType) return;
+
+            const basePrice = PAINT_TYPES[selectedPaintType].basePrice;
+
+            // Count unique colors
+            const uniqueColors = new Set(Object.values(partColors));
+            const colorCount = uniqueColors.size;
+
+            let multiplier = 1;
+            if (colorCount === 1) {
+                multiplier = 1; // Single color discount
+            } else if (colorCount <= 3) {
+                multiplier = 1.15; // 2-3 colors
+            } else {
+                multiplier = 1.30; // 4+ colors
+            }
+
+            // Check for custom color
+            if (uniqueColors.has('custom')) {
+                multiplier += 0.1; // +10% for custom color
+            }
+
+            const totalPrice = Math.round(basePrice * multiplier);
+
+            // Update UI
+            const breakdown = document.getElementById('price-breakdown');
+            breakdown.innerHTML = `
+                <div class="price-breakdown-item">
+                    <span class="text-[10px] text-text-secondary uppercase tracking-widest">Base Price (${PAINT_TYPES[selectedPaintType].name})</span>
+                    <span class="text-xs font-bold">${GarageData.formatCurrency(basePrice)}</span>
+                </div>
+                <div class="price-breakdown-item">
+                    <span class="text-[10px] text-text-secondary uppercase tracking-widest">Color Complexity (${colorCount} color${colorCount > 1 ? 's' : ''})</span>
+                    <span class="text-xs font-bold">${multiplier > 1 ? '+' : ''}${Math.round((multiplier - 1) * 100)}%</span>
+                </div>
+                ${uniqueColors.has('custom') ? `
+                <div class="price-breakdown-item">
+                    <span class="text-[10px] text-text-secondary uppercase tracking-widest">Custom Color Fee</span>
+                    <span class="text-xs font-bold">+₦100,000</span>
+                </div>
+                ` : ''}
+            `;
+
+            document.getElementById('total-price').textContent = GarageData.formatCurrency(totalPrice);
+        }
+
+        function saveProgress() {
+            const config = {
+                vehicleId: activeVehicleId,
+                paintType: selectedPaintType,
+                partColors: partColors,
+                specialRequests: document.getElementById('special-requests').value,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('paint_service_progress', JSON.stringify(config));
+            showSaveNotification();
+        }
+
+        function showSaveNotification() {
+            // Create a toast notification instead of alert
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-fade-in';
+            toast.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">check_circle</span>
+                    <span class="text-xs font-bold uppercase tracking-widest">Progress Saved!</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        function proceedToReview() {
+            if (!selectedPaintType) {
+                showValidationError('Please select a paint type');
+                return;
+            }
+
+            if (Object.keys(partColors).length === 0) {
+                showValidationError('Please select colors for at least one body part');
+                return;
+            }
+
+            const specialRequests = document.getElementById('special-requests').value;
+
+            // Save configuration
+            const config = {
+                vehicleId: activeVehicleId,
+                paintType: selectedPaintType,
+                partColors: partColors,
+                specialRequests: specialRequests,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('paint_service_config', JSON.stringify(config));
+
+            // Navigate to review page
+            window.location.href = 'paint-service-review.html';
+        }
+
+        function showValidationError(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed top-20 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-xl shadow-lg z-50 animate-fade-in';
+            toast.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm">error</span>
+                    <span class="text-xs font-bold">${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+
+</html>

@@ -16,6 +16,16 @@ router.post('/initiate', protect, async (req, res, next) => {
 });
 
 /**
+ * Step 1.5: Seller Accepts Deal
+ */
+router.post('/:id/accept', protect, async (req, res, next) => {
+    try {
+        const result = await escrowService.acceptDeal(req.params.id, req.user.id);
+        res.status(200).json({ success: true, data: result });
+    } catch (err) { next(err); }
+});
+
+/**
  * Step 1b: Upgrade to 70%
  */
 router.post('/:id/upgrade-70', protect, async (req, res, next) => {

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Clear Fines | Dealer360 Workshop</title>
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)', 'primary-dark': 'var(--primary-dark)', 'bg-body': 'var(--bg-body)',
+                        'bg-surface': 'var(--bg-surface)', 'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)', 'text-secondary': 'var(--text-secondary)', 'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: { bebas: ['Bebas Neue', 'sans-serif'], display: ['Rajdhani', 'sans-serif'], body: ['Inter', 'sans-serif'], }
+                }
+            }
+        }
+    </script>
+    <style>
+        html,
+        body {
+            background-color: var(--bg-body) !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-wrapper {
+            background-color: var(--bg-body);
+        }
+
+        .fine-card {
+            border-left: 4px solid #ef4444;
+            background: var(--bg-surface);
+        }
+    </style>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+    <script src="js/registration-services.js"></script>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+    <div class="page-wrapper container pb-32">
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2"><span
+                    class="material-symbols-outlined text-text-primary">arrow_back</span></button>
+            <h1 class="header-title uppercase tracking-widest">Clear Fines</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+            <!-- PROGRESS -->
+            <div class="flex items-center justify-center gap-2 mb-6 mt-4">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                        1</div>
+                    <span class="text-[9px] uppercase tracking-widest text-primary font-bold">Verify</span>
+                </div>
+                <div class="w-12 h-0.5 bg-border-color"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-border-color text-text-secondary flex items-center justify-center text-xs font-bold">
+                        2</div>
+                    <span class="text-[9px] uppercase tracking-widest text-text-secondary">Review</span>
+                </div>
+            </div>
+
+            <!-- SEARCH STATUS -->
+            <div id="search-section" class="mb-8">
+                <div class="bg-bg-surface border border-border-color rounded-2xl p-8 text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-primary text-3xl">search_check</span>
+                    </div>
+                    <h3 class="font-[var(--font-bebas)] text-xl tracking-widest mb-1">Scanning Agencies</h3>
+                    <p class="text-[10px] text-text-secondary uppercase tracking-widest mb-6">Checking FRSC, VIO &
+                        LASTMA databases...</p>
+                    <div class="w-full bg-bg-body h-1 rounded-full overflow-hidden">
+                        <div class="h-full bg-primary animate-[shimmer_2s_infinite]" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FINES LIST -->
+            <div id="results-section" class="hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-sm font-black uppercase tracking-widest font-display">Outstanding Fines</h3>
+                    <span
+                        class="px-2 py-0.5 bg-red-500/10 text-red-500 rounded-full text-[9px] font-black uppercase tracking-widest"
+                        id="fine-count">2 Found</span>
+                </div>
+
+                <div class="space-y-4 mb-6" id="fines-container">
+                    <!-- Fines mocked here -->
+                    <div class="fine-card rounded-xl p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="text-xs font-black uppercase tracking-widest">LASTMA Violation</p>
+                                <p class="text-[10px] text-text-secondary">Illegal Parking - Ikeja Underbridge</p>
+                            </div>
+                            <p class="text-sm font-bold text-red-500">₦20,000</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-4 pt-4 border-t border-border-color/30">
+                            <span class="text-[8px] text-text-secondary uppercase font-bold">12 Jan 2026 • 14:32</span>
+                            <span
+                                class="text-[8px] px-2 py-1 bg-bg-body border border-border-color rounded font-bold uppercase">Ticket:
+                                L-93821</span>
+                        </div>
+                    </div>
+
+                    <div class="fine-card rounded-xl p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="text-xs font-black uppercase tracking-widest">VIO EXPIRY</p>
+                                <p class="text-[10px] text-text-secondary">Expired Roadworthiness Fine</p>
+                            </div>
+                            <p class="text-sm font-bold text-red-500">₦5,000</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-4 pt-4 border-t border-border-color/30">
+                            <span class="text-[8px] text-text-secondary uppercase font-bold">01 Feb 2026 • 09:15</span>
+                            <span
+                                class="text-[8px] px-2 py-1 bg-bg-body border border-border-color rounded font-bold uppercase">Ticket:
+                                V-44210</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-5 mb-8">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-[10px] text-text-secondary uppercase font-bold">Total Fines</span>
+                        <span class="text-sm font-bold">₦25,000</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-[10px] text-text-secondary uppercase font-bold">Processing Fee</span>
+                        <span class="text-sm font-bold">₦2,500</span>
+                    </div>
+                    <div class="pt-3 border-t border-primary/20 flex justify-between">
+                        <span class="text-xs font-black uppercase tracking-widest">Amount to Clear</span>
+                        <span class="text-base font-black text-primary">₦27,500</span>
+                    </div>
+                </div>
+
+                <button onclick="clearFines()"
+                    class="w-full py-4 bg-primary text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20">
+                    Clear All Outstanding Fines
+                </button>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item"><span class="material-symbols-outlined">grid_view</span><span
+                    class="nav-label">Home</span></a>
+            <a href="../fleet.html" class="nav-item"><span class="material-symbols-outlined">explore</span><span
+                    class="nav-label">Fleet</span></a>
+            <a href="../garage.html" class="nav-item active"><span
+                    class="material-symbols-outlined">directions_car</span><span class="nav-label">Garage</span></a>
+            <a href="../inquiries.html" class="nav-item"><span class="material-symbols-outlined">forum</span><span
+                    class="nav-label">Concierge</span></a>
+            <a href="../settings.html" class="nav-item"><span class="material-symbols-outlined">tune</span><span
+                    class="nav-label">Settings</span></a>
+        </nav>
+    </div>
+
+    <script>
+        function init() {
+            setTimeout(() => {
+                document.getElementById('search-section').classList.add('hidden');
+                document.getElementById('results-section').classList.remove('hidden');
+            }, 2500);
+        }
+
+        function clearFines() {
+            // Save mock config
+            RegistrationServices.saveProgress('fines-clearing', {
+                fines: [
+                    { id: 'L-93821', type: 'LASTMA', amount: 20000 },
+                    { id: 'V-44210', type: 'VIO', amount: 5000 }
+                ],
+                totalAmount: 27500
+            });
+            window.location.href = 'fines-clearing-review.html';
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

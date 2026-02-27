@@ -7,6 +7,7 @@ router.use(protect); // All routes in /api/me require authentication
 
 router.get('/garage', meController.getMyGarage);
 router.get('/bids', meController.getMyBids);
+router.get('/sales', meController.getMySales);
 router.patch('/profile', meController.updateProfile);
 router.post('/settle/:auctionId', meController.settleAuction);
 

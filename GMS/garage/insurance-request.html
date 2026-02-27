@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Purchase Insurance | Dealer360 Workshop</title>
+
+    <!-- CSS SYSTEM -->
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+
+    <!-- Tailwind CDN + Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)',
+                        'primary-dark': 'var(--primary-dark)',
+                        'bg-body': 'var(--bg-body)',
+                        'bg-surface': 'var(--bg-surface)',
+                        'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)',
+                        'text-secondary': 'var(--text-secondary)',
+                        'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: {
+                        bebas: ['Bebas Neue', 'sans-serif'],
+                        display: ['Rajdhani', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+
+    <style>
+        /* Success Modal */
+        .success-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .success-modal.active {
+            display: flex;
+        }
+
+        .success-content {
+            background: var(--bg-surface);
+            border: 1px solid var(--primary);
+            border-radius: 2rem;
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+            animation: successSlideUp 0.5s ease-out;
+        }
+
+        @keyframes successSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            animation: successPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes successPulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7);
+            }
+
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 20px rgba(var(--primary-rgb), 0);
+            }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            animation: confettiFall 3s ease-out forwards;
+        }
+
+        @keyframes confettiFall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .workflow-step {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            background: var(--bg-body);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .workflow-step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary)/10;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .terms-box {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .terms-box::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .terms-box::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+
+    <div class="page-wrapper container pb-32">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2">
+                <span class="material-symbols-outlined text-text-primary">arrow_back</span>
+            </button>
+            <h1 class="header-title uppercase tracking-widest">Purchase Insurance</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+
+            <!-- PROGRESS INDICATOR -->
+            <div class="flex items-center justify-center gap-2 mb-6 mt-4">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                        ✓
+                    </div>
+                    <span class="text-[9px] uppercase tracking-widest text-text-secondary">Configure</span>
+                </div>
+                <div class="w-12 h-0.5 bg-primary"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                        ✓
+                    </div>
+                    <span class="text-[9px] uppercase tracking-widest text-text-secondary">Compare</span>
+                </div>
+                <div class="w-12 h-0.5 bg-primary"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                        3
+                    </div>
+                    <span class="text-[9px] uppercase tracking-widest text-primary font-bold">Purchase</span>
+                </div>
+            </div>
+
+            <!-- SELECTED QUOTE SUMMARY -->
+            <div class="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-5 mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="text-4xl" id="insurer-logo">🛡️</div>
+                    <div>
+                        <h2 class="text-lg font-[var(--font-bebas)] tracking-widest uppercase" id="insurer-name">-</h2>
+                        <p class="text-[9px] text-text-secondary uppercase tracking-widest" id="coverage-type">-</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-bg-surface/50 rounded-xl p-3">
+                        <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-1">Annual
+                            Premium
+                        </p>
+                        <p class="text-2xl font-bold text-primary" id="premium-amount">₦0</p>
+                    </div>
+                    <div class="bg-bg-surface/50 rounded-xl p-3">
+                        <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-1">Payment Plan
+                        </p>
+                        <p class="text-sm font-bold capitalize" id="payment-plan">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POLICY DETAILS -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Policy Details</h3>
+
+                <div class="space-y-3 text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-text-secondary">Vehicle:</span>
+                        <span class="font-bold" id="vehicle-details">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-text-secondary">Vehicle Value:</span>
+                        <span class="font-bold" id="vehicle-value">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-text-secondary">Policy Start Date:</span>
+                        <span class="font-bold" id="start-date">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-text-secondary">Policy End Date:</span>
+                        <span class="font-bold" id="end-date">-</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-text-secondary">Deductible:</span>
+                        <span class="font-bold" id="deductible">-</span>
+                    </div>
+                </div>
+
+                <div class="mt-4" id="add-ons-list">
+                    <!-- Populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- WHAT HAPPENS NEXT -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-primary">info</span>
+                    What Happens Next?
+                </h3>
+
+                <div class="space-y-2">
+                    <div class="workflow-step">
+                        <div class="workflow-step-number">1</div>
+                        <div>
+                            <p class="text-xs font-bold mb-1">Payment Processing</p>
+                            <p class="text-[9px] text-text-secondary">Secure payment via card, bank transfer, or USSD
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="workflow-step-number">2</div>
+                        <div>
+                            <p class="text-xs font-bold mb-1">Policy Activation</p>
+                            <p class="text-[9px] text-text-secondary">Insurance activated immediately upon payment
+                                confirmation
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="workflow-step-number">3</div>
+                        <div>
+                            <p class="text-xs font-bold mb-1">Certificate Delivery</p>
+                            <p class="text-[9px] text-text-secondary">Digital certificate sent via email and WhatsApp
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="workflow-step-number">4</div>
+                        <div>
+                            <p class="text-xs font-bold mb-1">Renewal Reminders</p>
+                            <p class="text-[9px] text-text-secondary">Automatic reminders 90, 60, 30, and 7 days before
+                                expiry
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="workflow-step">
+                        <div class="workflow-step-number">5</div>
+                        <div>
+                            <p class="text-xs font-bold mb-1">Claims Support</p>
+                            <p class="text-[9px] text-text-secondary">24/7 claims assistance through the app
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TERMS & CONDITIONS -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-3">Terms & Conditions</h3>
+                <div class="terms-box">
+                    <p class="mb-3">By purchasing this insurance policy, you agree to the following:</p>
+
+                    <p class="font-bold mb-2">1. Policy Coverage</p>
+                    <p class="mb-3">Coverage is as specified in the policy document. Please review all terms carefully
+                        before purchase.</p>
+
+                    <p class="font-bold mb-2">2. Premium Payment</p>
+                    <p class="mb-3">Premium must be paid in full before policy activation. For installment plans, missed
+                        payments may result in policy suspension.</p>
+
+                    <p class="font-bold mb-2">3. Claims Process</p>
+                    <p class="mb-3">All claims must be reported within 24 hours of the incident. Required documents
+                        include police report (for accidents/theft), photos, and claim form.</p>
+
+                    <p class="font-bold mb-2">4. Deductible</p>
+                    <p class="mb-3">The deductible amount must be paid by you before the insurer settles any claim.
+                        Choose your deductible carefully.</p>
+
+                    <p class="font-bold mb-2">5. Policy Renewal</p>
+                    <p class="mb-3">Policy expires after 12 months. You will receive renewal reminders. Failure to renew
+                        means you are driving uninsured.</p>
+
+                    <p class="font-bold mb-2">6. Cancellation</p>
+                    <p class="mb-3">You may cancel within 14 days for a full refund (cooling-off period). After 14 days,
+                        cancellation may incur fees.</p>
+
+                    <p class="font-bold mb-2">7. Fraud</p>
+                    <p class="mb-3">Any fraudulent claims or false information will result in policy cancellation and
+                        potential legal action.</p>
+
+                    <p class="font-bold mb-2">8. Third-Party Service</p>
+                    <p class="mb-3">Dealer360 facilitates insurance purchase but is not the insurer. All claims and
+                        disputes are handled by the insurance company.</p>
+                </div>
+
+                <label class="flex items-start gap-3 mt-4 cursor-pointer">
+                    <input type="checkbox" id="terms-checkbox" class="mt-1">
+                    <span class="text-[10px] text-text-secondary leading-relaxed">
+                        I have read and agree to the terms and conditions above. I understand that this is a binding
+                        insurance contract.
+                    </span>
+                </label>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="flex gap-3">
+                <button onclick="window.history.back()"
+                    class="flex-1 py-4 bg-bg-surface border border-border-color rounded-xl text-[11px] font-black uppercase tracking-widest hover:border-primary transition-all">
+                    Back to Quotes
+                </button>
+                <button onclick="proceedToPayment()" id="purchase-btn"
+                    class="flex-1 py-4 bg-primary text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                    Proceed to Payment
+                </button>
+            </div>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span class="nav-label">Home</span>
+            </a>
+            <a href="../fleet.html" class="nav-item">
+                <span class="material-symbols-outlined">explore</span>
+                <span class="nav-label">Fleet</span>
+            </a>
+            <a href="../garage.html" class="nav-item active">
+                <span class="material-symbols-outlined">directions_car</span>
+                <span class="nav-label">Garage</span>
+            </a>
+            <a href="../inquiries.html" class="nav-item">
+                <span class="material-symbols-outlined">forum</span>
+                <span class="nav-label">Concierge</span>
+            </a>
+            <a href="../settings.html" class="nav-item">
+                <span class="material-symbols-outlined">tune</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div class="success-modal" id="success-modal">
+        <div class="success-content">
+            <div class="p-8 text-center">
+                <div class="success-icon mb-6">
+                    <span class="material-symbols-outlined text-white text-5xl">check_circle</span>
+                </div>
+
+                <h2 class="text-2xl font-[var(--font-bebas)] tracking-widest uppercase mb-2">Insurance Activated!</h2>
+                <p class="text-sm text-text-secondary mb-6">Your insurance policy is now active
+                </p>
+
+                <div class="bg-bg-body rounded-xl p-4 mb-6">
+                    <p class="text-[9px] font-black uppercase tracking-widest text-text-secondary mb-2">Policy Number
+                    </p>
+                    <p class="text-lg font-bold text-primary" id="policy-number">-</p>
+                </div>
+
+                <div class="space-y-2 text-left mb-6">
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-green-500 text-sm">check</span>
+                        <p class="text-xs text-text-secondary">Certificate sent to your email and WhatsApp</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-green-500 text-sm">check</span>
+                        <p class="text-xs text-text-secondary">Coverage starts immediately</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-green-500 text-sm">check</span>
+                        <p class="text-xs text-text-secondary">Renewal reminders set up</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="material-symbols-outlined text-green-500 text-sm">check</span>
+                        <p class="text-xs text-text-secondary">Document saved to your vehicle profile</p>
+                    </div>
+                </div>
+
+                <button onclick="goToServiceHistory()"
+                    class="w-full py-4 bg-primary text-white rounded-xl text-sm font-bold uppercase tracking-widest hover:bg-primary-dark transition-all">
+                    View Service History
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let configuration = null;
+        let selectedQuote = null;
+
+        // Initialize
+        function init() {
+            const saved = localStorage.getItem('insurance_service_config');
+            if (!saved) {
+                window.location.href = 'insurance-config.html';
+                return;
+            }
+
+            configuration = JSON.parse(saved);
+            selectedQuote = configuration.selectedQuote;
+
+            if (!selectedQuote) {
+                window.location.href = 'insurance-review.html';
+                return;
+            }
+
+            renderPolicyDetails();
+            setupTermsCheckbox();
+        }
+
+        function renderPolicyDetails() {
+            // Insurer info
+            document.getElementById('insurer-logo').textContent = selectedQuote.logo || '🛡️';
+            document.getElementById('insurer-name').textContent = selectedQuote.insurerName;
+
+            let coverageText = configuration.coverageType.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            document.getElementById('coverage-type').textContent = coverageText;
+
+            // Premium
+            document.getElementById('premium-amount').textContent = GarageData.formatCurrency(selectedQuote.quotedPrice);
+            document.getElementById('payment-plan').textContent = configuration.paymentPlan;
+
+            // Vehicle details
+            document.getElementById('vehicle-details').textContent = `${configuration.vehicleMake} ${configuration.vehicleModel} ${configuration.vehicleYear}`;
+            document.getElementById('vehicle-value').textContent = GarageData.formatCurrency(configuration.vehicleValue);
+
+            // Dates
+            const today = new Date();
+            const oneYearLater = new Date(today);
+            oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+
+            document.getElementById('start-date').textContent = today.toLocaleDateString('en-NG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('end-date').textContent = oneYearLater.toLocaleDateString('en-NG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Deductible
+            if (configuration.deductible) {
+                document.getElementById('deductible').textContent = GarageData.formatCurrency(configuration.deductible);
+            } else {
+                document.getElementById('deductible').textContent = 'N/A';
+            }
+
+            // Add-ons
+            if (configuration.addOns && configuration.addOns.length > 0) {
+                const addOnsList = document.getElementById('add-ons-list');
+                addOnsList.innerHTML = `
+                    <h4 class="text-xs font-black uppercase tracking-widest mb-2">Add-Ons Included:</h4>
+                    <ul class="space-y-1 text-xs">
+                        ${configuration.addOns.map(addon => `
+                            <li class="flex items-center gap-2">
+                                <span class="text-green-500">✓</span>
+                                <span>${addon.name.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                                <span class="text-text-secondary ml-auto">${GarageData.formatCurrency(addon.value)}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+            }
+        }
+
+        function setupTermsCheckbox() {
+            const checkbox = document.getElementById('terms-checkbox');
+            const purchaseBtn = document.getElementById('purchase-btn');
+
+            purchaseBtn.disabled = true;
+
+            checkbox.addEventListener('change', (e) => {
+                purchaseBtn.disabled = !e.target.checked;
+            });
+        }
+
+        function proceedToPayment() {
+            // In production, this would integrate with payment gateway
+            // For now, simulate successful payment
+
+            // Create service record
+            const today = new Date();
+            const oneYearLater = new Date(today);
+            oneYearLater.setFullYear(oneYearLater.getFullYear() + 1);
+
+            const policyNumber = `${selectedQuote.insurerId.toUpperCase()}-POL-${Date.now().toString().slice(-6)}`;
+
+            const serviceRecord = {
+                vehicleId: configuration.vehicleId,
+                type: 'comprehensive-insurance',
+                title: `${configuration.coverageType.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Insurance`,
+                status: 'active',
+                createdAt: today.toISOString(),
+
+                configuration: {
+                    coverageType: configuration.coverageType,
+                    addOns: configuration.addOns || [],
+                    deductible: configuration.deductible,
+                    paymentPlan: configuration.paymentPlan,
+                    specialRequests: configuration.specialRequests || ''
+                },
+
+                insurerName: selectedQuote.insurerName,
+                policyNumber: policyNumber,
+                premium: selectedQuote.quotedPrice,
+                issuedAt: today.toISOString(),
+                expiresAt: oneYearLater.toISOString(),
+
+                // Document tracking
+                document: {
+                    type: 'insurance',
+                    provider: selectedQuote.insurerName,
+                    policyNumber: policyNumber,
+                    coverageType: configuration.coverageType,
+                    issuedAt: today.toISOString(),
+                    expiresAt: oneYearLater.toISOString(),
+                    status: 'active',
+
+                    // Renewal notifications
+                    notifications: {
+                        '90days': { sent: false, sentAt: null },
+                        '60days': { sent: false, sentAt: null },
+                        '30days': { sent: false, sentAt: null },
+                        '7days': { sent: false, sentAt: null },
+                        'expired': { sent: false, sentAt: null }
+                    }
+                },
+
+                // Payment
+                payment: {
+                    method: 'card',
+                    amount: selectedQuote.quotedPrice,
+                    status: 'paid',
+                    paidAt: today.toISOString(),
+                    transactionRef: `TXN-${Date.now()}`
+                },
+
+                lineItems: [
+                    {
+                        name: `${selectedQuote.insurerName} - ${configuration.coverageType.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}`,
+                        price: selectedQuote.quotedPrice
+                    }
+                ]
+            };
+
+            // Save to localStorage (in production, this would be an API call)
+            const record = GarageData.createServiceRecord(serviceRecord);
+
+            // Clear saved config
+            localStorage.removeItem('insurance_service_config');
+            localStorage.removeItem('insurance_service_progress');
+
+            // Show success modal with confetti
+            showSuccessModal(policyNumber);
+        }
+
+        function showSuccessModal(policyNumber) {
+            const modal = document.getElementById('success-modal');
+            document.getElementById('policy-number').textContent = policyNumber;
+
+            // Create confetti
+            createConfetti();
+
+            // Show modal
+            modal.classList.add('active');
+        }
+
+        function createConfetti() {
+            const colors = ['#00ff88', '#0088ff', '#ff0088', '#ffff00', '#ff8800'];
+            const confettiCount = 50;
+
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+
+        function goToServiceHistory() {
+            window.location.href = 'service-history.html?vid=' + configuration.vehicleId;
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+
+</html>

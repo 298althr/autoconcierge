@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Chassis/Engine Personalization | Dealer360 Workshop</title>
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)', 'primary-dark': 'var(--primary-dark)', 'bg-body': 'var(--bg-body)',
+                        'bg-surface': 'var(--bg-surface)', 'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)', 'text-secondary': 'var(--text-secondary)', 'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: { bebas: ['Bebas Neue', 'sans-serif'], display: ['Rajdhani', 'sans-serif'], body: ['Inter', 'sans-serif'], }
+                }
+            }
+        }
+    </script>
+    <style>
+        html,
+        body {
+            background-color: var(--bg-body) !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-wrapper {
+            background-color: var(--bg-body);
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--bg-body);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 0.875rem 1rem;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px var(--primary)/10;
+        }
+    </style>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+    <script src="js/registration-services.js"></script>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+    <div class="page-wrapper container pb-32">
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2"><span
+                    class="material-symbols-outlined text-text-primary">arrow_back</span></button>
+            <h1 class="header-title uppercase tracking-widest">Legal Identity</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+            <!-- PROGRESS -->
+            <div class="flex items-center justify-center gap-2 mb-6 mt-4">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                        1</div>
+                    <span class="text-[9px] uppercase tracking-widest text-primary font-bold">Configure</span>
+                </div>
+                <div class="w-12 h-0.5 bg-border-color"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-border-color text-text-secondary flex items-center justify-center text-xs font-bold">
+                        2</div>
+                    <span class="text-[9px] uppercase tracking-widest text-text-secondary">Review</span>
+                </div>
+                <div class="w-12 h-0.5 bg-border-color"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-border-color text-text-secondary flex items-center justify-center text-xs font-bold">
+                        3</div>
+                    <span class="text-[9px] uppercase tracking-widest text-text-secondary">Submit</span>
+                </div>
+            </div>
+
+            <!-- VEHICLE -->
+            <div class="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-5 mb-6"
+                id="vehicle-card"></div>
+
+            <!-- TYPE SELECTION -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4 font-display">Service Logic</h3>
+                <div class="space-y-4">
+                    <div class="form-group">
+                        <label
+                            class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-2 block">Change
+                            Type</label>
+                        <select id="change-type" onchange="handleTypeChange()" class="form-input">
+                            <option value="engine">Engine Change (Replacement)</option>
+                            <option value="chassis">Chassis Number Update</option>
+                            <option value="both">Both Engine & Chassis</option>
+                        </select>
+                    </div>
+
+                    <div id="engine-fields" class="space-y-4 pt-4 border-t border-border-color/20 mt-4">
+                        <div class="form-group">
+                            <label
+                                class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-2 block">New
+                                Engine Number</label>
+                            <input type="text" id="new-engine-num" placeholder="Enter new engine number..."
+                                class="form-input tracking-widest">
+                        </div>
+                    </div>
+
+                    <div id="chassis-fields" class="hidden space-y-4 pt-4 border-t border-border-color/20 mt-4">
+                        <div class="form-group">
+                            <label
+                                class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-2 block">New
+                                Chassis Number</label>
+                            <input type="text" id="new-chassis-num" placeholder="Enter new chassis number..."
+                                class="form-input tracking-widest">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DOCUMENTS -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6" id="document-upload"></div>
+
+            <!-- PRICING -->
+            <div class="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-5 mb-6"
+                id="pricing-breakdown"></div>
+
+            <button onclick="proceedToReview()"
+                class="w-full py-4 bg-primary text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all">
+                Proceed to Review
+            </button>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item"><span class="material-symbols-outlined">grid_view</span><span
+                    class="nav-label">Home</span></a>
+            <a href="../fleet.html" class="nav-item"><span class="material-symbols-outlined">explore</span><span
+                    class="nav-label">Fleet</span></a>
+            <a href="../garage.html" class="nav-item active"><span
+                    class="material-symbols-outlined">directions_car</span><span class="nav-label">Garage</span></a>
+            <a href="../inquiries.html" class="nav-item"><span class="material-symbols-outlined">forum</span><span
+                    class="nav-label">Concierge</span></a>
+            <a href="../settings.html" class="nav-item"><span class="material-symbols-outlined">tune</span><span
+                    class="nav-label">Settings</span></a>
+        </nav>
+    </div>
+
+    <script>
+        let activeVehicle = null;
+
+        function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            activeVehicle = GarageData.getVehicleById(urlParams.get('vid') || GarageData.getActiveVehicle()?.id);
+
+            if (!activeVehicle) { window.location.href = 'select-vehicle.html?service=chassis-engine'; return; }
+
+            RegistrationServices.renderVehicleCard(activeVehicle, 'vehicle-card');
+
+            loadProgress();
+            handleTypeChange();
+
+            document.addEventListener('input', saveProgress);
+            document.addEventListener('change', saveProgress);
+        }
+
+        function handleTypeChange() {
+            const type = document.getElementById('change-type').value;
+            document.getElementById('engine-fields').style.display = (type === 'engine' || type === 'both') ? 'block' : 'none';
+            document.getElementById('chassis-fields').style.display = (type === 'chassis' || type === 'both') ? 'block' : 'none';
+
+            let docs = ['receipt', 'sworn-affidavit', 'police-report'];
+            RegistrationServices.renderDocumentUpload('document-upload', docs);
+
+            updatePricing();
+            saveProgress();
+        }
+
+        function updatePricing() {
+            const type = document.getElementById('change-type').value;
+            const fees = {
+                governmentFees: type === 'both' ? 45000 : 25000,
+                serviceFee: 50000,
+                total: 0
+            };
+            fees.total = fees.governmentFees + fees.serviceFee;
+            RegistrationServices.renderFeeBreakdown('pricing-breakdown', fees);
+        }
+
+        function saveProgress() {
+            const config = {
+                vehicleId: activeVehicle.id,
+                changeType: document.getElementById('change-type').value,
+                newEngineNum: document.getElementById('new-engine-num').value,
+                newChassisNum: document.getElementById('new-chassis-num').value
+            };
+            RegistrationServices.saveProgress('chassis-engine', config);
+        }
+
+        function loadProgress() {
+            const saved = RegistrationServices.loadProgress('chassis-engine');
+            if (saved) {
+                document.getElementById('change-type').value = saved.changeType || 'engine';
+                document.getElementById('new-engine-num').value = saved.newEngineNum || '';
+                document.getElementById('new-chassis-num').value = saved.newChassisNum || '';
+            }
+        }
+
+        function proceedToReview() {
+            const validation = RegistrationServices.validateDocuments(['receipt', 'sworn-affidavit']);
+            if (!validation.valid) {
+                RegistrationServices.showToast(`Missing: ${validation.missing.join(', ')}`, 'error');
+                return;
+            }
+            saveProgress();
+            window.location.href = `chassis-engine-review.html?vid=${activeVehicle.id}`;
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

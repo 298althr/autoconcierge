@@ -22,10 +22,11 @@ import {
     Calendar,
     Activity,
     ShieldCheck,
-    Gavel
+    Gavel,
+    Loader2
 } from 'lucide-react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AuctionRoomPage() {
     const { id } = useParams();
@@ -33,6 +34,20 @@ export default function AuctionRoomPage() {
     const { auction, loading, error, placeBid, buyNow } = useAuction(id as string, token);
     const { wallet } = useWallet();
     const [showHistoryModal, setShowHistoryModal] = React.useState(false);
+    const [buyNowSuccess, setBuyNowSuccess] = React.useState(false);
+
+    const handleBuyNow = async () => {
+        try {
+            await buyNow();
+            setBuyNowSuccess(true);
+            // Redirect after a short delay so they can see success
+            setTimeout(() => {
+                window.location.href = '/garage';
+            }, 2000);
+        } catch (err: any) {
+            alert(err.message);
+        }
+    };
 
     if (loading) return (
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center">
@@ -62,6 +77,35 @@ export default function AuctionRoomPage() {
     return (
         <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-32 pb-20 px-6">
             <MotionBackground />
+            <AnimatePresence>
+                {buyNowSuccess && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-xl flex items-center justify-center p-6"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            className="bg-white rounded-[3.5rem] p-12 max-w-sm w-full text-center shadow-2xl relative overflow-hidden"
+                        >
+                            <div className="absolute top-0 left-0 w-full h-2 bg-emerald-500" />
+                            <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner">
+                                <ShieldCheck size={48} />
+                            </div>
+                            <h2 className="text-3xl font-heading font-extrabold text-slate-900 mb-4">Market Won.</h2>
+                            <p className="text-slate-500 text-sm font-subheading mb-8 leading-relaxed">
+                                You have successfully initiated the acquisition. Transferring you to the vault to oversee the settlement process...
+                            </p>
+                            <div className="flex items-center justify-center space-x-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                <Loader2 className="animate-spin" size={14} />
+                                <span>Vault Synching</span>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
             <PillHeader />
 
             <div className="max-w-7xl mx-auto relative z-10">
@@ -186,7 +230,7 @@ export default function AuctionRoomPage() {
                                 buyNowPrice={auction.buy_now_price}
                                 kycStatus={user?.kyc_status}
                                 onBid={placeBid}
-                                onBuyNow={buyNow}
+                                onBuyNow={handleBuyNow}
                                 onViewHistory={() => setShowHistoryModal(true)}
                                 disabled={auction.status !== 'live'}
                             />

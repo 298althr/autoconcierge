@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Select Asset | Dealer360 Workshop</title>
+
+    <!-- CSS SYSTEM -->
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+
+    <!-- Tailwind CDN + Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)',
+                        'primary-dark': 'var(--primary-dark)',
+                        'bg-body': 'var(--bg-body)',
+                        'bg-surface': 'var(--bg-surface)',
+                        'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)',
+                        'text-secondary': 'var(--text-secondary)',
+                        'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: {
+                        bebas: ['Bebas Neue', 'sans-serif'],
+                        display: ['Rajdhani', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+
+    <style>
+        .vehicle-select-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .vehicle-select-card:hover,
+        .vehicle-select-card:active {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(153, 0, 17, 0.15);
+        }
+
+        .vehicle-select-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.04), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .vehicle-select-card:hover::after {
+            opacity: 1;
+        }
+
+        .vehicle-img-wrap {
+            position: relative;
+            height: 11rem;
+            overflow: hidden;
+        }
+
+        .vehicle-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .vehicle-select-card:hover .vehicle-img-wrap img {
+            transform: scale(1.05);
+        }
+
+        .status-transit {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .status-upgrade {
+            background: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .status-ready {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .stat-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        @keyframes cardEntry {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .vehicle-select-card {
+            animation: cardEntry 0.5s ease forwards;
+        }
+
+        .vehicle-select-card:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .vehicle-select-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+    </style>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+
+    <div class="page-wrapper container pb-32">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2">
+                <span class="material-symbols-outlined text-text-primary">arrow_back</span>
+            </button>
+            <h1 class="header-title uppercase tracking-widest">SELECT ASSET</h1>
+            <button class="p-2" onclick="window.location.href='service-history.html'">
+                <span class="material-symbols-outlined text-text-secondary">history</span>
+            </button>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+
+            <!-- SECTION HEADER -->
+            <div class="mt-6 mb-6">
+                <div class="bg-primary/5 border border-primary/20 rounded-3xl p-5">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-[8px] font-black uppercase tracking-[0.2em] text-primary">Deployment
+                            Gate</span>
+                        <span class="material-symbols-outlined text-primary text-sm animate-pulse">security</span>
+                    </div>
+                    <h2 class="font-[var(--font-bebas)] text-2xl tracking-widest leading-none">
+                        WHICH ASSET NEEDS SERVICE?</h2>
+                    <p class="text-[10px] text-text-secondary uppercase tracking-widest mt-2">
+                        Select a vehicle from your garage to deploy workshop services.</p>
+                </div>
+            </div>
+
+            <!-- TARGET SERVICE (shown if redirected from specific service) -->
+            <div id="target-service-banner" class="hidden mb-6">
+                <div class="bg-bg-surface-elevated border border-white/5 rounded-2xl p-4 flex items-center gap-4">
+                    <div
+                        class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                        <span class="material-symbols-outlined" id="target-service-icon">build</span>
+                    </div>
+                    <div>
+                        <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-0.5">
+                            Deploying Service</p>
+                        <p class="text-sm font-bold uppercase tracking-widest" id="target-service-name">
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VEHICLE LIST -->
+            <div class="space-y-5" id="vehicle-list">
+                <!-- Rendered by JS -->
+            </div>
+
+            <!-- EMPTY STATE -->
+            <div id="empty-state" class="hidden text-center py-20 opacity-40">
+                <span class="material-symbols-outlined text-5xl mb-4">directions_car</span>
+                <p class="text-xs uppercase font-bold tracking-widest mb-2">No Assets Found
+                </p>
+                <p class="text-[10px] text-text-secondary uppercase tracking-widest">
+                    Purchase or register a vehicle to access Workshop services.</p>
+            </div>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span class="nav-label">Home</span>
+            </a>
+            <a href="../fleet.html" class="nav-item">
+                <span class="material-symbols-outlined">explore</span>
+                <span class="nav-label">Fleet</span>
+            </a>
+            <a href="../garage.html" class="nav-item active">
+                <span class="material-symbols-outlined">directions_car</span>
+                <span class="nav-label">Garage</span>
+            </a>
+            <a href="../inquiries.html" class="nav-item">
+                <span class="material-symbols-outlined">forum</span>
+                <span class="nav-label">Concierge</span>
+            </a>
+            <a href="../settings.html" class="nav-item">
+                <span class="material-symbols-outlined">tune</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        // Read target service from URL (e.g., ?service=engine-scan)
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetService = urlParams.get('service');
+
+        // Show target service banner if redirected from a specific service card
+        if (targetService) {
+            const banner = document.getElementById('target-service-banner');
+            const cfg = GarageData.getServiceTypeConfig(targetService);
+            document.getElementById('target-service-icon').textContent = cfg.icon;
+            document.getElementById('target-service-name').textContent = cfg.label;
+            banner.classList.remove('hidden');
+        }
+
+        // Render vehicle cards
+        function renderVehicles() {
+            const vehicles = GarageData.getUserVehicles();
+            const container = document.getElementById('vehicle-list');
+            const emptyState = document.getElementById('empty-state');
+
+            if (vehicles.length === 0) {
+                emptyState.classList.remove('hidden');
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.innerHTML = vehicles.map(v => {
+                const statusCfg = GarageData.getVehicleStatusConfig(v.status);
+                const serviceCount = GarageData.getServiceCountForVehicle(v.id);
+                const totalSpent = GarageData.getTotalSpentForVehicle(v.id);
+
+                return `
+                <div class="vehicle-select-card" onclick="selectVehicle('${v.id}')">
+                    <div class="vehicle-img-wrap">
+                        <img src="${v.image}" alt="${v.year} ${v.make} ${v.model}">
+                        <div class="absolute inset-0 bg-gradient-to-t from-bg-surface via-transparent to-transparent"></div>
+                        <div class="absolute top-4 left-4">
+                            <span class="garage-status-pill ${statusCfg.class}" style="padding:0.25rem 0.75rem;border-radius:100px;font-size:8px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;">${statusCfg.label}</span>
+                        </div>
+                        <div class="absolute bottom-4 left-4 right-4">
+                            <h3 class="text-2xl font-[var(--font-bebas)] text-white tracking-widest leading-none">
+                                ${v.year} ${v.make.toUpperCase()} ${v.model.toUpperCase()}</h3>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex gap-4">
+                                <div class="stat-chip">
+                                    <span class="material-symbols-outlined text-xs">tag</span>
+                                    ${v.vin.slice(-6)}
+                                </div>
+                                <div class="stat-chip">
+                                    <span class="material-symbols-outlined text-xs">speed</span>
+                                    ${(v.mileage / 1000).toFixed(0)}K KM
+                                </div>
+                                <div class="stat-chip">
+                                    <span class="material-symbols-outlined text-xs">build</span>
+                                    ${serviceCount} SERVICES
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 p-3 bg-bg-surface-elevated rounded-2xl border border-border-color/50 mb-4">
+                            <div>
+                                <p class="text-[8px] font-black uppercase tracking-widest opacity-40 mb-1">Current Value</p>
+                                <p class="text-sm font-bold">${GarageData.formatCurrency(v.currentValue)}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[8px] font-black uppercase tracking-widest opacity-40 mb-1">Service Spend</p>
+                                <p class="text-sm font-bold text-primary">${GarageData.formatCurrency(totalSpent)}</p>
+                            </div>
+                        </div>
+                        <button class="w-full py-3 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center justify-center gap-2 hover:brightness-110 transition-all">
+                            <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            DEPLOY SERVICES
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function selectVehicle(vehicleId) {
+            GarageData.setActiveVehicle(vehicleId);
+
+            if (targetService) {
+                // Map service ID to the correct entry point file
+                const serviceMap = {
+                    'license-renewal': 'license-renewal-config.html',
+                    'roadworthiness': 'roadworthiness-config.html',
+                    'vehicle-registration': 'vehicle-registration-config.html',
+                    'number-plates': 'number-plates-config.html',
+                    'change-ownership': 'change-ownership-config.html',
+                    'title-transfer': 'title-transfer-config.html',
+                    'title-verification': 'title-verification-config.html',
+                    'police-cmr': 'police-cmr-config.html',
+                    'tinted-permit': 'tinted-permit-config.html',
+                    'chassis-engine': 'chassis-engine-config.html',
+                    'specialized-permits': 'specialized-permits-config.html',
+                    'insurance': 'insurance-config.html',
+                    'history-check': 'history-check-config.html',
+                    'fines-clearing': 'fines-clearing-config.html',
+                    'wheel-services': 'wheel-services-config.html',
+                    'ac-servicing': 'ac-servicing-config.html',
+                    'cng-conversion': 'cng-conversion-config.html',
+                    'security-tech': 'security-tech-config.html',
+                    'emergency-rescue': 'emergency-rescue-config.html',
+                    'diagnostics-hub': 'diagnostics-hub.html',
+                    'registration-hub': 'registration-hub.html',
+                    'legal-hub': 'legal-hub.html',
+                    'performance-hub': 'performance-hub.html',
+                    'refurbishment-hub': 'refurbishment-hub.html',
+                    'logistics-hub': 'logistics-hub.html',
+                    'upgrade-configurator': 'upgrade-configurator.html'
+                };
+
+                const targetFile = serviceMap[targetService] || `${targetService}.html`;
+                window.location.href = targetFile;
+            } else {
+                // Go back to garage workshop tab
+                window.location.href = '../garage.html?tab=workshop';
+            }
+        }
+
+        // Init
+        renderVehicles();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title id="page-title">Service | Dealer360 Workshop</title>
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)', 'primary-dark': 'var(--primary-dark)',
+                        'bg-body': 'var(--bg-body)', 'bg-surface': 'var(--bg-surface)',
+                        'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)', 'text-secondary': 'var(--text-secondary)',
+                        'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: { bebas: ['Bebas Neue', 'sans-serif'], display: ['Rajdhani', 'sans-serif'], body: ['Inter', 'sans-serif'], }
+                }
+            }
+        }
+    </script>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+    <div class="page-wrapper container pb-32">
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2">
+                <span class="material-symbols-outlined text-text-primary">arrow_back</span>
+            </button>
+            <h1 class="header-title uppercase tracking-widest" id="header-title">SERVICE</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+            <!-- Service Header -->
+            <div class="bg-primary/5 border border-primary/20 rounded-3xl p-5 mb-6 mt-4">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-symbols-outlined text-primary text-2xl" id="service-icon">build</span>
+                    <div>
+                        <h2 class="font-[var(--font-bebas)] text-xl tracking-widest" id="service-title">SERVICE</h2>
+                        <p class="text-[9px] text-text-secondary uppercase tracking-widest" id="service-subtitle">
+                            Professional service</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicle Card -->
+            <div id="vehicle-card" class="bg-bg-surface border border-border-color rounded-3xl overflow-hidden mb-6">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Service Description -->
+            <div class="bg-bg-surface-elevated border border-border-color rounded-3xl p-5 mb-6">
+                <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-4">Service Details</p>
+                <div id="service-description" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Package Options -->
+            <div class="mb-6" id="package-options">
+                <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-3">Select Package</p>
+                <div id="packages-container" class="space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Pricing Summary -->
+            <div class="bg-bg-surface border border-border-color rounded-3xl p-5 mb-6">
+                <div class="flex items-center justify-between mb-4 pb-4 border-b border-border-color">
+                    <span class="text-[10px] font-black uppercase tracking-widest">Total Cost</span>
+                    <span class="text-2xl font-bold text-primary" id="total-cost">₦0</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-green-400 text-sm">verified</span>
+                    <p class="text-[9px] text-text-secondary uppercase tracking-widest" id="partner-name">Verified
+                        Partner</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3">
+                <button onclick="window.history.back()"
+                    class="flex-1 py-4 bg-bg-surface border border-border-color rounded-xl text-[11px] font-black uppercase tracking-widest">Cancel</button>
+                <button onclick="bookService()"
+                    class="flex-1 py-4 bg-primary text-white rounded-xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-primary/20">Book
+                    Service</button>
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span class="nav-label">Home</span>
+            </a>
+            <a href="../fleet.html" class="nav-item">
+                <span class="material-symbols-outlined">explore</span>
+                <span class="nav-label">Fleet</span>
+            </a>
+            <a href="../garage.html" class="nav-item active">
+                <span class="material-symbols-outlined">directions_car</span>
+                <span class="nav-label">Garage</span>
+            </a>
+            <a href="../inquiries.html" class="nav-item">
+                <span class="material-symbols-outlined">forum</span>
+                <span class="nav-label">Concierge</span>
+            </a>
+            <a href="../settings.html" class="nav-item">
+                <span class="material-symbols-outlined">tune</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        let activeVehicle = null;
+        let selectedPackage = null;
+
+        // Service configurations
+        const serviceConfigs = {
+            'registration': {
+                icon: 'description',
+                title: 'VEHICLE REGISTRATION',
+                subtitle: 'License & state protocols',
+                description: [
+                    'Complete vehicle registration and licensing services',
+                    'Document preparation and submission',
+                    'Government liaison and follow-up',
+                    'Number plate procurement',
+                    'Registration certificate delivery'
+                ],
+                packages: [
+                    { name: 'New Registration', price: 125000, features: ['Fresh registration', 'Number plate', 'Certificate'] },
+                    { name: 'Renewal', price: 65000, features: ['Annual renewal', 'Updated certificate'] },
+                    { name: 'Transfer of Ownership', price: 95000, features: ['Ownership transfer', 'New certificate', 'Number plate update'] }
+                ],
+                partner: 'Dealer360 Licensing Services'
+            },
+            'repaint': {
+                icon: 'palette',
+                title: 'VEHICLE REPAINT',
+                subtitle: 'Color change & AI preview',
+                description: [
+                    'Professional full-body respray or wrap',
+                    'AI-powered color preview before commitment',
+                    'Premium paint brands and finishes',
+                    'Surface preparation and rust treatment',
+                    '12-month paint warranty'
+                ],
+                packages: [
+                    { name: 'Standard Repaint', price: 280000, features: ['Solid color', 'Standard finish', '6-month warranty'] },
+                    { name: 'Premium Repaint', price: 450000, features: ['Metallic/Pearl', 'Premium finish', '12-month warranty'] },
+                    { name: 'Matte/Satin Wrap', price: 620000, features: ['Full vinyl wrap', 'Matte/Satin finish', '3-year warranty'] }
+                ],
+                partner: 'AutoCraft Lagos Terminal'
+            },
+            'deep-clean': {
+                icon: 'cleaning_services',
+                title: 'DEEP CLEAN & DETAILING',
+                subtitle: 'Professional detailing packages',
+                description: [
+                    'Comprehensive interior and exterior cleaning',
+                    'Engine bay detailing',
+                    'Paint correction and ceramic coating options',
+                    'Leather conditioning and fabric protection',
+                    'Odor elimination and sanitization'
+                ],
+                packages: [
+                    { name: 'Basic Detail', price: 45000, features: ['Exterior wash', 'Interior vacuum', 'Basic polish'] },
+                    { name: 'Premium Detail', price: 95000, features: ['Full exterior detail', 'Deep interior clean', 'Engine bay', 'Wax protection'] },
+                    { name: 'Showroom Finish', price: 180000, features: ['Paint correction', 'Ceramic coating', 'Leather treatment', 'Engine detail'] }
+                ],
+                partner: 'AutoCraft Lagos Terminal'
+            },
+            'legal': {
+                icon: 'gavel',
+                title: 'LEGAL SERVICES',
+                subtitle: 'Title & transfer protocols',
+                description: [
+                    'Vehicle title verification and transfer',
+                    'Legal documentation review',
+                    'Ownership dispute resolution',
+                    'Lien clearance assistance',
+                    'Legal compliance certification'
+                ],
+                packages: [
+                    { name: 'Title Verification', price: 75000, features: ['Ownership check', 'Lien search', 'Report'] },
+                    { name: 'Title Transfer', price: 150000, features: ['Full transfer process', 'Documentation', 'Registration'] },
+                    { name: 'Legal Consultation', price: 200000, features: ['Attorney review', 'Dispute resolution', 'Full legal support'] }
+                ],
+                partner: 'Dealer360 Legal Services'
+            },
+            'customs': {
+                icon: 'verified',
+                title: 'CUSTOMS & DUTY',
+                subtitle: 'Clearance & verification',
+                description: [
+                    'Import duty calculation and payment',
+                    'Customs clearance processing',
+                    'Documentation and compliance',
+                    'Port liaison and vehicle release',
+                    'Duty exemption application (if eligible)'
+                ],
+                packages: [
+                    { name: 'Standard Clearance', price: 350000, features: ['Duty payment', 'Documentation', 'Port release'] },
+                    { name: 'Express Clearance', price: 480000, features: ['Priority processing', '48-hour release', 'Full support'] },
+                    { name: 'Exemption Application', price: 250000, features: ['Eligibility check', 'Application filing', 'Follow-up'] }
+                ],
+                partner: 'Dealer360 Customs Services'
+            },
+            'logistics': {
+                icon: 'local_shipping',
+                title: 'LOGISTICS & TRANSPORT',
+                subtitle: 'Terminal handover moves',
+                description: [
+                    'Secure vehicle transportation',
+                    'Port-to-door delivery',
+                    'Interstate vehicle relocation',
+                    'Insurance coverage during transit',
+                    'Real-time GPS tracking'
+                ],
+                packages: [
+                    { name: 'Local Delivery', price: 35000, features: ['Within Lagos', 'Same-day delivery', 'Insurance'] },
+                    { name: 'Interstate Transport', price: 120000, features: ['Nationwide', '3-5 days', 'Full insurance', 'GPS tracking'] },
+                    { name: 'Port Pickup', price: 85000, features: ['Port collection', 'Inspection', 'Delivery to location'] }
+                ],
+                partner: 'Dealer360 Logistics'
+            },
+            'valuation': {
+                icon: 'analytics',
+                title: 'AI VALUATION',
+                subtitle: 'AI exit strategy & ROI',
+                description: [
+                    'AI-powered market value assessment',
+                    'Resale strategy recommendations',
+                    'ROI analysis and projections',
+                    'Optimal selling timeline',
+                    'Upgrade impact on value'
+                ],
+                packages: [
+                    { name: 'Basic Valuation', price: 25000, features: ['Current market value', 'Basic report'] },
+                    { name: 'Comprehensive Analysis', price: 65000, features: ['Full market analysis', 'ROI projections', 'Strategy report'] },
+                    { name: 'Exit Strategy Package', price: 120000, features: ['Full analysis', 'Listing optimization', '30-day support'] }
+                ],
+                partner: 'Dealer360 Analytics'
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            activeVehicle = GarageData.getActiveVehicle();
+            if (!activeVehicle) {
+                const serviceName = getServiceNameFromURL();
+                window.location.href = `select-vehicle.html?service=${serviceName}`;
+                return;
+            }
+
+            const serviceName = getServiceNameFromURL();
+            const config = serviceConfigs[serviceName];
+
+            if (!config) {
+                alert('Service not found');
+                window.location.href = '../garage.html?tab=workshop';
+                return;
+            }
+
+            initializeService(config);
+            renderVehicleCard();
+        });
+
+        function getServiceNameFromURL() {
+            const path = window.location.pathname;
+            const filename = path.split('/').pop();
+            return filename.replace('.html', '');
+        }
+
+        function initializeService(config) {
+            document.getElementById('page-title').textContent = config.title + ' | Dealer360';
+            document.getElementById('header-title').textContent = config.title;
+            document.getElementById('service-icon').textContent = config.icon;
+            document.getElementById('service-title').textContent = config.title;
+            document.getElementById('service-subtitle').textContent = config.subtitle;
+            document.getElementById('partner-name').textContent = config.partner;
+
+            // Render description
+            document.getElementById('service-description').innerHTML = config.description.map(item => `
+                <div class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+                    <p class="text-[10px] leading-tight">${item}</p>
+                </div>
+            `).join('');
+
+            // Render packages
+            document.getElementById('packages-container').innerHTML = config.packages.map((pkg, idx) => `
+                <label class="flex items-start gap-4 p-4 bg-bg-surface border border-border-color rounded-2xl cursor-pointer hover:border-primary transition-all">
+                    <input type="radio" name="package" value="${idx}" ${idx === 0 ? 'checked' : ''} onchange="selectPackage(${idx}, ${pkg.price})">
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between mb-2">
+                            <p class="text-sm font-bold">${pkg.name}</p>
+                            <span class="text-sm font-bold text-primary">${GarageData.formatCurrency(pkg.price)}</span>
+                        </div>
+                        <div class="space-y-1">
+                            ${pkg.features.map(f => `<p class="text-[9px] text-text-secondary">• ${f}</p>`).join('')}
+                        </div>
+                    </div>
+                </label>
+            `).join('');
+
+            // Select first package by default
+            selectPackage(0, config.packages[0].price);
+        }
+
+        function renderVehicleCard() {
+            const v = activeVehicle;
+            document.getElementById('vehicle-card').innerHTML = `
+                <div class="relative h-32 overflow-hidden">
+                    <img src="${v.image}" class="w-full h-full object-cover" alt="">
+                    <div class="absolute inset-0 bg-gradient-to-t from-bg-surface via-transparent to-transparent"></div>
+                    <div class="absolute bottom-3 left-4">
+                        <h3 class="text-lg font-[var(--font-bebas)] text-white tracking-widest">${v.year} ${v.make.toUpperCase()} ${v.model.toUpperCase()}</h3>
+                        <p class="text-[8px] text-white/60 uppercase tracking-widest font-bold mt-0.5">VIN: ${v.vin.slice(-8)}</p>
+                    </div>
+                </div>
+                <div class="p-4 grid grid-cols-2 gap-3">
+                    <div>
+                        <p class="text-[7px] font-black uppercase tracking-widest opacity-40 mb-1">Mileage</p>
+                        <p class="text-sm font-bold">${(v.mileage / 1000).toFixed(0)}K KM</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[7px] font-black uppercase tracking-widest opacity-40 mb-1">Current Value</p>
+                        <p class="text-sm font-bold text-primary">${GarageData.formatCurrency(v.currentValue)}</p>
+                    </div>
+                </div>`;
+        }
+
+        function selectPackage(index, price) {
+            selectedPackage = { index, price };
+            document.getElementById('total-cost').textContent = GarageData.formatCurrency(price);
+        }
+
+        function bookService() {
+            const serviceName = getServiceNameFromURL();
+            const config = serviceConfigs[serviceName];
+            const pkg = config.packages[selectedPackage.index];
+
+            const serviceRecord = GarageData.createServiceRecord({
+                vehicleId: activeVehicle.id,
+                type: serviceName,
+                title: `${config.title} — ${pkg.name}`,
+                partnerName: config.partner,
+                invoiceTotal: pkg.price,
+                beforeScores: {
+                    beauty: 5, performance: 6, comfort: 5, tech: 3,
+                    value: activeVehicle.currentValue
+                },
+                afterScores: {
+                    beauty: 6, performance: 6, comfort: 6, tech: 4,
+                    value: activeVehicle.currentValue + (pkg.price * 0.3)
+                },
+                lineItems: [
+                    { name: `${config.title} — ${pkg.name}`, price: pkg.price }
+                ],
+                details: { package: pkg.name, features: pkg.features }
+            });
+
+            window.location.href = `contract-sign.html?sid=${serviceRecord.id}`;
+        }
+    </script>
+</body>
+
+</html>

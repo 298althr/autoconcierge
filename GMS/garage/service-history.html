@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Service History | Dealer360 Workshop</title>
+
+    <!-- CSS SYSTEM -->
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+
+    <!-- Tailwind CDN + Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)',
+                        'primary-dark': 'var(--primary-dark)',
+                        'bg-body': 'var(--bg-body)',
+                        'bg-surface': 'var(--bg-surface)',
+                        'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)',
+                        'text-secondary': 'var(--text-secondary)',
+                        'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: {
+                        bebas: ['Bebas Neue', 'sans-serif'],
+                        display: ['Rajdhani', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+
+    <style>
+        .timeline-line {
+            position: absolute;
+            left: 1.25rem;
+            top: 3rem;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--border-color), transparent);
+        }
+
+        .timeline-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            background: var(--bg-body);
+            position: absolute;
+            left: 0.9rem;
+            top: 0.25rem;
+            z-index: 2;
+        }
+
+        .timeline-dot.completed {
+            background: var(--primary);
+        }
+
+        .service-record-card {
+            border: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            border-radius: 1.25rem;
+            padding: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .service-record-card:hover {
+            border-color: var(--primary);
+        }
+
+        .filter-chip {
+            padding: 0.4rem 0.85rem;
+            border-radius: 100px;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border: 1px solid var(--border-color);
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .record-animate {
+            animation: fadeUp 0.4s ease forwards;
+            opacity: 0;
+        }
+
+        /* Modal Styles */
+        .modal-fade-in {
+            animation: modalFadeIn 0.3s ease forwards;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .progress-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .progress-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0.625rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary), var(--border-color));
+        }
+
+        .progress-step {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-step::before {
+            content: '';
+            position: absolute;
+            left: -1.4375rem;
+            top: 0.25rem;
+            width: 0.875rem;
+            height: 0.875rem;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background: var(--bg-body);
+            z-index: 2;
+        }
+
+        .progress-step.completed::before {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .progress-step.active::before {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(153, 0, 17, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 4px rgba(153, 0, 17, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(153, 0, 17, 0.1);
+            }
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 2rem;
+        }
+
+        .star {
+            cursor: pointer;
+            color: var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #FFD700;
+            transform: scale(1.1);
+        }
+
+        .service-record-card {
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+
+    <div class="page-wrapper container pb-32">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2">
+                <span class="material-symbols-outlined text-text-primary">arrow_back</span>
+            </button>
+            <h1 class="header-title uppercase tracking-widest">SERVICE LOG</h1>
+            <button class="p-2" onclick="exportHistory()">
+                <span class="material-symbols-outlined text-text-secondary">download</span>
+            </button>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+
+            <!-- VEHICLE SELECTOR (compact) -->
+            <div class="mt-4 mb-6">
+                <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-3">
+                    Viewing History For</p>
+                <div class="flex gap-3 overflow-x-auto no-scrollbar pb-2" id="vehicle-tabs">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+
+            <!-- ACTIVE VEHICLE CARD -->
+            <div id="vehicle-summary" class="mb-6">
+                <!-- Rendered by JS -->
+            </div>
+
+            <!-- STATS ROW -->
+            <div class="grid grid-cols-3 gap-3 mb-6" id="stats-row">
+                <!-- Rendered by JS -->
+            </div>
+
+            <!-- FILTER CHIPS -->
+            <div class="flex gap-2 overflow-x-auto no-scrollbar mb-6 pb-1">
+                <button class="filter-chip active" onclick="filterRecords('all', this)">All</button>
+                <button class="filter-chip" onclick="filterRecords('pending', this)">Pending</button>
+                <button class="filter-chip" onclick="filterRecords('awaiting-payment', this)">Payment</button>
+                <button class="filter-chip" onclick="filterRecords('in-progress', this)">Active</button>
+                <button class="filter-chip" onclick="filterRecords('completed', this)">Completed</button>
+                <button class="filter-chip" onclick="filterRecords('cancelled', this)">Cancelled</button>
+            </div>
+
+            <!-- SERVICE RECORDS TIMELINE -->
+            <div id="records-container" class="space-y-4">
+                <!-- Rendered by JS -->
+            </div>
+
+            <!-- EMPTY STATE -->
+            <div id="empty-records" class="hidden text-center py-16 opacity-40">
+                <span class="material-symbols-outlined text-5xl mb-4">receipt_long</span>
+                <p class="text-xs uppercase font-bold tracking-widest mb-2">No Records Found</p>
+                <p class="text-[10px] text-text-secondary uppercase tracking-widest">
+                    Service records will appear here once you deploy a workshop service.</p>
+            </div>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span class="nav-label">Home</span>
+            </a>
+            <a href="../fleet.html" class="nav-item">
+                <span class="material-symbols-outlined">explore</span>
+                <span class="nav-label">Fleet</span>
+            </a>
+            <a href="../garage.html" class="nav-item active">
+                <span class="material-symbols-outlined">directions_car</span>
+                <span class="nav-label">Garage</span>
+            </a>
+            <a href="../inquiries.html" class="nav-item">
+                <span class="material-symbols-outlined">forum</span>
+                <span class="nav-label">Concierge</span>
+            </a>
+            <a href="../settings.html" class="nav-item">
+                <span class="material-symbols-outlined">tune</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <!-- SERVICE DETAIL MODAL -->
+    <div id="service-detail-modal" class="fixed inset-0 bg-black/95 z-50 hidden overflow-y-auto">
+        <div class="min-h-screen flex flex-col">
+            <!-- Modal Header -->
+            <div class="sticky top-0 z-10 bg-bg-body/80 backdrop-blur-xl border-b border-border-color">
+                <div class="flex items-center justify-between p-4">
+                    <button onclick="closeServiceModal()" class="p-2 -ml-2">
+                        <span class="material-symbols-outlined text-text-primary">close</span>
+                    </button>
+                    <h2 class="text-sm font-black uppercase tracking-widest">Service Details</h2>
+                    <button onclick="shareService()" class="p-2 -mr-2">
+                        <span class="material-symbols-outlined text-text-secondary">share</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="flex-1 px-gutter pb-8" id="modal-content">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activeVehicleId = null;
+        let currentFilter = 'all';
+
+        // ─── Vehicle Tab Selector ───
+        function renderVehicleTabs() {
+            const vehicles = GarageData.getUserVehicles();
+            const container = document.getElementById('vehicle-tabs');
+
+            // Check URL param or use first vehicle
+            const urlParams = new URLSearchParams(window.location.search);
+            const vidParam = urlParams.get('vid');
+            activeVehicleId = vidParam || (vehicles.length > 0 ? vehicles[0].id : null);
+
+            container.innerHTML = vehicles.map(v => {
+                const isActive = v.id === activeVehicleId;
+                return `
+                <button onclick="switchVehicle('${v.id}')"
+                    class="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 rounded-2xl border transition-all ${isActive
+                        ? 'bg-primary/10 border-primary/40 text-text-primary'
+                        : 'bg-bg-surface border-border-color text-text-secondary hover:border-primary/30'
+                    }">
+                    <img src="${v.image}" class="w-8 h-8 rounded-lg object-cover" alt="">
+                    <div class="text-left">
+                        <p class="text-[10px] font-black uppercase tracking-widest leading-none">${v.year} ${v.make}</p>
+                        <p class="text-[8px] font-bold uppercase tracking-widest opacity-50 mt-0.5">${v.model}</p>
+                    </div>
+                </button>`;
+            }).join('');
+        }
+
+        function switchVehicle(vehicleId) {
+            activeVehicleId = vehicleId;
+            renderVehicleTabs();
+            renderVehicleSummary();
+            renderStats();
+            renderRecords();
+        }
+
+        // ─── Vehicle Summary Card ───
+        function renderVehicleSummary() {
+            const v = GarageData.getVehicleById(activeVehicleId);
+            if (!v) return;
+            const statusCfg = GarageData.getVehicleStatusConfig(v.status);
+
+            document.getElementById('vehicle-summary').innerHTML = `
+            <div class="bg-bg-surface border border-border-color rounded-3xl overflow-hidden">
+                <div class="relative h-36 overflow-hidden">
+                    <img src="${v.image}" class="w-full h-full object-cover" alt="">
+                    <div class="absolute inset-0 bg-gradient-to-t from-bg-surface via-bg-surface/30 to-transparent"></div>
+                    <div class="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                        <div>
+                            <h3 class="text-xl font-[var(--font-bebas)] text-white tracking-widest leading-none">
+                                ${v.year} ${v.make.toUpperCase()} ${v.model.toUpperCase()}</h3>
+                            <p class="text-[9px] text-white/60 uppercase tracking-widest font-bold mt-1">
+                                VIN: ${v.vin.slice(-8)}</p>
+                        </div>
+                        <span class="garage-status-pill ${statusCfg.class}" style="padding:0.25rem 0.75rem;border-radius:100px;font-size:8px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;">${statusCfg.label}</span>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // ─── Stats Row ───
+        function renderStats() {
+            const records = GarageData.getServiceRecords(activeVehicleId);
+            const completed = records.filter(r => r.status === 'completed').length;
+            const totalSpent = records.filter(r => r.paidAt).reduce((s, r) => s + (r.invoiceTotal || 0), 0);
+            const active = records.filter(r => r.status === 'in-progress' || r.status === 'awaiting-payment').length;
+
+            document.getElementById('stats-row').innerHTML = `
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-4 text-center">
+                <p class="text-xl font-bold text-text-primary">${records.length}</p>
+                <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary opacity-50 mt-1">Total</p>
+            </div>
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-4 text-center">
+                <p class="text-xl font-bold text-green-500">${completed}</p>
+                <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary opacity-50 mt-1">Done</p>
+            </div>
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-4 text-center">
+                <p class="text-xl font-bold text-primary">${GarageData.formatCurrency(totalSpent)}</p>
+                <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary opacity-50 mt-1">Spent</p>
+            </div>`;
+        }
+
+        // ─── Records List ───
+        function renderRecords() {
+            const filters = currentFilter === 'all' ? {} : { status: currentFilter };
+            const records = GarageData.getServiceRecords(activeVehicleId, filters);
+            const container = document.getElementById('records-container');
+            const emptyState = document.getElementById('empty-records');
+
+            if (records.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            container.innerHTML = records.map((rec, idx) => {
+                const statusCfg = GarageData.getStatusConfig(rec.status);
+                const typeCfg = GarageData.getServiceTypeConfig(rec.type);
+
+                return `
+                <div class="service-record-card record-animate" style="animation-delay: ${idx * 0.08}s" onclick="openServiceModal('${rec.id}')">
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                                <span class="material-symbols-outlined ${typeCfg.color} text-lg">${typeCfg.icon}</span>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold uppercase tracking-widest leading-tight">${rec.title}</p>
+                                <p class="text-[9px] text-text-secondary uppercase tracking-widest mt-0.5">
+                                    ${typeCfg.label} • ${rec.partnerName}</p>
+                            </div>
+                        </div>
+                        <span class="px-2 py-1 ${statusCfg.bg} ${statusCfg.color} rounded-lg text-[8px] font-bold uppercase tracking-wide border ${statusCfg.border} flex items-center gap-1 flex-shrink-0">
+                            <span class="material-symbols-outlined text-xs">${statusCfg.icon}</span>
+                            ${statusCfg.label}
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[10px] mb-3 px-1">
+                        <span class="text-text-secondary">
+                            <span class="material-symbols-outlined text-xs align-middle mr-1">calendar_today</span>
+                            ${GarageData.formatDate(rec.createdAt)}
+                        </span>
+                        <span class="font-bold text-text-primary">${GarageData.formatCurrency(rec.invoiceTotal)}</span>
+                    </div>
+
+                    ${rec.beforeScores && rec.afterScores && rec.afterScores.value ? `
+                    <div class="grid grid-cols-2 gap-2 p-3 bg-bg-body/50 rounded-xl border border-border-color/30">
+                        <div>
+                            <p class="text-[7px] font-black uppercase tracking-widest opacity-40 mb-1">Before Value</p>
+                            <p class="text-[10px] font-bold">${GarageData.formatCurrency(rec.beforeScores.value)}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[7px] font-black uppercase tracking-widest opacity-40 mb-1">After Value</p>
+                            <p class="text-[10px] font-bold text-green-500">${GarageData.formatCurrency(rec.afterScores.value)}</p>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    ${rec.status === 'awaiting-payment' ? `
+                    <div class="mt-3 p-3 bg-orange-500/5 border border-orange-500/20 rounded-xl flex items-center gap-2">
+                        <span class="material-symbols-outlined text-orange-500 text-sm">timer</span>
+                        <p class="text-[9px] text-orange-500 font-bold uppercase tracking-widest">
+                            Payment deadline: ${GarageData.formatDate(rec.paymentDeadline)}</p>
+                    </div>
+                    ` : ''}
+                </div>`;
+            }).join('');
+        }
+
+        // ─── Filter ───
+        function filterRecords(status, btn) {
+            currentFilter = status;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            renderRecords();
+        }
+
+        // ─── Export (simulated) ───
+        function exportHistory() {
+            const records = GarageData.getServiceRecords(activeVehicleId);
+            const csv = 'Date,Service,Partner,Status,Amount\n' +
+                records.map(r =>
+                    `${GarageData.formatDate(r.createdAt)},${r.title},${r.partnerName},${r.status},${r.invoiceTotal}`
+                ).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `service-history-${activeVehicleId}.csv`;
+            a.click();
+        }
+
+        // ─── SERVICE DETAIL MODAL ───
+        let currentServiceId = null;
+        let userRating = 0;
+
+        function openServiceModal(serviceId) {
+            currentServiceId = serviceId;
+            const service = GarageData.getServiceById(serviceId);
+            if (!service) return;
+
+            const modal = document.getElementById('service-detail-modal');
+            const content = document.getElementById('modal-content');
+
+            // Render modal content
+            content.innerHTML = renderServiceDetail(service);
+
+            // Show modal with animation
+            modal.classList.remove('hidden');
+            modal.classList.add('modal-fade-in');
+
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeServiceModal() {
+            const modal = document.getElementById('service-detail-modal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
+            currentServiceId = null;
+            userRating = 0;
+        }
+
+        function renderServiceDetail(service) {
+            const vehicle = GarageData.getVehicleById(service.vehicleId);
+            const statusCfg = GarageData.getStatusConfig(service.status);
+            const typeCfg = GarageData.getServiceTypeConfig(service.type);
+
+            // Define service progress states
+            const progressStates = getProgressStates(service);
+
+            // Check if service can be verified
+            const canVerify = service.status === 'completed' && !service.verifiedAt;
+            const isVerified = service.verifiedAt;
+
+            return `
+                <!-- Service Header -->
+                <div class="mt-6 mb-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                            <span class="material-symbols-outlined ${typeCfg.color} text-2xl">${typeCfg.icon}</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-[var(--font-bebas)] tracking-widest uppercase leading-tight">${service.title}</h3>
+                            <p class="text-[9px] text-text-secondary uppercase tracking-widest mt-1">${typeCfg.label}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="px-3 py-1.5 ${statusCfg.bg} ${statusCfg.color} rounded-xl text-[9px] font-bold uppercase tracking-wide border ${statusCfg.border} flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">${statusCfg.icon}</span>
+                            ${statusCfg.label}
+                        </span>
+                        ${isVerified ? `
+                        <span class="px-3 py-1.5 bg-green-500/10 text-green-500 rounded-xl text-[9px] font-bold uppercase tracking-wide border border-green-500/20 flex items-center gap-1.5">
+                            <span class="material-symbols-outlined text-sm">verified</span>
+                            Verified
+                        </span>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Vehicle Info -->
+                <div class="bg-bg-surface border border-border-color rounded-2xl p-4 mb-6">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-3">Vehicle</p>
+                    <div class="flex items-center gap-3">
+                        <img src="${vehicle.image}" class="w-16 h-16 rounded-xl object-cover" alt="">
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-widest">${vehicle.year} ${vehicle.make} ${vehicle.model}</p>
+                            <p class="text-[9px] text-text-secondary uppercase tracking-widest mt-1">VIN: ${vehicle.vin.slice(-8)}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Service Progress Timeline -->
+                <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-4">Service Progress</p>
+                    <div class="progress-timeline">
+                        ${progressStates.map(state => `
+                            <div class="progress-step ${state.status}">
+                                <div class="flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <p class="text-xs font-bold uppercase tracking-widest ${state.status === 'completed' ? 'text-primary' : state.status === 'active' ? 'text-primary' : 'text-text-secondary'}">${state.label}</p>
+                                        ${state.timestamp ? `
+                                            <p class="text-[9px] text-text-secondary uppercase tracking-widest mt-1">
+                                                ${GarageData.formatDate(state.timestamp)}
+                                            </p>
+                                        ` : ''}
+                                        ${state.note ? `
+                                            <p class="text-[10px] text-text-secondary mt-2 leading-relaxed">${state.note}</p>
+                                        ` : ''}
+                                    </div>
+                                    ${state.assignedTo ? `
+                                        <span class="text-[8px] text-text-secondary uppercase tracking-widest ml-4">${state.assignedTo}</span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Partner Info -->
+                <div class="bg-bg-surface border border-border-color rounded-2xl p-4 mb-6">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-3">Service Partner</p>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm font-bold uppercase tracking-widest">${service.partnerName}</p>
+                            <p class="text-[9px] text-text-secondary uppercase tracking-widest mt-1">Certified Workshop</p>
+                        </div>
+                        <button onclick="contactPartner('${service.id}')" class="px-3 py-2 bg-primary/10 text-primary rounded-xl text-[9px] font-bold uppercase tracking-widest border border-primary/20 hover:bg-primary hover:text-white transition-all">
+                            Contact
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Invoice Breakdown -->
+                <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-4">Invoice Breakdown</p>
+                    ${service.lineItems && service.lineItems.length > 0 ? `
+                        <div class="space-y-3 mb-4">
+                            ${service.lineItems.map(item => `
+                                <div class="flex items-center justify-between">
+                                    <p class="text-[10px] text-text-secondary uppercase tracking-widest">${item.name}</p>
+                                    <p class="text-xs font-bold">${GarageData.formatCurrency(item.price)}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="pt-3 border-t border-border-color flex items-center justify-between">
+                            <p class="text-xs font-bold uppercase tracking-widest">Total</p>
+                            <p class="text-lg font-bold text-primary">${GarageData.formatCurrency(service.invoiceTotal)}</p>
+                        </div>
+                    ` : `
+                        <div class="flex items-center justify-between">
+                            <p class="text-xs font-bold uppercase tracking-widest">Total Amount</p>
+                            <p class="text-lg font-bold text-primary">${GarageData.formatCurrency(service.invoiceTotal)}</p>
+                        </div>
+                    `}
+
+                    ${service.paidAt ? `
+                        <div class="mt-4 p-3 bg-green-500/5 border border-green-500/20 rounded-xl flex items-center gap-2">
+                            <span class="material-symbols-outlined text-green-500 text-sm">check_circle</span>
+                            <p class="text-[9px] text-green-500 font-bold uppercase tracking-widest">
+                                Paid on ${GarageData.formatDate(service.paidAt)}
+                            </p>
+                        </div>
+                    ` : service.status === 'awaiting-payment' ? `
+                        <div class="mt-4 p-3 bg-orange-500/5 border border-orange-500/20 rounded-xl">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="material-symbols-outlined text-orange-500 text-sm">timer</span>
+                                <p class="text-[9px] text-orange-500 font-bold uppercase tracking-widest">
+                                    Payment Due: ${GarageData.formatDate(service.paymentDeadline)}
+                                </p>
+                            </div>
+                            <button onclick="window.location.href='payment.html?sid=${service.id}'" class="w-full mt-2 px-4 py-2.5 bg-primary text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-primary-dark transition-all">
+                                Pay Now
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+
+                <!-- Before/After Value Impact -->
+                ${service.beforeScores && service.afterScores && service.afterScores.value ? `
+                <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-4">Value Impact</p>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="text-center p-4 bg-bg-body/50 rounded-xl border border-border-color/30">
+                            <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-2">Before</p>
+                            <p class="text-lg font-bold">${GarageData.formatCurrency(service.beforeScores.value)}</p>
+                        </div>
+                        <div class="text-center p-4 bg-green-500/5 rounded-xl border border-green-500/20">
+                            <p class="text-[8px] font-black uppercase tracking-widest text-green-500 mb-2">After</p>
+                            <p class="text-lg font-bold text-green-500">${GarageData.formatCurrency(service.afterScores.value)}</p>
+                        </div>
+                    </div>
+                    <div class="text-center p-3 bg-primary/5 rounded-xl border border-primary/20">
+                        <p class="text-[8px] font-black uppercase tracking-widest text-primary mb-1">Value Increase</p>
+                        <p class="text-2xl font-bold text-primary">+${GarageData.formatCurrency(service.afterScores.value - service.beforeScores.value)}</p>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- Verification & Feedback (for completed services) -->
+                ${canVerify ? `
+                <div class="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-5 mb-6">
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="material-symbols-outlined text-primary">verified_user</span>
+                        <p class="text-sm font-bold uppercase tracking-widest">Verify Service Completion</p>
+                    </div>
+                    <p class="text-[10px] text-text-secondary mb-4 leading-relaxed">
+                        Please confirm that the service has been completed to your satisfaction and rate your experience.
+                    </p>
+
+                    <!-- Star Rating -->
+                    <div class="mb-4">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-text-secondary mb-3">Rate Your Experience</p>
+                        <div class="star-rating justify-center" id="star-rating">
+                            ${[1, 2, 3, 4, 5].map(star => `
+                                <span class="star" onclick="setRating(${star})">★</span>
+                            `).join('')}
+                        </div>
+                        <p class="text-center text-[9px] text-text-secondary uppercase tracking-widest mt-2" id="rating-label">Tap to rate</p>
+                    </div>
+
+                    <!-- Feedback Text -->
+                    <div class="mb-4">
+                        <p class="text-[9px] font-black uppercase tracking-widest text-text-secondary mb-2">Feedback (Optional)</p>
+                        <textarea id="service-feedback" rows="3" 
+                            class="w-full bg-bg-surface border border-border-color rounded-xl p-3 text-xs text-text-primary resize-none focus:border-primary focus:outline-none"
+                            placeholder="Share your experience to help us improve..."></textarea>
+                    </div>
+
+                    <!-- Verify Button -->
+                    <button onclick="verifyService('${service.id}')" 
+                        class="w-full px-4 py-3 bg-primary text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-primary-dark transition-all flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        Verify & Submit Feedback
+                    </button>
+                </div>
+                ` : isVerified ? `
+                <div class="bg-green-500/5 border border-green-500/20 rounded-2xl p-5 mb-6">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="material-symbols-outlined text-green-500">verified</span>
+                        <p class="text-sm font-bold uppercase tracking-widest text-green-500">Service Verified</p>
+                    </div>
+                    <p class="text-[10px] text-text-secondary mb-3">
+                        Verified on ${GarageData.formatDate(service.verifiedAt)}
+                    </p>
+                    ${service.rating ? `
+                        <div class="flex items-center gap-2 mb-2">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-text-secondary">Your Rating:</p>
+                            <div class="flex gap-1">
+                                ${[1, 2, 3, 4, 5].map(star => `
+                                    <span class="text-lg" style="color: ${star <= service.rating ? '#FFD700' : 'var(--border-color)'}">★</span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                    ${service.feedback ? `
+                        <div class="mt-3 p-3 bg-bg-surface rounded-xl border border-border-color">
+                            <p class="text-[9px] font-black uppercase tracking-widest text-text-secondary mb-2">Your Feedback</p>
+                            <p class="text-[10px] text-text-secondary leading-relaxed">${service.feedback}</p>
+                        </div>
+                    ` : ''}
+                </div>
+                ` : ''}
+
+                <!-- Service Details -->
+                <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                    <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-4">Service Details</p>
+                    <div class="space-y-3 text-[10px]">
+                        <div class="flex items-center justify-between">
+                            <span class="text-text-secondary uppercase tracking-widest">Service ID</span>
+                            <span class="font-bold font-mono">${service.id}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-text-secondary uppercase tracking-widest">Created</span>
+                            <span class="font-bold">${GarageData.formatDate(service.createdAt)}</span>
+                        </div>
+                        ${service.contractSigned ? `
+                        <div class="flex items-center justify-between">
+                            <span class="text-text-secondary uppercase tracking-widest">Contract Signed</span>
+                            <span class="font-bold text-green-500">Yes</span>
+                        </div>
+                        ` : ''}
+                        ${service.paidAt ? `
+                        <div class="flex items-center justify-between">
+                            <span class="text-text-secondary uppercase tracking-widest">Payment Method</span>
+                            <span class="font-bold">${service.paymentMethod || 'Bank Transfer'}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    ${service.contractSigned && service.signatureData ? `
+                    <button onclick="viewSignature('${service.id}')" class="px-4 py-3 bg-bg-surface border border-border-color text-text-primary rounded-xl text-[9px] font-bold uppercase tracking-widest hover:border-primary transition-all">
+                        View Signature
+                    </button>
+                    ` : ''}
+                    <button onclick="downloadInvoice('${service.id}')" class="px-4 py-3 bg-bg-surface border border-border-color text-text-primary rounded-xl text-[9px] font-bold uppercase tracking-widest hover:border-primary transition-all">
+                        Download Invoice
+                    </button>
+                </div>
+            `;
+        }
+
+        // Get progress states based on service status and metadata
+        function getProgressStates(service) {
+            const states = [
+                {
+                    label: 'Service Received',
+                    status: 'completed',
+                    timestamp: service.createdAt,
+                    note: 'Your service request has been received and logged in our system.'
+                },
+                {
+                    label: 'Partner Assigned',
+                    status: service.assignedAt ? 'completed' : service.status === 'pending' ? 'pending' : 'active',
+                    timestamp: service.assignedAt || null,
+                    assignedTo: service.partnerName,
+                    note: service.assignedAt ? 'Service partner has been assigned to your request.' : null
+                },
+                {
+                    label: 'Work In Progress',
+                    status: service.status === 'in-progress' ? 'active' : service.status === 'completed' || service.verifiedAt ? 'completed' : 'pending',
+                    timestamp: service.workStartedAt || (service.status === 'in-progress' ? service.paidAt : null),
+                    note: service.workStartedAt ? 'Workshop team is actively working on your vehicle.' : null
+                },
+                {
+                    label: 'Quality Check',
+                    status: service.qualityCheckAt ? 'completed' : service.status === 'completed' ? 'active' : 'pending',
+                    timestamp: service.qualityCheckAt || null,
+                    note: service.qualityCheckAt ? 'Service has passed our quality inspection standards.' : null
+                },
+                {
+                    label: 'Service Completed',
+                    status: service.status === 'completed' ? 'completed' : 'pending',
+                    timestamp: service.completedAt || null,
+                    note: service.completedAt ? 'All work has been completed and your vehicle is ready.' : null
+                },
+                {
+                    label: 'Customer Verification',
+                    status: service.verifiedAt ? 'completed' : service.status === 'completed' ? 'active' : 'pending',
+                    timestamp: service.verifiedAt || null,
+                    note: service.verifiedAt ? `You verified this service with ${service.rating || 0} stars.` : service.status === 'completed' ? 'Awaiting your verification and feedback.' : null
+                }
+            ];
+
+            return states;
+        }
+
+        // Star rating function
+        function setRating(rating) {
+            userRating = rating;
+            const stars = document.querySelectorAll('.star');
+            const label = document.getElementById('rating-label');
+
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+
+            const labels = ['Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+            label.textContent = labels[rating - 1];
+        }
+
+        // Verify service function
+        function verifyService(serviceId) {
+            if (userRating === 0) {
+                alert('Please rate your experience before verifying.');
+                return;
+            }
+
+            const feedback = document.getElementById('service-feedback').value.trim();
+
+            // Update service record
+            const service = GarageData.getServiceById(serviceId);
+            service.verifiedAt = new Date().toISOString();
+            service.rating = userRating;
+            service.feedback = feedback;
+
+            // Save to localStorage
+            const allServices = GarageData.getAllServiceRecords();
+            const index = allServices.findIndex(s => s.id === serviceId);
+            if (index !== -1) {
+                allServices[index] = service;
+                localStorage.setItem('dealer360_garage_services', JSON.stringify(allServices));
+            }
+
+            // Show success message
+            alert(`Thank you for verifying! You rated this service ${userRating} stars.`);
+
+            // Refresh modal
+            closeServiceModal();
+            renderRecords();
+        }
+
+        // Helper functions
+        function contactPartner(serviceId) {
+            const service = GarageData.getServiceById(serviceId);
+            alert(`Contacting ${service.partnerName}...\n\nIn production, this would open a chat or call interface.`);
+        }
+
+        function viewSignature(serviceId) {
+            const service = GarageData.getServiceById(serviceId);
+            if (service.signatureData) {
+                const win = window.open();
+                win.document.write(`
+                    <html>
+                        <head><title>Digital Signature</title></head>
+                        <body style="margin:0;padding:20px;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;">
+                            <img src="${service.signatureData}" style="max-width:100%;border:2px solid #990011;border-radius:12px;background:#fff;">
+                        </body>
+                    </html>
+                `);
+            }
+        }
+
+        function downloadInvoice(serviceId) {
+            alert('Invoice download initiated...\n\nIn production, this would generate a PDF invoice.');
+        }
+
+        function shareService() {
+            if (currentServiceId) {
+                const service = GarageData.getServiceById(currentServiceId);
+                alert(`Sharing service: ${service.title}\n\nIn production, this would open a share sheet.`);
+            }
+        }
+
+        // ─── Init ───
+        renderVehicleTabs();
+        renderVehicleSummary();
+        renderStats();
+        renderRecords();
+    </script>
+</body>
+
+</html>

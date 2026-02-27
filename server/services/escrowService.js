@@ -24,7 +24,7 @@ class EscrowService {
             // 1. Create Escrow Record
             const escrowRes = await client.query(`
                 INSERT INTO auction_escrow (auction_id, buyer_id, seller_id, total_deal_amount, held_amount, stage, status)
-                VALUES ($1, $2, $3, $4, 0, 'commitment_10', 'active') RETURNING *
+                VALUES ($1, $2, $3, $4, 0, 'waiting_seller_acceptance', 'active') RETURNING *
             `, [auctionId, buyerId, auction.created_by, amount]);
             const escrow = escrowRes.rows[0];
 
@@ -52,6 +52,34 @@ class EscrowService {
             if (isInternal) {
                 client.release();
             }
+        }
+    }
+
+    /**
+     * Step 1.5: Seller Accepts the Deal
+     */
+    async acceptDeal(escrowId, sellerId) {
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN');
+            const escrowRes = await client.query('SELECT * FROM auction_escrow WHERE id = $1 FOR UPDATE', [escrowId]);
+            const escrow = escrowRes.rows[0];
+            if (!escrow) throw { status: 404, message: 'Escrow not found' };
+            if (escrow.seller_id !== sellerId) throw { status: 403, message: 'Only the vehicle owner/seller can accept the deal' };
+
+            await client.query(`
+                UPDATE auction_escrow 
+                SET stage = 'commitment_10', updated_at = NOW() 
+                WHERE id = $1
+            `, [escrowId]);
+
+            await client.query('COMMIT');
+            return { success: true, message: 'Deal accepted by seller. Buyer notified for remaining payment.' };
+        } catch (err) {
+            await client.query('ROLLBACK');
+            throw err;
+        } finally {
+            client.release();
         }
     }
 
@@ -149,6 +177,27 @@ class EscrowService {
             `, [sellerPayout, commission, escrowId]);
 
             await client.query("UPDATE auctions SET status = 'settled', settled_at = NOW() WHERE id = $1", [escrow.auction_id]);
+
+            // === AUTOMATED OWNERSHIP TRANSFER ===
+            const auctionRes = await client.query('SELECT vehicle_id FROM auctions WHERE id = $1', [escrow.auction_id]);
+            const vehicleId = auctionRes.rows[0]?.vehicle_id;
+
+            if (vehicleId) {
+                // 1. Log the transfer
+                await client.query(`
+                    INSERT INTO vehicle_ownership_transfers (
+                        vehicle_id, previous_owner_id, new_owner_id, 
+                        auction_id, escrow_id, sale_price, transfer_type
+                    ) VALUES ($1, $2, $3, $4, $5, $6, 'sale')
+                `, [vehicleId, escrow.seller_id, escrow.buyer_id, escrow.auction_id, escrowId, totalDeal]);
+
+                // 2. Update vehicle record (Move to buyer's garage)
+                await client.query(`
+                    UPDATE vehicles 
+                    SET owner_id = $1, status = 'available', updated_at = NOW() 
+                    WHERE id = $2
+                `, [escrow.buyer_id, vehicleId]);
+            }
 
             await client.query('COMMIT');
             return { success: true, payout: sellerPayout };

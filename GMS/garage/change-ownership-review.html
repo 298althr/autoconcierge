@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Review Change of Ownership | Dealer360 Workshop</title>
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)', 'primary-dark': 'var(--primary-dark)', 'bg-body': 'var(--bg-body)',
+                        'bg-surface': 'var(--bg-surface)', 'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)', 'text-secondary': 'var(--text-secondary)', 'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: { bebas: ['Bebas Neue', 'sans-serif'], display: ['Rajdhani', 'sans-serif'], body: ['Inter', 'sans-serif'], }
+                }
+            }
+        }
+    </script>
+    <style>
+        html,
+        body {
+            background-color: var(--bg-body) !important;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-wrapper {
+            background-color: var(--bg-body);
+        }
+    </style>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+    <script src="js/registration-services.js"></script>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+    <div class="page-wrapper container pb-32">
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2"><span
+                    class="material-symbols-outlined text-text-primary">arrow_back</span></button>
+            <h1 class="header-title uppercase tracking-widest">Review Process</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+            <!-- PROGRESS -->
+            <div class="flex items-center justify-center gap-2 mb-6 mt-4">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary/20 text-primary flex items-center justify-center text-xs font-bold">
+                        ✓</div>
+                    <span class="text-[9px] uppercase tracking-widest text-primary font-bold">Configure</span>
+                </div>
+                <div class="w-12 h-0.5 bg-primary"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                        2</div>
+                    <span class="text-[9px] uppercase tracking-widest text-primary font-bold">Review</span>
+                </div>
+                <div class="w-12 h-0.5 bg-border-color"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-border-color text-text-secondary flex items-center justify-center text-xs font-bold">
+                        3</div>
+                    <span class="text-[9px] uppercase tracking-widest text-text-secondary">Submit</span>
+                </div>
+            </div>
+
+            <!-- VEHICLE CARD -->
+            <div class="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-5 mb-6"
+                id="vehicle-card"></div>
+
+            <!-- SUMMARY -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-sm font-black uppercase tracking-widest">Ownership Change Summary</h3>
+                    <button onclick="window.history.back()" class="text-primary text-xs font-bold">EDIT</button>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="p-3 bg-bg-body rounded-xl border border-border-color/30">
+                        <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-1">Transfer
+                            From (Seller)</p>
+                        <p class="text-sm font-bold" id="summ-seller-name"></p>
+                        <p class="text-xs text-text-secondary" id="summ-seller-phone"></p>
+                    </div>
+                    <div class="p-3 bg-bg-body rounded-xl border border-border-color/30">
+                        <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-1">Transfer To
+                            (Buyer)</p>
+                        <p class="text-sm font-bold" id="summ-buyer-name"></p>
+                        <p class="text-xs text-text-secondary" id="summ-buyer-phone"></p>
+                        <p class="text-[10px] text-text-secondary italic mt-1" id="summ-buyer-address"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PROCESSING STATUS -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Services Included</h3>
+                <div id="service-checklist"
+                    class="space-y-2 text-xs font-bold uppercase tracking-wider text-text-secondary">
+                    <div class="flex justify-between items-center py-2 border-b border-border-color/20"><span
+                            class="flex items-center gap-2"><span
+                                class="material-symbols-outlined text-primary text-sm">check_circle</span> NPF CMR
+                            Registration</span> <span class="text-[8px]">ACTIVE</span></div>
+                    <div class="flex justify-between items-center py-2 border-b border-border-color/20"><span
+                            class="flex items-center gap-2"><span
+                                class="material-symbols-outlined text-primary text-sm">check_circle</span> Legal
+                            Affidavit</span> <span class="text-[8px]">ACTIVE</span></div>
+                    <div class="flex justify-between items-center py-2 border-b border-border-color/20"><span
+                            class="flex items-center gap-2"><span
+                                class="material-symbols-outlined text-primary text-sm">check_circle</span> MVAA Title
+                            Update</span> <span class="text-[8px]">ACTIVE</span></div>
+                    <div id="vis-row" class="flex justify-between items-center py-2 border-b border-border-color/20">
+                        <span class="flex items-center gap-2"><span
+                                class="material-symbols-outlined text-primary text-sm">check_circle</span> VIS Physical
+                            Audit</span> <span class="text-[8px]">ACTIVE</span></div>
+                </div>
+            </div>
+
+            <!-- DOCUMENTS -->
+            <div class="bg-bg-surface border border-border-color rounded-2xl p-5 mb-6">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Ownership Documents</h3>
+                <div id="document-checklist" class="space-y-2"></div>
+            </div>
+
+            <!-- PRICING -->
+            <div id="pricing-section"
+                class="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-5 mb-6">
+            </div>
+
+            <button onclick="proceedToSubmit()"
+                class="w-full py-4 bg-primary text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all">
+                Submit Change Request
+            </button>
+        </main>
+
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item"><span class="material-symbols-outlined">grid_view</span><span
+                    class="nav-label">Home</span></a>
+            <a href="../fleet.html" class="nav-item"><span class="material-symbols-outlined">explore</span><span
+                    class="nav-label">Fleet</span></a>
+            <a href="../garage.html" class="nav-item active"><span
+                    class="material-symbols-outlined">directions_car</span><span class="nav-label">Garage</span></a>
+            <a href="../inquiries.html" class="nav-item"><span class="material-symbols-outlined">forum</span><span
+                    class="nav-label">Concierge</span></a>
+            <a href="../settings.html" class="nav-item"><span class="material-symbols-outlined">tune</span><span
+                    class="nav-label">Settings</span></a>
+        </nav>
+    </div>
+
+    <script>
+        let config = null;
+
+        function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            config = RegistrationServices.loadProgress('change-ownership');
+
+            if (!config) { window.location.href = 'change-ownership-config.html'; return; }
+
+            RegistrationServices.renderVehicleCard(GarageData.getVehicleById(config.vehicleId), 'vehicle-card');
+
+            document.getElementById('summ-seller-name').textContent = config.sellerName;
+            document.getElementById('summ-seller-phone').textContent = config.sellerPhone;
+            document.getElementById('summ-buyer-name').textContent = config.buyerName;
+            document.getElementById('summ-buyer-phone').textContent = config.buyerPhone;
+            document.getElementById('summ-buyer-address').textContent = config.buyerAddress;
+
+            document.getElementById('vis-row').style.display = config.includeVis ? 'flex' : 'none';
+
+            renderDocumentChecklist();
+            renderPricing();
+        }
+
+        function renderDocumentChecklist() {
+            const docs = window.uploadedDocuments || {};
+            const required = ['vehicle-license', 'proof-of-ownership', 'seller-id', 'buyer-id'];
+            const container = document.getElementById('document-checklist');
+
+            container.innerHTML = required.map(type => {
+                const isUploaded = docs[type];
+                return `
+                    <div class="flex items-center justify-between p-3 bg-bg-body rounded-xl border border-border-color/30">
+                        <div class="flex items-center gap-3">
+                            <span class="material-symbols-outlined ${isUploaded ? 'text-green-500' : 'text-red-500'}">
+                                ${isUploaded ? 'check_circle' : 'cancel'}
+                            </span>
+                            <span class="text-sm font-bold uppercase tracking-wider text-text-primary">${type.replace(/-/g, ' ')}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderPricing() {
+            const fees = {
+                governmentFees: 75000,
+                serviceFee: 150000,
+                policeReport: 10000,
+                affidavit: 10000,
+                visInspection: config.includeVis ? 15000 : 0,
+                total: 0
+            };
+            fees.total = fees.governmentFees + fees.serviceFee + fees.policeReport + fees.affidavit + fees.visInspection;
+            RegistrationServices.renderFeeBreakdown('pricing-section', fees);
+        }
+
+        function proceedToSubmit() {
+            window.location.href = `change-ownership-request.html?vid=${config.vehicleId}`;
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

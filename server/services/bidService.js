@@ -18,8 +18,12 @@ class BidService {
             `, [auctionId]);
             if (!auctionRes.rows[0]) throw { status: 404, message: 'Auction not found' };
             const auction = auctionRes.rows[0];
-            const depositPct = parseFloat(auction.deposit_pct || 10) / 100;
 
+            if (auction.created_by === userId) {
+                throw { status: 403, message: 'You cannot bid on your own asset.' };
+            }
+
+            const depositPct = parseFloat(auction.deposit_pct || 10) / 100;
             if (auction.status !== 'live') throw { status: 400, message: 'Auction is not live' };
 
             const now = new Date();
@@ -107,8 +111,12 @@ class BidService {
             `, [auctionId]);
             if (!auctionRes.rows[0]) throw { status: 404, message: 'Auction not found' };
             const auction = auctionRes.rows[0];
-            const depositPct = parseFloat(auction.deposit_pct || 10) / 100;
 
+            if (auction.created_by === userId) {
+                throw { status: 403, message: 'You cannot buy your own asset.' };
+            }
+
+            const depositPct = parseFloat(auction.deposit_pct || 10) / 100;
             if (auction.status !== 'live') throw { status: 400, message: 'Auction is not live' };
             if (!auction.buy_now_price) throw { status: 400, message: 'Buy Now not available' };
 
@@ -134,7 +142,10 @@ class BidService {
             }
 
             await client.query('INSERT INTO bids (auction_id, user_id, amount, is_winning) VALUES ($1, $2, $3, true)', [auctionId, userId, amount]);
-            await client.query("UPDATE auctions SET current_price = $1, winner_id = $2, status = 'ended', updated_at = NOW() WHERE id = $3", [amount, userId, auctionId]);
+            // We DO NOT end the auction status here anymore. 
+            // The auction stays 'live' or becomes 'pending_seller_acceptance' if we want to hide it, 
+            // but for now let's mark it as 'ended' once seller accepts.
+            await client.query("UPDATE auctions SET current_price = $1, winner_id = $2, updated_at = NOW() WHERE id = $3", [amount, userId, auctionId]);
 
             const escrowService = require('./escrowService');
             await escrowService.initiateEscrow(auctionId, userId, amount, client);

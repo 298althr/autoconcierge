@@ -44,6 +44,31 @@ class MeController {
     }
 
     /**
+     * Get items being sold by the user (Auctions and Pending Escrows)
+     */
+    async getMySales(req, res, next) {
+        try {
+            const result = await pool.query(`
+                SELECT ae.*, v.make, v.model, v.year, v.images, 
+                       u.display_name as buyer_name
+                FROM auction_escrow ae
+                JOIN auctions a ON ae.auction_id = a.id
+                JOIN vehicles v ON a.vehicle_id = v.id
+                JOIN users u ON ae.buyer_id = u.id
+                WHERE ae.seller_id = $1
+                ORDER BY ae.updated_at DESC
+            `, [req.user.id]);
+
+            res.status(200).json({
+                success: true,
+                data: result.rows
+            });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    /**
      * Update user profile
      */
     async updateProfile(req, res, next) {

@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Insurance Configuration | Dealer360 Workshop</title>
+
+    <!-- CSS SYSTEM -->
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+
+    <!-- Tailwind CDN + Config -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'var(--primary)',
+                        'primary-dark': 'var(--primary-dark)',
+                        'bg-body': 'var(--bg-body)',
+                        'bg-surface': 'var(--bg-surface)',
+                        'bg-surface-elevated': 'var(--bg-surface-elevated)',
+                        'text-primary': 'var(--text-primary)',
+                        'text-secondary': 'var(--text-secondary)',
+                        'border-color': 'var(--border-color)',
+                    },
+                    fontFamily: {
+                        bebas: ['Bebas Neue', 'sans-serif'],
+                        display: ['Rajdhani', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="../js/theme.js"></script>
+    <script src="js/garage-data.js"></script>
+
+    <style>
+        .coverage-card {
+            border: 2px solid var(--border-color);
+            background: var(--bg-surface);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .coverage-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.15);
+        }
+
+        .coverage-card.selected {
+            border-color: var(--primary);
+            border-width: 3px;
+            background: linear-gradient(135deg, var(--primary)/10, var(--primary)/5);
+        }
+
+        .coverage-card.recommended {
+            border-color: var(--primary);
+        }
+
+        .coverage-card .badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: var(--primary);
+            color: var(--bg-body);
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .add-on-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-on-checkbox:hover {
+            border-color: var(--primary);
+            background: var(--primary)/5;
+        }
+
+        .add-on-checkbox input:checked~.add-on-details {
+            color: var(--primary);
+        }
+
+        .deductible-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .deductible-option:hover {
+            border-color: var(--primary);
+        }
+
+        .deductible-option input:checked~div {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .payment-option:hover {
+            border-color: var(--primary);
+        }
+
+        .payment-option input:checked~div h4 {
+            color: var(--primary);
+        }
+
+        .security-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+        }
+
+        .security-checkbox:hover {
+            border-color: var(--primary);
+        }
+
+        .premium-estimate {
+            background: linear-gradient(135deg, var(--primary)/20, var(--primary)/10);
+            border: 2px solid var(--primary);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .estimate-range {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-surface);
+            border: 1px solid var(--primary);
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 9999;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-bg-body text-text-primary">
+
+    <div class="page-wrapper container pb-32">
+
+        <!-- HEADER -->
+        <header class="app-header">
+            <button onclick="window.history.back()" class="p-2 -ml-2">
+                <span class="material-symbols-outlined text-text-primary">arrow_back</span>
+            </button>
+            <h1 class="header-title uppercase tracking-widest">Insurance Configuration</h1>
+            <div class="w-10"></div>
+        </header>
+
+        <main class="animate-fade-in px-gutter">
+
+            <!-- PROGRESS INDICATOR -->
+            <div class="flex items-center justify-center gap-2 mb-6 mt-4">
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+                        1
+                    </div>
+                    <span class="text-[9px] uppercase tracking-widest text-primary font-bold">Configure</span>
+                </div>
+                <div class="w-12 h-0.5 bg-border-color"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-border-color text-text-secondary flex items-center justify-center text-xs font-bold">
+                        2
+                    </div>
+                    <span class="text-[9px] uppercase tracking-widest text-text-secondary">Compare</span>
+                </div>
+                <div class="w-12 h-0.5 bg-border-color"></div>
+                <div class="flex items-center gap-2">
+                    <div
+                        class="w-8 h-8 rounded-full bg-border-color text-text-secondary flex items-center justify-center text-xs font-bold">
+                        3
+                    </div>
+                    <span class="text-[9px] uppercase tracking-widest text-text-secondary">Purchase</span>
+                </div>
+            </div>
+
+            <!-- VEHICLE CARD -->
+            <div class="bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-5 mb-6"
+                id="vehicle-card">
+                <!-- Populated by JavaScript -->
+            </div>
+
+            <!-- COVERAGE TYPE SELECTION -->
+            <div class="mb-8">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Select Coverage Type</h3>
+
+                <div class="coverage-card mb-4" onclick="selectCoverage('third-party')">
+                    <div class="flex items-start gap-4">
+                        <span class="material-symbols-outlined text-4xl text-primary">shield</span>
+                        <div class="flex-1">
+                            <h4 class="text-base font-bold mb-1">Third-Party Only</h4>
+                            <p class="text-2xl font-bold text-primary mb-2">₦15,000 - ₦20,000<span
+                                    class="text-sm text-text-secondary">/year</span></p>
+                            <div class="space-y-1 text-xs">
+                                <p class="text-green-500">✓ Third-party property damage (up to ₦3M)</p>
+                                <p class="text-green-500">✓ Third-party bodily injury (unlimited)</p>
+                                <p class="text-red-500">✗ Own damage</p>
+                                <p class="text-red-500">✗ Theft</p>
+                                <p class="text-red-500">✗ Fire</p>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="badge">Mandatory</span>
+                </div>
+
+                <div class="coverage-card mb-4" onclick="selectCoverage('third-party-fire-theft')">
+                    <div class="flex items-start gap-4">
+                        <span class="material-symbols-outlined text-4xl text-orange-500">local_fire_department</span>
+                        <div class="flex-1">
+                            <h4 class="text-base font-bold mb-1">Third-Party Fire & Theft</h4>
+                            <p class="text-2xl font-bold text-primary mb-2">~₦25,000<span
+                                    class="text-sm text-text-secondary">/year</span></p>
+                            <div class="space-y-1 text-xs">
+                                <p class="text-green-500">✓ Third-party property damage</p>
+                                <p class="text-green-500">✓ Third-party bodily injury</p>
+                                <p class="text-green-500">✓ Fire damage</p>
+                                <p class="text-green-500">✓ Theft</p>
+                                <p class="text-red-500">✗ Own damage (accidents)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="badge" style="background: orange;">Popular</span>
+                </div>
+
+                <div class="coverage-card recommended" onclick="selectCoverage('comprehensive')">
+                    <div class="flex items-start gap-4">
+                        <span class="material-symbols-outlined text-4xl text-primary">verified_user</span>
+                        <div class="flex-1">
+                            <h4 class="text-base font-bold mb-1">Comprehensive</h4>
+                            <p class="text-2xl font-bold text-primary mb-2">3% - 7%<span
+                                    class="text-sm text-text-secondary"> of vehicle value</span></p>
+                            <div class="space-y-1 text-xs">
+                                <p class="text-green-500">✓ Third-party property damage</p>
+                                <p class="text-green-500">✓ Third-party bodily injury</p>
+                                <p class="text-green-500">✓ Own damage (accidents)</p>
+                                <p class="text-green-500">✓ Theft</p>
+                                <p class="text-green-500">✓ Fire</p>
+                                <p class="text-green-500">✓ Optional: Flood, Riot, etc.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="badge">Recommended</span>
+                </div>
+            </div>
+
+            <!-- ADD-ONS (for Comprehensive) -->
+            <div class="mb-8" id="add-ons-section" style="display: none;">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Add-Ons (Optional)</h3>
+
+                <label class="add-on-checkbox">
+                    <input type="checkbox" name="excess-buyback" value="25000" onchange="updateEstimate()">
+                    <div class="add-on-details flex-1">
+                        <h4 class="text-sm font-bold">Excess Buy-Back</h4>
+                        <p class="text-xs text-text-secondary">Waive the excess/deductible on claims</p>
+                    </div>
+                    <span class="text-primary font-bold">+₦25,000</span>
+                </label>
+
+                <label class="add-on-checkbox">
+                    <input type="checkbox" name="windscreen" value="15000" onchange="updateEstimate()">
+                    <div class="add-on-details flex-1">
+                        <h4 class="text-sm font-bold">Windscreen Cover</h4>
+                        <p class="text-xs text-text-secondary">Full windscreen replacement without deductible</p>
+                    </div>
+                    <span class="text-primary font-bold">+₦15,000</span>
+                </label>
+
+                <label class="add-on-checkbox" style="border-color: var(--primary);">
+                    <input type="checkbox" name="flood" value="30000" checked onchange="updateEstimate()">
+                    <div class="add-on-details flex-1">
+                        <h4 class="text-sm font-bold">Flood Extension</h4>
+                        <p class="text-xs text-text-secondary">Critical for Lagos residents (rainy season protection)
+                        </p>
+                        <span
+                            class="text-[8px] bg-primary text-bg-body px-2 py-0.5 rounded-full uppercase font-bold">Recommended</span>
+                    </div>
+                    <span class="text-primary font-bold">+₦30,000</span>
+                </label>
+
+                <label class="add-on-checkbox">
+                    <input type="checkbox" name="riot" value="20000" onchange="updateEstimate()">
+                    <div class="add-on-details flex-1">
+                        <h4 class="text-sm font-bold">Riot & Strike</h4>
+                        <p class="text-xs text-text-secondary">Coverage for civil unrest damage</p>
+                    </div>
+                    <span class="text-primary font-bold">+₦20,000</span>
+                </label>
+
+                <label class="add-on-checkbox">
+                    <input type="checkbox" name="personal-accident" value="35000" onchange="updateEstimate()">
+                    <div class="add-on-details flex-1">
+                        <h4 class="text-sm font-bold">Personal Accident</h4>
+                        <p class="text-xs text-text-secondary">Medical expenses for driver and passengers</p>
+                    </div>
+                    <span class="text-primary font-bold">+₦35,000</span>
+                </label>
+            </div>
+
+            <!-- DEDUCTIBLE SELECTION -->
+            <div class="mb-8" id="deductible-section" style="display: none;">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-2">Select Deductible (Excess)</h3>
+                <p class="text-xs text-text-secondary mb-4">Higher deductible = Lower premium</p>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="deductible-option">
+                        <input type="radio" name="deductible" value="50000" class="hidden" onchange="updateEstimate()">
+                        <div class="text-lg font-bold">₦50,000</div>
+                        <span class="text-xs text-green-500">-5% premium</span>
+                    </label>
+                    <label class="deductible-option">
+                        <input type="radio" name="deductible" value="100000" class="hidden" checked
+                            onchange="updateEstimate()">
+                        <div class="text-lg font-bold">₦100,000</div>
+                        <span class="text-xs text-text-secondary">Standard</span>
+                    </label>
+                    <label class="deductible-option">
+                        <input type="radio" name="deductible" value="200000" class="hidden" onchange="updateEstimate()">
+                        <div class="text-lg font-bold">₦200,000</div>
+                        <span class="text-xs text-green-500">-10% premium</span>
+                    </label>
+                    <label class="deductible-option">
+                        <input type="radio" name="deductible" value="500000" class="hidden" onchange="updateEstimate()">
+                        <div class="text-lg font-bold">₦500,000</div>
+                        <span class="text-xs text-green-500">-15% premium</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- PAYMENT PLAN -->
+            <div class="mb-8" id="payment-plan-section" style="display: none;">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Payment Plan</h3>
+
+                <label class="payment-option">
+                    <input type="radio" name="payment-plan" value="annual" class="hidden" checked
+                        onchange="updateEstimate()">
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold">Annual</h4>
+                        <p class="text-xs text-text-secondary">Pay once, save more</p>
+                    </div>
+                    <span class="text-xs bg-green-500 text-white px-2 py-1 rounded-full">Best Value</span>
+                </label>
+
+                <label class="payment-option">
+                    <input type="radio" name="payment-plan" value="quarterly" class="hidden"
+                        onchange="updateEstimate()">
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold">Quarterly</h4>
+                        <p class="text-xs text-text-secondary">Pay every 3 months</p>
+                    </div>
+                    <span class="text-xs text-orange-500">+5% total</span>
+                </label>
+
+                <label class="payment-option">
+                    <input type="radio" name="payment-plan" value="monthly" class="hidden" onchange="updateEstimate()">
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold">Monthly</h4>
+                        <p class="text-xs text-text-secondary">Spread payments over 12 months</p>
+                    </div>
+                    <span class="text-xs text-orange-500">+10% total</span>
+                </label>
+            </div>
+
+            <!-- DRIVER & VEHICLE INFO -->
+            <div class="mb-8" id="info-section" style="display: none;">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-2">Driver & Vehicle Information</h3>
+                <p class="text-xs text-text-secondary mb-4">This information affects your premium</p>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-bg-surface rounded-xl p-3">
+                        <label
+                            class="text-[8px] font-black uppercase tracking-widest text-text-secondary block mb-1">Driver
+                            Age</label>
+                        <input type="number" id="driver-age" value="35" readonly
+                            class="w-full bg-transparent text-lg font-bold">
+                    </div>
+                    <div class="bg-bg-surface rounded-xl p-3">
+                        <label
+                            class="text-[8px] font-black uppercase tracking-widest text-text-secondary block mb-1">Experience
+                            (years)</label>
+                        <input type="number" id="driver-experience" value="15" readonly
+                            class="w-full bg-transparent text-lg font-bold">
+                    </div>
+                    <div class="bg-bg-surface rounded-xl p-3">
+                        <label
+                            class="text-[8px] font-black uppercase tracking-widest text-text-secondary block mb-1">Claims
+                            (3 years)</label>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="claims-history" value="0" readonly
+                                class="w-full bg-transparent text-lg font-bold">
+                            <span class="text-[8px] bg-green-500 text-white px-2 py-0.5 rounded-full">Clean</span>
+                        </div>
+                    </div>
+                    <div class="bg-bg-surface rounded-xl p-3">
+                        <label
+                            class="text-[8px] font-black uppercase tracking-widest text-text-secondary block mb-1">Vehicle
+                            Value</label>
+                        <input type="text" id="vehicle-value" value="₦5,000,000" readonly
+                            class="w-full bg-transparent text-lg font-bold">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECURITY FEATURES -->
+            <div class="mb-8" id="security-section" style="display: none;">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-2">Security Features</h3>
+                <p class="text-xs text-text-secondary mb-4">Security features can reduce your premium by up to 15%</p>
+
+                <label class="security-checkbox">
+                    <input type="checkbox" name="tracking" checked onchange="updateEstimate()">
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold">GPS Tracking Device</h4>
+                    </div>
+                    <span class="text-xs text-green-500">-10% premium</span>
+                </label>
+
+                <label class="security-checkbox">
+                    <input type="checkbox" name="alarm" checked onchange="updateEstimate()">
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold">Car Alarm System</h4>
+                    </div>
+                    <span class="text-xs text-green-500">-3% premium</span>
+                </label>
+
+                <label class="security-checkbox">
+                    <input type="checkbox" name="immobilizer" checked onchange="updateEstimate()">
+                    <div class="flex-1">
+                        <h4 class="text-sm font-bold">Immobilizer</h4>
+                    </div>
+                    <span class="text-xs text-green-500">-2% premium</span>
+                </label>
+            </div>
+
+            <!-- ESTIMATED PREMIUM -->
+            <div class="premium-estimate mb-8" id="premium-estimate" style="display: none;">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-2">Estimated Premium Range</h3>
+                <div class="estimate-range">
+                    <span class="min" id="estimate-min">₦250,000</span>
+                    <span class="separator">-</span>
+                    <span class="max" id="estimate-max">₦350,000</span>
+                    <span class="period text-base">/year</span>
+                </div>
+                <p class="text-xs text-text-secondary">Final price depends on insurer selection</p>
+            </div>
+
+            <!-- SPECIAL REQUESTS -->
+            <div class="mb-8">
+                <h3 class="text-sm font-black uppercase tracking-widest mb-4">Special Requests (Optional)</h3>
+                <textarea id="special-requests" maxlength="500"
+                    placeholder="Any specific requirements or questions? (e.g., 'Please include flood extension as I live in Lekki')"
+                    class="w-full bg-bg-surface border border-border-color rounded-xl p-4 text-sm resize-none"
+                    rows="4"></textarea>
+                <div class="flex justify-between items-center mt-2">
+                    <span class="text-xs text-text-secondary" id="char-count">0/500</span>
+                </div>
+            </div>
+
+            <!-- ACTION BUTTON -->
+            <button onclick="proceedToQuotes()" id="proceed-btn" disabled
+                class="w-full py-4 bg-primary text-white rounded-xl text-sm font-black uppercase tracking-widest shadow-lg shadow-primary/20 hover:bg-primary-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+                Get Quotes from 5+ Insurers
+            </button>
+
+        </main>
+
+        <!-- BOTTOM NAVIGATION -->
+        <nav class="bottom-nav">
+            <a href="../dashboard.html" class="nav-item">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span class="nav-label">Home</span>
+            </a>
+            <a href="../fleet.html" class="nav-item">
+                <span class="material-symbols-outlined">explore</span>
+                <span class="nav-label">Fleet</span>
+            </a>
+            <a href="../garage.html" class="nav-item active">
+                <span class="material-symbols-outlined">directions_car</span>
+                <span class="nav-label">Garage</span>
+            </a>
+            <a href="../inquiries.html" class="nav-item">
+                <span class="material-symbols-outlined">forum</span>
+                <span class="nav-label">Concierge</span>
+            </a>
+            <a href="../settings.html" class="nav-item">
+                <span class="material-symbols-outlined">tune</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
+    </div>
+
+    <script>
+        let activeVehicle = null;
+        let selectedCoverageType = null;
+
+        // Initialize
+        function init() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const vid = urlParams.get('vid') || GarageData.getActiveVehicle()?.id;
+
+            activeVehicle = GarageData.getVehicleById(vid);
+
+            if (!activeVehicle) {
+                window.location.href = 'select-vehicle.html?service=comprehensive-insurance';
+                return;
+            }
+
+            renderVehicleCard();
+            setupCharCounter();
+            loadProgress();
+        }
+
+        function renderVehicleCard() {
+            const card = document.getElementById('vehicle-card');
+            card.innerHTML = `
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="material-symbols-outlined text-primary text-3xl">directions_car</span>
+                    <div>
+                        <h2 class="text-lg font-[var(--font-bebas)] tracking-widest uppercase">${activeVehicle.make} ${activeVehicle.model}</h2>
+                        <p class="text-[9px] text-text-secondary uppercase tracking-widest">${activeVehicle.year} • ${activeVehicle.plateNumber}</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-bg-surface/50 rounded-xl p-3">
+                        <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-1">Vehicle Value</p>
+                        <p class="text-sm font-bold">${GarageData.formatCurrency(activeVehicle.currentValue)}</p>
+                    </div>
+                    <div class="bg-bg-surface/50 rounded-xl p-3">
+                        <p class="text-[8px] font-black uppercase tracking-widest text-text-secondary mb-1">Usage</p>
+                        <p class="text-sm font-bold capitalize">${activeVehicle.usage || 'Private'}</p>
+                    </div>
+                </div>
+            `;
+
+            // Update vehicle value in info section
+            document.getElementById('vehicle-value').value = GarageData.formatCurrency(activeVehicle.currentValue);
+        }
+
+        function selectCoverage(type) {
+            selectedCoverageType = type;
+
+            // Update UI
+            document.querySelectorAll('.coverage-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+
+            // Show/hide sections based on coverage type
+            if (type === 'comprehensive') {
+                document.getElementById('add-ons-section').style.display = 'block';
+                document.getElementById('deductible-section').style.display = 'block';
+                document.getElementById('payment-plan-section').style.display = 'block';
+                document.getElementById('info-section').style.display = 'block';
+                document.getElementById('security-section').style.display = 'block';
+                document.getElementById('premium-estimate').style.display = 'block';
+            } else {
+                document.getElementById('add-ons-section').style.display = 'none';
+                document.getElementById('deductible-section').style.display = 'none';
+                document.getElementById('payment-plan-section').style.display = 'none';
+                document.getElementById('info-section').style.display = 'none';
+                document.getElementById('security-section').style.display = 'none';
+                document.getElementById('premium-estimate').style.display = 'none';
+            }
+
+            updateEstimate();
+            saveProgress();
+        }
+
+        function updateEstimate() {
+            if (!selectedCoverageType) return;
+
+            if (selectedCoverageType === 'comprehensive') {
+                const vehicleValue = activeVehicle.currentValue;
+                let basePremium = vehicleValue * 0.05; // 5% base
+
+                // Add-ons
+                let addOnsTotal = 0;
+                document.querySelectorAll('#add-ons-section input:checked').forEach(input => {
+                    addOnsTotal += parseInt(input.value);
+                });
+
+                // Deductible discount
+                const deductible = parseInt(document.querySelector('input[name="deductible"]:checked')?.value || 100000);
+                let deductibleDiscount = 0;
+                if (deductible === 50000) deductibleDiscount = 0.05;
+                else if (deductible === 200000) deductibleDiscount = 0.10;
+                else if (deductible === 500000) deductibleDiscount = 0.15;
+
+                // Security discount
+                let securityDiscount = 0;
+                if (document.querySelector('input[name="tracking"]')?.checked) securityDiscount += 0.10;
+                if (document.querySelector('input[name="alarm"]')?.checked) securityDiscount += 0.03;
+                if (document.querySelector('input[name="immobilizer"]')?.checked) securityDiscount += 0.02;
+
+                // Payment plan multiplier
+                const paymentPlan = document.querySelector('input[name="payment-plan"]:checked')?.value || 'annual';
+                let paymentMultiplier = 1.0;
+                if (paymentPlan === 'quarterly') paymentMultiplier = 1.05;
+                else if (paymentPlan === 'monthly') paymentMultiplier = 1.10;
+
+                // Calculate total
+                const totalBeforeDiscount = (basePremium + addOnsTotal) * paymentMultiplier;
+                const totalDiscount = (basePremium * deductibleDiscount) + (basePremium * securityDiscount);
+                const estimatedMin = Math.round((totalBeforeDiscount - totalDiscount) * 0.9);
+                const estimatedMax = Math.round((totalBeforeDiscount - totalDiscount) * 1.1);
+
+                document.getElementById('estimate-min').textContent = GarageData.formatCurrency(estimatedMin);
+                document.getElementById('estimate-max').textContent = GarageData.formatCurrency(estimatedMax);
+            }
+
+            // Enable proceed button
+            document.getElementById('proceed-btn').disabled = false;
+        }
+
+        function setupCharCounter() {
+            const textarea = document.getElementById('special-requests');
+            const counter = document.getElementById('char-count');
+
+            textarea.addEventListener('input', () => {
+                counter.textContent = `${textarea.value.length}/500`;
+            });
+        }
+
+        function saveProgress() {
+            if (!selectedCoverageType) return;
+
+            const progress = {
+                vehicleId: activeVehicle.id,
+                coverageType: selectedCoverageType,
+                addOns: [],
+                deductible: parseInt(document.querySelector('input[name="deductible"]:checked')?.value || 100000),
+                paymentPlan: document.querySelector('input[name="payment-plan"]:checked')?.value || 'annual',
+                securityFeatures: {
+                    tracking: document.querySelector('input[name="tracking"]')?.checked || false,
+                    alarm: document.querySelector('input[name="alarm"]')?.checked || false,
+                    immobilizer: document.querySelector('input[name="immobilizer"]')?.checked || false
+                },
+                specialRequests: document.getElementById('special-requests').value,
+                timestamp: new Date().toISOString()
+            };
+
+            // Get selected add-ons
+            document.querySelectorAll('#add-ons-section input:checked').forEach(input => {
+                progress.addOns.push({
+                    name: input.name,
+                    value: parseInt(input.value)
+                });
+            });
+
+            localStorage.setItem('insurance_service_progress', JSON.stringify(progress));
+
+            // Show toast
+            showToast('Progress Saved!', 'success');
+        }
+
+        function loadProgress() {
+            const saved = localStorage.getItem('insurance_service_progress');
+            if (!saved) return;
+
+            const progress = JSON.parse(saved);
+
+            // Restore coverage type
+            if (progress.coverageType) {
+                const coverageCard = document.querySelector(`.coverage-card[onclick*="${progress.coverageType}"]`);
+                if (coverageCard) {
+                    coverageCard.click();
+                }
+            }
+
+            // Restore add-ons
+            progress.addOns?.forEach(addon => {
+                const checkbox = document.querySelector(`input[name="${addon.name}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+
+            // Restore deductible
+            const deductibleRadio = document.querySelector(`input[name="deductible"][value="${progress.deductible}"]`);
+            if (deductibleRadio) deductibleRadio.checked = true;
+
+            // Restore payment plan
+            const paymentRadio = document.querySelector(`input[name="payment-plan"][value="${progress.paymentPlan}"]`);
+            if (paymentRadio) paymentRadio.checked = true;
+
+            // Restore security features
+            if (progress.securityFeatures) {
+                document.querySelector('input[name="tracking"]').checked = progress.securityFeatures.tracking;
+                document.querySelector('input[name="alarm"]').checked = progress.securityFeatures.alarm;
+                document.querySelector('input[name="immobilizer"]').checked = progress.securityFeatures.immobilizer;
+            }
+
+            // Restore special requests
+            document.getElementById('special-requests').value = progress.specialRequests || '';
+
+            updateEstimate();
+        }
+
+        function proceedToQuotes() {
+            if (!selectedCoverageType) {
+                showToast('Please select a coverage type', 'error');
+                return;
+            }
+
+            // Save final configuration
+            const configuration = {
+                vehicleId: activeVehicle.id,
+                coverageType: selectedCoverageType,
+                addOns: [],
+                deductible: parseInt(document.querySelector('input[name="deductible"]:checked')?.value || 100000),
+                paymentPlan: document.querySelector('input[name="payment-plan"]:checked')?.value || 'annual',
+                vehicleValue: activeVehicle.currentValue,
+                vehicleMake: activeVehicle.make,
+                vehicleModel: activeVehicle.model,
+                vehicleYear: activeVehicle.year,
+                vehicleUsage: activeVehicle.usage || 'private',
+                driverAge: parseInt(document.getElementById('driver-age').value),
+                driverExperience: parseInt(document.getElementById('driver-experience').value),
+                claimsHistory: parseInt(document.getElementById('claims-history').value),
+                securityFeatures: {
+                    tracking: document.querySelector('input[name="tracking"]')?.checked || false,
+                    alarm: document.querySelector('input[name="alarm"]')?.checked || false,
+                    immobilizer: document.querySelector('input[name="immobilizer"]')?.checked || false
+                },
+                specialRequests: document.getElementById('special-requests').value,
+                timestamp: new Date().toISOString()
+            };
+
+            // Get selected add-ons
+            document.querySelectorAll('#add-ons-section input:checked').forEach(input => {
+                configuration.addOns.push({
+                    name: input.name,
+                    value: parseInt(input.value)
+                });
+            });
+
+            localStorage.setItem('insurance_service_config', JSON.stringify(configuration));
+
+            // Navigate to review page
+            window.location.href = `insurance-review.html?vid=${activeVehicle.id}`;
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.style.background = type === 'success' ? 'var(--primary)' : '#ef4444';
+            toast.style.color = 'white';
+            toast.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined">${type === 'success' ? 'check_circle' : 'error'}</span>
+                    <span class="font-bold">${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.animation = 'slideDown 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 2000);
+        }
+
+        // Auto-save on input
+        document.addEventListener('input', () => {
+            if (selectedCoverageType) {
+                saveProgress();
+            }
+        });
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+
+</html>
