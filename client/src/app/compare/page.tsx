@@ -296,7 +296,14 @@ export default function ComparePage() {
                                                         >
                                                             <div className="w-10 h-7 bg-slate-100 rounded-lg overflow-hidden relative shrink-0 border border-slate-200 group-hover:border-burgundy/20">
                                                                 {res.photos ? (
-                                                                    <Image src={getVehicleImages(res.photos)[0]} alt={res.name} fill className="object-cover" />
+                                                                    <Image
+                                                                        src={getVehicleImages(res.photos)[0]}
+                                                                        alt={res.name}
+                                                                        fill
+                                                                        sizes="40px"
+                                                                        quality={40}
+                                                                        className="object-cover"
+                                                                    />
                                                                 ) : <Zap size={10} className="m-auto" />}
                                                             </div>
                                                             <div className="flex flex-col min-w-0">
@@ -333,7 +340,16 @@ export default function ComparePage() {
                                                                 >
                                                                     <div className="flex items-center gap-4">
                                                                         <div className="w-12 h-8 bg-slate-100 rounded-lg overflow-hidden relative border border-slate-100 group-hover:border-burgundy/20">
-                                                                            {m.photos ? <Image src={getVehicleImages(m.photos)[0]} alt={m.name} fill className="object-cover" /> : null}
+                                                                            {m.photos ? (
+                                                                                <Image
+                                                                                    src={getVehicleImages(m.photos)[0]}
+                                                                                    alt={m.name}
+                                                                                    fill
+                                                                                    sizes="48px"
+                                                                                    quality={40}
+                                                                                    className="object-cover"
+                                                                                />
+                                                                            ) : null}
                                                                         </div>
                                                                         <span className="text-sm font-heading font-extrabold text-slate-900 uppercase tracking-tight">{m.name}</span>
                                                                     </div>

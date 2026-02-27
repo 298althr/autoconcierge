@@ -29,6 +29,8 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
                     src={getAssetUrl(getVehicleImages(vehicle.images)[0])}
                     alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                     fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    quality={60}
                     className="object-cover group-hover:scale-105 transition-transform duration-700"
                 />
 

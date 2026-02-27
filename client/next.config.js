@@ -9,7 +9,8 @@ const nextConfig = {
         ignoreDuringBuilds: true,
     },
     images: {
-        unoptimized: true, // Optional: useful for Railway trial or when image optimization is not critical
+        // We removed unoptimized: true to enable Next.js image optimization (resizing/chunking)
+        // ensure sharp is installed in production for best performance.
         remotePatterns: [
             {
                 protocol: 'https',
