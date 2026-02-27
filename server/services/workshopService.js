@@ -1,4 +1,5 @@
 const { query } = require('../config/database');
+const notificationService = require('./notificationService');
 
 /**
  * AutoGaard Workshop Service
@@ -77,6 +78,19 @@ class WorkshopService {
         );
 
         await this.logWorkflowEvent(requestId, 3, 4, partnerId, 'partner', `Partner submitted quote of ${amount}`);
+
+        // Notify Owner
+        const ownerRes = await query('SELECT user_id FROM workshop_requests WHERE id = $1', [requestId]);
+        if (ownerRes.rows[0]) {
+            notificationService.createNotification(ownerRes.rows[0].user_id, {
+                title: 'Service Quote Received',
+                message: `A partner has submitted a quote of ₦${amount.toLocaleString()} for your service request.`,
+                type: 'service_update',
+                link: '/dashboard/garage/workshop/services',
+                metadata: { request_id: requestId, quote_amount: amount }
+            });
+        }
+
         return res.rows[0];
     }
 
@@ -113,6 +127,18 @@ class WorkshopService {
             RETURNING *
         `;
         const res = await query(sql, [step, label, requestId]);
+        const request = res.rows[0];
+
+        // Notify Owner if partner updated it
+        if (actorType === 'partner') {
+            notificationService.createNotification(request.user_id, {
+                title: 'Service Progress Update',
+                message: `Your service request is now: ${label}`,
+                type: 'service_update',
+                link: '/dashboard/garage/workshop/services',
+                metadata: { request_id: requestId, step, label }
+            });
+        }
 
         // Special logic for financial milestones
         if (step === 7) {

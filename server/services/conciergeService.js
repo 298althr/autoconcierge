@@ -1,6 +1,7 @@
 const axios = require('axios');
 const env = require('../config/env');
 const { query } = require('../config/database');
+const notificationService = require('./notificationService');
 
 class ConciergeService {
     /**
@@ -20,7 +21,15 @@ class ConciergeService {
             [userId, type, JSON.stringify(details), aiAnalysis ? JSON.stringify(aiAnalysis) : null]
         );
 
-        return result.rows[0];
+        const request = result.rows[0];
+
+        // Notify Admins
+        const userRes = await query('SELECT id, display_name FROM users WHERE id = $1', [userId]);
+        if (userRes.rows[0]) {
+            notificationService.notifyNewConciergeRequest(userRes.rows[0], request);
+        }
+
+        return request;
     }
 
     /**
@@ -104,7 +113,26 @@ class ConciergeService {
             'UPDATE concierge_requests SET status = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
             [status, requestId]
         );
-        return result.rows[0];
+        const request = result.rows[0];
+
+        if (request) {
+            notificationService.createNotification(request.user_id, {
+                title: 'Concierge Request Update',
+                message: `Your ${request.request_type} request status is now ${status}.`,
+                type: 'concierge_update',
+                link: '/dashboard/concierge',
+                metadata: { request_id: requestId, status }
+            });
+        }
+
+        return request;
+    }
+
+    // Placeholder for logWorkflowEvent - assuming it exists elsewhere or needs to be added
+    async logWorkflowEvent(requestId, workflowId, eventType, actorId, actorType, description) {
+        // This is a placeholder. Implement actual logging logic here.
+        console.log(`Workflow Event: Request ID ${requestId}, Event Type ${eventType}, Actor ${actorType}:${actorId}, Description: ${description}`);
+        // Example: await query('INSERT INTO workflow_events (...) VALUES (...)', [...]);
     }
 }
 

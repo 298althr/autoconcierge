@@ -11,4 +11,9 @@ router.get('/sales', meController.getMySales);
 router.patch('/profile', meController.updateProfile);
 router.post('/settle/:auctionId', meController.settleAuction);
 
+// Notifications
+router.get('/notifications', meController.getNotifications);
+router.get('/notifications/unread-count', meController.getUnreadCount);
+router.patch('/notifications/:id/read', meController.markNotificationAsRead);
+
 module.exports = router;

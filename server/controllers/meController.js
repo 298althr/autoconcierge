@@ -1,5 +1,6 @@
 const { pool } = require('../config/database');
 const settlementService = require('../services/settlementService');
+const notificationService = require('../services/notificationService');
 
 class MeController {
     /**
@@ -140,6 +141,35 @@ class MeController {
                 message: 'Auction settled successfully',
                 data: result
             });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async getNotifications(req, res, next) {
+        try {
+            const { limit, offset } = req.query;
+            const data = await notificationService.getMyNotifications(req.user.id, limit, offset);
+            res.status(200).json({ success: true, data });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async markNotificationAsRead(req, res, next) {
+        try {
+            const { id } = req.params;
+            const data = await notificationService.markAsRead(req.user.id, id);
+            res.status(200).json({ success: true, data });
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async getUnreadCount(req, res, next) {
+        try {
+            const count = await notificationService.getUnreadCount(req.user.id);
+            res.status(200).json({ success: true, count });
         } catch (err) {
             next(err);
         }

@@ -1,5 +1,6 @@
 const { pool } = require('../config/database');
 const emailService = require('./emailService');
+const notificationService = require('./notificationService');
 
 class AuctionService {
     async createAuction(userId, auctionData) {
@@ -157,6 +158,15 @@ class AuctionService {
                         const escrowService = require('./escrowService');
                         await escrowService.initiateEscrow(auction.id, auction.winner_id, parseFloat(auction.current_price));
                         await pool.query("UPDATE auctions SET status = 'sold_pending_70' WHERE id = $1", [auction.id]);
+
+                        // Notify Winner via App
+                        notificationService.createNotification(auction.winner_id, {
+                            title: 'Auction Won!',
+                            message: `Congratulations! You won the auction for #${auction.id.slice(0, 8)}. Next steps initiated.`,
+                            type: 'auction_won',
+                            link: `/dashboard/garage`,
+                            metadata: { auction_id: auction.id }
+                        });
                     } catch (err) {
                         console.error('[Escrow Init Error]:', err.message);
                     }

@@ -18,12 +18,24 @@ export function getAssetUrl(path: string | null | undefined) {
 
 export function getVehicleImages(images: any): string[] {
     if (!images) return [];
-    try {
-        const parsed = typeof images === 'string' ? JSON.parse(images) : images;
-        return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-        return [];
+    if (Array.isArray(images)) return images;
+
+    if (typeof images === 'string') {
+        // Try JSON parse first
+        if (images.startsWith('[') || images.startsWith('{')) {
+            try {
+                const parsed = JSON.parse(images);
+                return Array.isArray(parsed) ? parsed : [parsed];
+            } catch (e) {
+                // fall through to plain string check
+            }
+        }
+        // If it's a comma-separated list or just a single URL
+        if (images.includes(',')) return images.split(',').map(s => s.trim());
+        return [images.trim()];
     }
+
+    return [];
 }
 
 export async function apiFetch(endpoint: string, options: ApiOptions = {}) {

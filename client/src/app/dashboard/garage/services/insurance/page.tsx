@@ -67,11 +67,11 @@ export default function InsuranceHub() {
     useEffect(() => {
         if (token) {
             apiFetch('/me/garage', { token })
-                .then((res: any) => {
+                .then((res: { data?: any[] }) => {
                     setVehicles(res.data || []);
                     setLoading(false);
                 })
-                .catch((err: any) => {
+                .catch((err: Error) => {
                     console.error('Error fetching vehicles:', err);
                     setLoading(false);
                 });
@@ -259,6 +259,6 @@ export default function InsuranceHub() {
     );
 }
 
-function BadgeCheck({ className, size }: { className?: string, size?: number }) {
-    return <CheckCircle2 className={className} size={size} />
+function BadgeCheck({ className, size }: { className?: string; size?: number }) {
+    return <CheckCircle2 className={className} size={size} />;
 }

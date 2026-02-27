@@ -127,6 +127,7 @@ class VehicleService {
         ];
 
         const result = await query(sql, params);
+        return result.rows[0];
     }
 
     async updateVehiclePrivacy(id, userId, isPrivate) {

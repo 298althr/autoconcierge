@@ -1,36 +1,31 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import {
     Warehouse,
     Plus,
-    ArrowRight,
     Car,
     Activity,
     Tag,
-    Clock,
-    ShieldCheck,
-    ShoppingBag,
     Wrench,
-    MapPin,
+    ShieldCheck,
     ChevronRight,
     Search,
-    Filter,
     Eye,
     EyeOff,
-    CheckCircle2
+    Info,
+    ArrowUpRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useGarage, useSales } from '@/hooks/useGarage';
 import WorkshopHubs from '@/components/garage/WorkshopHubs';
-import MotionBackground from '@/components/landing/MotionBackground';
 import { getAssetUrl, apiFetch, getVehicleImages } from '@/lib/api';
 
 export default function GaragePage() {
     const { user, token } = useAuth();
-    const [activeTab, setActiveTab] = useState<'vault' | 'workshop' | 'sales'>('vault');
+    const [activeTab, setActiveTab] = useState<'vault' | 'services' | 'sales'>('vault');
 
     const { vehicles, loading: garageLoading, refetch } = useGarage(token);
     const { sales, loading: salesLoading } = useSales(token);
@@ -50,193 +45,72 @@ export default function GaragePage() {
         }
     };
 
-    const renderVehicleCard = (v: any) => {
-        const images = getVehicleImages(v.images);
-        const displayImage = getAssetUrl(images[0]);
-
-        return (
-            <motion.div
-                layout
-                key={v.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300"
-            >
-                <div className="relative aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden mb-4">
-                    {images.length > 0 ? (
-                        <img src={displayImage} alt={`${v.make} ${v.model}`} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                    ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">
-                            <Car size={32} strokeWidth={1.5} />
-                            <span className="text-[10px] font-black uppercase tracking-widest mt-2 text-slate-400">No Image</span>
-                        </div>
-                    )}
-
-                    {/* Privacy Toggle Overlay */}
-                    <div className="absolute top-3 right-3 flex gap-2">
-                        <button
-                            onClick={(e) => { e.preventDefault(); togglePrivacy(v.id, v.is_private); }}
-                            className={`p-2 rounded-xl backdrop-blur-md transition-all shadow-lg ${v.is_private ? 'bg-slate-900/80 text-white' : 'bg-white/80 text-slate-900 hover:bg-white'}`}
-                            title={v.is_private ? 'Currently Private' : 'Currently Public'}
-                        >
-                            {v.is_private ? <EyeOff size={14} /> : <Eye size={14} />}
-                        </button>
-                    </div>
-
-                    {v.active_auction_status && (
-                        <div className="absolute top-3 left-3">
-                            <span className="bg-emerald-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider flex items-center shadow-lg shadow-emerald-500/20">
-                                <Activity size={10} className="mr-1.5 animate-pulse" />
-                                {v.active_auction_status}
-                            </span>
-                        </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                        <Link href={`/vehicles/${v.id}`} className="w-full bg-slate-900 text-white py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-center shadow-xl transform translate-y-2 group-hover:translate-y-0 transition-all">
-                            Inspect Asset
-                        </Link>
-                    </div>
-                </div>
-
-                <div className="px-1">
-                    <div className="flex justify-between items-start mb-3">
-                        <div>
-                            <div className="flex items-center gap-2">
-                                <h3 className="font-heading font-extrabold text-slate-900 text-lg tracking-tight leading-tight group-hover:text-burgundy transition-colors">{v.make} {v.model}</h3>
-                                {v.is_private && <EyeOff size={12} className="text-slate-400" />}
-                            </div>
-                            <div className="flex items-center mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                                <span>{v.year}</span>
-                                <span className="mx-2 text-slate-200">|</span>
-                                <span className="text-[9px]">{v.vin?.substring(0, 10) || 'NO-VIN-PROV'}</span>
-                            </div>
-                        </div>
-                        <div className="bg-slate-50 p-2 rounded-xl group-hover:bg-burgundy/5 transition-colors">
-                            <ShieldCheck size={18} className="text-emerald-500" />
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                        <div className="flex flex-col">
-                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em]">Market Value</span>
-                            <span className="text-sm font-heading font-extrabold text-slate-900">₦{(v.price || 0).toLocaleString()}</span>
-                        </div>
-                        <Link href={`/dashboard/garage/services/diagnostics?id=${v.id}`} className="p-2.5 bg-slate-50 hover:bg-burgundy hover:text-white text-slate-400 rounded-xl transition-all active:scale-95 shadow-sm">
-                            <Wrench size={16} />
-                        </Link>
-                    </div>
-                </div>
-            </motion.div>
-        );
-    };
-
-    const renderSaleCard = (s: any) => {
-        const images = Array.isArray(s.images) ? s.images : (typeof s.images === 'string' ? JSON.parse(s.images) : []);
-        const displayImage = getAssetUrl(images[0]);
-
-        return (
-            <motion.div
-                layout
-                key={s.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="group bg-white rounded-3xl border border-slate-100 p-4 shadow-sm hover:shadow-xl transition-all duration-300"
-            >
-                <div className="relative aspect-[16/10] bg-slate-50 rounded-2xl overflow-hidden mb-4">
-                    {images.length > 0 ? (
-                        <img src={displayImage} alt={`${s.make} ${s.model}`} className="w-full h-full object-cover transition-all duration-500" />
-                    ) : (
-                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                            <Car size={32} strokeWidth={1.5} />
-                        </div>
-                    )}
-                    <div className="absolute top-3 left-3 bg-slate-900 text-white text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-wider flex items-center shadow-lg">
-                        <ShoppingBag size={12} className="mr-1.5 text-burgundy" />
-                        {s.type === 'escrow' ? 'Escrow Lock' : 'Live Auction'}
-                    </div>
-                </div>
-
-                <div className="px-1">
-                    <div className="flex justify-between items-start mb-3">
-                        <div>
-                            <h3 className="font-heading font-extrabold text-slate-900 text-lg tracking-tight group-hover:text-burgundy transition-colors">{s.make} {s.model}</h3>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                                {s.type === 'escrow' ? `Buyer: ${s.counterpart_name}` : 'Platform Listing'}
-                            </p>
-                        </div>
-                        <div className="text-right">
-                            <div className="text-sm font-heading font-extrabold text-burgundy">₦{(s.price || 0).toLocaleString()}</div>
-                            <div className="inline-block mt-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase rounded-full">
-                                {s.stage?.replace('_', ' ') || 'Active'}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex items-center">
-                            <Clock size={12} className="mr-1.5" />
-                            {new Date(s.updated_at).toLocaleDateString()}
-                        </span>
-                        <Link href={s.type === 'escrow' ? `/dashboard/escrow/${s.id}` : `/auctions/${s.id}`} className="text-[10px] font-black text-burgundy uppercase tracking-widest flex items-center hover:translate-x-1 transition-transform">
-                            Manage <ChevronRight size={14} className="ml-0.5" />
-                        </Link>
-                    </div>
-                </div>
-            </motion.div>
-        );
-    };
-
     return (
-        <div className="space-y-6 max-w-6xl mx-auto pb-24 relative min-h-[80vh]">
-            <MotionBackground />
+        <div className="max-w-6xl mx-auto space-y-8 pb-32">
+            {/* Immersive Header */}
+            <div className="relative h-48 md:h-64 rounded-[3rem] overflow-hidden bg-onyx shadow-2xl shadow-onyx/30">
+                <div className="absolute inset-0 bg-gradient-to-r from-onyx via-onyx/80 to-transparent z-10" />
+                <div className="absolute top-0 right-0 w-full h-full opacity-30 z-0">
+                    <div className="w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-burgundy/40 via-transparent to-transparent" />
+                </div>
 
-            {/* Premium Header Section */}
-            <div className="flex flex-col md:flex-row justify-between md:items-end gap-6 px-4 py-8">
-                <div>
-                    <div className="inline-flex items-center space-x-2 bg-burgundy/5 text-burgundy px-3 py-1.5 rounded-full font-black uppercase tracking-[0.2em] text-[10px] mb-4">
+                <div className="relative z-20 h-full flex flex-col justify-center px-8 md:px-12">
+                    <div className="flex items-center gap-2 text-burgundy font-black text-[10px] uppercase tracking-[0.3em] mb-4">
                         <Warehouse size={14} />
-                        <span>Asset Management</span>
+                        <span>Asset Custody</span>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-heading font-extrabold text-slate-900 tracking-tight leading-none italic">The Garage.</h1>
-                    <p className="text-sm md:text-base font-subheading font-medium text-slate-500 mt-4 max-w-lg">
-                        Securely manage your vehicle portfolio, deploy maintenance protocols, and track asset appreciation.
+                    <h1 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-4 italic">
+                        The Garage<span className="text-burgundy">.</span>
+                    </h1>
+                    <p className="text-white/60 text-xs md:text-sm font-bold max-w-md uppercase tracking-widest leading-relaxed">
+                        Precision management of your automotive portfolio and concierge protocols.
                     </p>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <Link href="/dashboard/market" className="flex-1 md:flex-none flex items-center justify-center space-x-2 bg-white border border-slate-200 text-slate-900 px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm active:scale-95 leading-none">
-                        <Search size={16} className="text-slate-400" />
-                        <span>Discover</span>
+                <div className="absolute bottom-6 right-8 z-30 hidden md:flex gap-3">
+                    <Link href="/dashboard/market" className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10">
+                        Explore Market
                     </Link>
-                    <Link href="/valuation/wizard" className="flex-1 md:flex-none flex items-center justify-center space-x-2 bg-burgundy text-white px-6 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-burgundy-light transition-all shadow-xl shadow-burgundy/20 active:scale-95 leading-none">
-                        <Plus size={16} />
-                        <span>Register Asset</span>
+                    <Link href="/valuation/wizard" className="bg-burgundy hover:bg-burgundy-dark text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-burgundy/30">
+                        Register Asset
                     </Link>
                 </div>
             </div>
 
-            {/* Professional Sticky Nav */}
-            <div className="sticky top-4 z-40 px-4">
-                <div className="max-w-md mx-auto bg-white/80 backdrop-blur-2xl p-1.5 rounded-[2rem] flex space-x-1 border border-slate-200/50 shadow-2xl shadow-slate-200/30">
+            {/* Quick Actions for Mobile */}
+            <div className="grid grid-cols-2 gap-3 md:hidden">
+                <Link href="/dashboard/market" className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col items-center gap-2">
+                    <Search size={20} className="text-burgundy" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Discover</span>
+                </Link>
+                <Link href="/valuation/wizard" className="bg-burgundy p-4 rounded-[2rem] shadow-lg shadow-burgundy/20 flex flex-col items-center gap-2 text-white">
+                    <Plus size={20} />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Register</span>
+                </Link>
+            </div>
+
+            {/* Premium Tab Navigation */}
+            <div className="flex items-center justify-center">
+                <nav className="flex bg-gray-100/50 p-1.5 rounded-[2.5rem] w-full max-w-lg shadow-inner">
                     {[
                         { id: 'vault', label: 'Vault', icon: Warehouse },
-                        { id: 'workshop', label: 'Services', icon: Wrench },
-                        { id: 'sales', label: 'Market', icon: Tag }
+                        { id: 'services', label: 'Concierge', icon: Wrench },
+                        { id: 'sales', label: 'Listings', icon: Tag }
                     ].map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`flex-1 py-3 md:py-3.5 rounded-[1.5rem] text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${activeTab === tab.id ? 'bg-burgundy text-white shadow-xl shadow-burgundy/20 scale-105 z-10' : 'text-slate-400 hover:text-slate-900 hover:bg-slate-50'}`}
+                            className={`flex-1 py-3.5 rounded-[2rem] text-[10px] font-black uppercase tracking-widest transition-all duration-500 flex items-center justify-center gap-2 ${activeTab === tab.id ? 'bg-white text-onyx shadow-xl scale-105 z-10' : 'text-gray-400 hover:text-onyx'}`}
                         >
-                            <tab.icon size={16} />
-                            <span className="hidden xs:inline">{tab.label}</span>
+                            <tab.icon size={16} className={activeTab === tab.id ? 'text-burgundy' : ''} />
+                            <span>{tab.label}</span>
                         </button>
                     ))}
-                </div>
+                </nav>
             </div>
 
-            {/* Dynamic Content Area */}
-            <div className="px-4 pt-12">
+            {/* Tab Content */}
+            <div className="pt-4">
                 <AnimatePresence mode="wait">
                     {activeTab === 'vault' && (
                         <motion.div
@@ -244,57 +118,52 @@ export default function GaragePage() {
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
-                            className="space-y-8"
+                            className="space-y-6"
                         >
                             <div className="flex items-center justify-between px-2">
-                                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Your Portfolio ({vehicles.length})</h2>
-                                <div className="flex items-center space-x-2">
-                                    <button className="p-2 text-slate-400 hover:text-slate-900 border border-transparent hover:border-slate-200 rounded-lg transition-all"><Filter size={16} /></button>
-                                </div>
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Total Portfolio Assets ({vehicles.length})</h3>
                             </div>
 
                             {garageLoading ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {[1, 2, 3].map(i => <div key={i} className="bg-slate-50 h-[320px] rounded-3xl animate-pulse" />)}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {[1, 2, 3].map(i => <div key={i} className="aspect-[16/11] bg-gray-100 rounded-[2.5rem] animate-pulse" />)}
                                 </div>
                             ) : vehicles.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {vehicles.map(renderVehicleCard)}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {vehicles.map(v => (
+                                        <VehicleCard
+                                            key={v.id}
+                                            vehicle={v}
+                                            onTogglePrivacy={() => togglePrivacy(v.id, v.is_private)}
+                                        />
+                                    ))}
                                 </div>
                             ) : (
-                                <div className="glass-card bg-white/40 border border-slate-100 border-dashed rounded-[3rem] p-16 flex flex-col items-center justify-center min-h-[400px] text-center">
-                                    <div className="w-24 h-24 bg-slate-50 text-slate-300 rounded-[2.5rem] flex items-center justify-center mb-8 rotate-12 group-hover:rotate-0 transition-transform">
-                                        <Car size={48} strokeWidth={1} />
-                                    </div>
-                                    <h3 className="text-2xl font-heading font-extrabold text-slate-900 mb-3 tracking-tight">Your Vault is Empty</h3>
-                                    <p className="text-slate-500 font-medium max-w-sm mx-auto mb-10 leading-relaxed">
-                                        You haven't acquired any assets yet. Browse the marketplace or register a vehicle to begin your collection.
-                                    </p>
-                                    <Link href="/dashboard/market" className="inline-flex items-center space-x-3 bg-burgundy/10 text-burgundy px-10 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-burgundy hover:text-white transition-all active:scale-95 shadow-lg shadow-burgundy/5">
-                                        <span>Browse Market</span>
-                                        <ChevronRight size={16} />
-                                    </Link>
-                                </div>
+                                <EmptyState
+                                    icon={<Car size={48} />}
+                                    title="Vault Empty"
+                                    desc="You haven't added any vehicles to your custody yet."
+                                    actionUrl="/dashboard/market"
+                                    actionLabel="Browse Marketplace"
+                                />
                             )}
                         </motion.div>
                     )}
 
-                    {activeTab === 'workshop' && (
+                    {activeTab === 'services' && (
                         <motion.div
-                            key="workshop"
+                            key="services"
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
+                            className="space-y-12"
                         >
-                            <div className="max-w-4xl mx-auto space-y-12">
-                                <div className="text-center space-y-4 mb-20">
-                                    <h2 className="text-3xl font-heading font-extrabold text-slate-900 tracking-tight italic">Protocol Deployment.</h2>
-                                    <p className="text-slate-500 font-medium max-w-md mx-auto">
-                                        Select a specialized concierge service hub to initiate interventions or regulatory compliance.
-                                    </p>
-                                </div>
-                                <WorkshopHubs />
+                            <div className="text-center max-w-xl mx-auto py-8">
+                                <h2 className="text-3xl font-black text-onyx tracking-tight italic mb-4">Concierge Protocols.</h2>
+                                <p className="text-sm text-gray-400 font-bold uppercase tracking-widest leading-relaxed">
+                                    Deploy specialized services to enhance the lifecycle and valuation of your assets.
+                                </p>
                             </div>
+                            <WorkshopHubs />
                         </motion.div>
                     )}
 
@@ -303,40 +172,158 @@ export default function GaragePage() {
                             key="sales"
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -10 }}
-                            className="space-y-8"
+                            className="space-y-6"
                         >
                             <div className="flex items-center justify-between px-2">
-                                <h2 className="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Active Listings ({sales.length})</h2>
+                                <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Active Liquidation Pipeline ({sales.length})</h3>
                             </div>
-
                             {salesLoading ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {[1, 2, 3].map(i => <div key={i} className="bg-slate-50 h-[320px] rounded-3xl animate-pulse" />)}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {[1, 2, 3].map(i => <div key={i} className="aspect-[16/11] bg-gray-100 rounded-[2.5rem] animate-pulse" />)}
                                 </div>
                             ) : sales.length > 0 ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {sales.map(renderSaleCard)}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {sales.map(s => <SaleCard key={s.id} sale={s} />)}
                                 </div>
                             ) : (
-                                <div className="glass-card bg-white/40 border border-slate-100 border-dashed rounded-[3rem] p-16 flex flex-col items-center justify-center min-h-[400px] text-center">
-                                    <div className="w-24 h-24 bg-slate-50 text-slate-300 rounded-[2.5rem] flex items-center justify-center mb-8 -rotate-6">
-                                        <Tag size={48} strokeWidth={1} />
-                                    </div>
-                                    <h3 className="text-2xl font-heading font-extrabold text-slate-900 mb-3 tracking-tight">No Active Sales</h3>
-                                    <p className="text-slate-500 font-medium max-w-sm mx-auto mb-10 leading-relaxed">
-                                        You are not currently liquidating any assets. List a vehicle for sale or auction to track its progress.
-                                    </p>
-                                    <Link href="/valuation/wizard" className="inline-flex items-center space-x-3 bg-burgundy/10 text-burgundy px-10 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] hover:bg-burgundy hover:text-white transition-all active:scale-95 shadow-lg shadow-burgundy/5">
-                                        <span>Liquidate Asset</span>
-                                        <ChevronRight size={16} />
-                                    </Link>
-                                </div>
+                                <EmptyState
+                                    icon={<Tag size={48} />}
+                                    title="No Active Sales"
+                                    desc="You are not currently liquidating any of your assets."
+                                    actionUrl="/valuation/wizard"
+                                    actionLabel="List an Asset"
+                                />
                             )}
                         </motion.div>
                     )}
                 </AnimatePresence>
             </div>
+        </div>
+    );
+}
+
+function VehicleCard({ vehicle, onTogglePrivacy }: { vehicle: any, onTogglePrivacy: () => void }) {
+    const images = getVehicleImages(vehicle.images);
+    const displayImage = getAssetUrl(images[0]);
+
+    return (
+        <motion.div
+            whileHover={{ y: -8 }}
+            className="group bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-onyx/10 transition-all duration-500"
+        >
+            <div className="relative aspect-[16/10] bg-gray-50 overflow-hidden">
+                {images.length > 0 ? (
+                    <img src={displayImage} alt={vehicle.model} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-gray-200">
+                        <Car size={32} strokeWidth={1} />
+                    </div>
+                )}
+
+                <div className="absolute top-4 right-4 flex gap-2">
+                    <button
+                        onClick={(e) => { e.preventDefault(); onTogglePrivacy(); }}
+                        className={`p-2.5 rounded-2xl backdrop-blur-xl transition-all shadow-lg ${vehicle.is_private ? 'bg-onyx/90 text-white' : 'bg-white/90 text-onyx hover:bg-white'}`}
+                    >
+                        {vehicle.is_private ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                </div>
+
+                {vehicle.active_auction_status && (
+                    <div className="absolute top-4 left-4">
+                        <span className="bg-emerald-500 text-white text-[9px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest flex items-center shadow-lg">
+                            <Activity size={10} className="mr-1.5 animate-pulse" />
+                            {vehicle.active_auction_status}
+                        </span>
+                    </div>
+                )}
+
+                <div className="absolute inset-0 bg-gradient-to-t from-onyx/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                    <Link href={`/vehicles/${vehicle.id}`} className="w-full bg-white text-onyx py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest text-center shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-all flex items-center justify-center gap-2">
+                        Inspect Asset <ArrowUpRight size={14} />
+                    </Link>
+                </div>
+            </div>
+
+            <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                    <div>
+                        <h4 className="text-lg font-black text-onyx truncate mb-1">{vehicle.make} {vehicle.model}</h4>
+                        <div className="p-1 px-2 bg-gray-50 rounded-lg inline-flex items-center gap-2 text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                            {vehicle.year} • {vehicle.condition?.replace('_', ' ')}
+                        </div>
+                    </div>
+                    <div className="w-10 h-10 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-500">
+                        <ShieldCheck size={20} />
+                    </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                    <div className="flex flex-col">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Valuation</span>
+                        <span className="text-md font-black text-onyx">₦{(vehicle.price || 0).toLocaleString()}</span>
+                    </div>
+                    <div className="flex gap-2">
+                        <Link href={`/dashboard/garage/services/diagnostics?id=${vehicle.id}`} className="w-12 h-12 bg-gray-50 hover:bg-burgundy text-gray-400 hover:text-white rounded-2xl transition-all flex items-center justify-center border border-transparent shadow-sm">
+                            <Wrench size={18} />
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    );
+}
+
+function SaleCard({ sale }: { sale: any }) {
+    const images = Array.isArray(sale.images) ? sale.images : (typeof sale.images === 'string' ? JSON.parse(sale.images) : []);
+    const displayImage = getAssetUrl(images[0]);
+
+    return (
+        <div className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm p-4 group">
+            <div className="relative aspect-[16/10] bg-gray-50 rounded-[2rem] overflow-hidden mb-4">
+                {images.length > 0 ? (
+                    <img src={displayImage} alt={sale.model} className="w-full h-full object-cover" />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-200">
+                        <Car size={32} strokeWidth={1} />
+                    </div>
+                )}
+                <div className="absolute bottom-4 left-4 right-4 bg-onyx/80 backdrop-blur-md p-3 rounded-2xl text-white flex justify-between items-center">
+                    <span className="text-[9px] font-black uppercase tracking-widest">{sale.type}</span>
+                    <span className="text-[10px] font-black tracking-tight">₦{sale.price?.toLocaleString()}</span>
+                </div>
+            </div>
+
+            <div className="px-2 pb-2">
+                <div className="flex justify-between items-center mb-3">
+                    <h5 className="font-black text-onyx truncate text-sm">{sale.make} {sale.model}</h5>
+                    <span className={`px-2 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest ${sale.status === 'active' ? 'bg-emerald-50 text-emerald-500' : 'bg-burgundy/5 text-burgundy'}`}>
+                        {sale.stage?.replace('_', ' ')}
+                    </span>
+                </div>
+
+                <Link
+                    href={sale.type === 'escrow' ? `/dashboard/escrow/${sale.id}` : `/auctions/${sale.id}`}
+                    className="w-full py-3 bg-gray-50 hover:bg-onyx hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center justify-center gap-2 transition-all"
+                >
+                    Manage Protocol <ChevronRight size={14} />
+                </Link>
+            </div>
+        </div>
+    );
+}
+
+function EmptyState({ icon, title, desc, actionUrl, actionLabel }: any) {
+    return (
+        <div className="bg-white/50 border-2 border-dashed border-gray-100 rounded-[3rem] p-12 py-20 text-center flex flex-col items-center">
+            <div className="w-20 h-20 bg-gray-50 text-gray-300 rounded-[2rem] flex items-center justify-center mb-6">
+                {icon}
+            </div>
+            <h3 className="text-2xl font-black text-onyx tracking-tighter mb-2 italic">{title}</h3>
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-8 max-w-xs leading-relaxed">{desc}</p>
+            <Link href={actionUrl} className="bg-burgundy text-white px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-burgundy/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-3">
+                {actionLabel} <ChevronRight size={16} />
+            </Link>
         </div>
     );
 }

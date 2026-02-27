@@ -41,10 +41,15 @@ export function useSocket() {
         socketRef.current?.emit('leave_auction', auctionId);
     };
 
+    const authenticate = (token: string) => {
+        socketRef.current?.emit('authenticate', token);
+    };
+
     return {
         socket: socketRef.current,
         isConnected,
         joinAuction,
-        leaveAuction
+        leaveAuction,
+        authenticate
     };
 }

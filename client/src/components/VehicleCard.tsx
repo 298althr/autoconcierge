@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ShieldCheck, MapPin, Gauge } from 'lucide-react';
-import { getAssetUrl } from '@/lib/api';
+import { getAssetUrl, getVehicleImages } from '@/lib/api';
 
 interface Vehicle {
     id: string;
@@ -26,7 +26,7 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
             {/* Image Container */}
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-100">
                 <Image
-                    src={getAssetUrl(Array.isArray(vehicle.images) ? vehicle.images[0] : (typeof vehicle.images === 'string' ? JSON.parse(vehicle.images)[0] : null))}
+                    src={getAssetUrl(getVehicleImages(vehicle.images)[0])}
                     alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-700"

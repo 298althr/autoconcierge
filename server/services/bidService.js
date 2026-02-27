@@ -2,6 +2,7 @@ const { pool } = require('../config/database');
 const walletService = require('./walletService');
 const socketService = require('./socketService');
 const emailService = require('./emailService');
+const notificationService = require('./notificationService');
 
 class BidService {
     async placeBid(userId, auctionId, amount) {
@@ -50,6 +51,16 @@ class BidService {
                         description: `Deposit release (Outbid) for Auction #${auctionId.slice(0, 8)}`
                     }, client);
                 }
+
+                // Real-time outbid notification
+                notificationService.createNotification(auction.winner_id, {
+                    title: 'You were outbid!',
+                    message: `Higher bid of ₦${amount.toLocaleString()} on ${auction.make} ${auction.model}`,
+                    type: 'bid_outbid',
+                    link: `/auctions/${auctionId}`,
+                    metadata: { auction_id: auctionId, new_amount: amount }
+                });
+
                 await client.query('UPDATE bids SET is_winning = false WHERE auction_id = $1 AND user_id = $2', [auctionId, auction.winner_id]);
             }
 

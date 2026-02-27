@@ -1,5 +1,6 @@
 const { pool } = require('../config/database');
 const walletService = require('./walletService');
+const notificationService = require('./notificationService');
 
 class EscrowService {
     /**
@@ -39,6 +40,15 @@ class EscrowService {
 
             await client.query('UPDATE auction_escrow SET held_amount = $1 WHERE id = $2', [commitmentAmount, escrow.id]);
 
+            // Notify Seller
+            notificationService.createNotification(auction.created_by, {
+                title: 'New Purchase Request',
+                message: `A buyer has initiated commitment for your auction #${auctionId.slice(0, 8)}. Review and accept the deal.`,
+                type: 'escrow_update',
+                link: '/dashboard/sales',
+                metadata: { escrow_id: escrow.id, auction_id: auctionId }
+            });
+
             if (isInternal) {
                 await client.query('COMMIT');
             }
@@ -72,6 +82,15 @@ class EscrowService {
                 SET stage = 'commitment_10', updated_at = NOW() 
                 WHERE id = $1
             `, [escrowId]);
+
+            // Notify Buyer
+            notificationService.createNotification(escrow.buyer_id, {
+                title: 'Deal Accepted!',
+                message: `The seller has accepted your purchase request for escrow #${escrowId.slice(0, 8)}. Please proceed with the remaining payment.`,
+                type: 'escrow_update',
+                link: `/dashboard/escrow/${escrowId}`,
+                metadata: { escrow_id: escrowId }
+            });
 
             await client.query('COMMIT');
             return { success: true, message: 'Deal accepted by seller. Buyer notified for remaining payment.' };
@@ -194,9 +213,27 @@ class EscrowService {
                 // 2. Update vehicle record (Move to buyer's garage)
                 await client.query(`
                     UPDATE vehicles 
-                    SET owner_id = $1, status = 'available', updated_at = NOW() 
+                    SET owner_id = $1, status = 'available', is_private = true, updated_at = NOW() 
                     WHERE id = $2
                 `, [escrow.buyer_id, vehicleId]);
+
+                // Notify Buyer
+                notificationService.createNotification(escrow.buyer_id, {
+                    title: 'Vehicle Acquired!',
+                    message: `Transaction complete. The vehicle is now in your garage.`,
+                    type: 'escrow_update',
+                    link: '/dashboard/garage',
+                    metadata: { vehicle_id: vehicleId, escrow_id: escrowId }
+                });
+
+                // Notify Seller
+                notificationService.createNotification(escrow.seller_id, {
+                    title: 'Sale Successfully Disbursed',
+                    message: `Your sale of ₦${totalDeal.toLocaleString()} has been finalized and payout of ₦${sellerPayout.toLocaleString()} added to your wallet.`,
+                    type: 'escrow_update',
+                    link: '/dashboard/wallet',
+                    metadata: { escrow_id: escrowId, amount: sellerPayout }
+                });
             }
 
             await client.query('COMMIT');

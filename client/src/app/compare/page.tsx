@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { apiFetch } from '@/lib/api';
-import { Plus, X, ArrowRight, Zap, Info, ArrowLeftRight, Trash2, Share2 } from 'lucide-react';
+import { apiFetch, getVehicleImages } from '@/lib/api';
+import { Plus, X, ArrowRight, Zap, Info, ArrowLeftRight, Trash2, Share2, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MotionBackground from '@/components/landing/MotionBackground';
 import PillHeader from '@/components/landing/PillHeader';
@@ -30,6 +30,9 @@ export default function ComparePage() {
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [brands, setBrands] = useState<any[]>([]);
+    const [selectingBrand, setSelectingBrand] = useState<any>(null);
+    const [availableModels, setAvailableModels] = useState<any[]>([]);
+    const [isLoadingModels, setIsLoadingModels] = useState(false);
 
     useEffect(() => {
         // Load initial comparison IDs from URL if any
@@ -39,11 +42,23 @@ export default function ComparePage() {
             setSelectedIds(ids.split(',').map(Number));
         }
 
-        // Fetch brands for search
+        // Fetch brands for structured picker
         apiFetch('/catalog/brands').then(res => {
             if (res.data) setBrands(res.data);
         });
     }, []);
+
+    const fetchModels = async (brandId: number) => {
+        setIsLoadingModels(true);
+        try {
+            const res = await apiFetch(`/catalog/models?makeId=${brandId}`);
+            if (res.data) setAvailableModels(res.data);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsLoadingModels(false);
+        }
+    };
 
     useEffect(() => {
         if (selectedIds.length > 0) {
@@ -90,9 +105,6 @@ export default function ComparePage() {
 
         setIsSearching(true);
         try {
-            // Re-using models endpoint or similar if it supports search
-            // For now, let's assume we might need a search endpoint
-            // Or just fetch some models
             const res = await apiFetch(`/catalog/models?q=${query}`);
             if (res.data) setSearchResults(res.data.slice(0, 10));
         } catch (err) {
@@ -108,6 +120,8 @@ export default function ComparePage() {
         setSelectedIds([...selectedIds, id]);
         setSearchQuery('');
         setSearchResults([]);
+        setSelectingBrand(null);
+        setAvailableModels([]);
     };
 
     const removeVehicle = (id: number) => {
@@ -224,62 +238,114 @@ export default function ComparePage() {
                         ))}
 
                         {selectedIds.length < 4 && (
-                            <div className="relative group w-full lg:min-w-[280px]">
-                                <div className="flex bg-white border-2 border-dashed border-slate-200 hover:border-burgundy/40 rounded-2xl transition-all h-full">
-                                    <input
-                                        type="text"
-                                        placeholder="Search Model to Add..."
-                                        value={searchQuery}
-                                        onChange={(e) => handleSearch(e.target.value)}
-                                        className="bg-transparent px-5 py-3 md:py-4 outline-none w-full text-xs md:text-sm font-subheading font-medium"
-                                    />
-                                    <div className="px-4 flex items-center text-slate-300 group-hover:text-burgundy/40">
-                                        <Plus size={18} />
+                            <div className="relative group w-full lg:min-w-[400px]">
+                                <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2 items-center">
+                                    <div className="flex bg-white border-2 border-dashed border-slate-200 focus-within:border-burgundy/40 rounded-2xl transition-all h-full shadow-sm">
+                                        <input
+                                            type="text"
+                                            placeholder="Fast Audit (Search Model)..."
+                                            value={searchQuery}
+                                            onChange={(e) => {
+                                                handleSearch(e.target.value);
+                                                if (selectingBrand) setSelectingBrand(null);
+                                            }}
+                                            className="bg-transparent px-5 py-3 md:py-4 outline-none w-full text-xs md:text-sm font-subheading font-medium"
+                                        />
+                                        <div className="px-4 flex items-center text-slate-300 group-hover:text-burgundy/40">
+                                            <Search size={18} />
+                                        </div>
                                     </div>
+                                    <button
+                                        onClick={() => {
+                                            setSelectingBrand(selectingBrand === 'open' ? null : 'open');
+                                            setSearchQuery('');
+                                            setSearchResults([]);
+                                        }}
+                                        className={`px-6 py-3 md:py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-md ${selectingBrand ? 'bg-slate-900 text-white' : 'bg-white border border-slate-200 text-slate-500 hover:border-slate-400'}`}
+                                    >
+                                        {selectingBrand ? 'Dismiss Picker' : 'Browse Brands'}
+                                    </button>
                                 </div>
 
                                 <AnimatePresence>
-                                    {searchResults.length > 0 && (
+                                    {(searchResults.length > 0 || selectingBrand) && (
                                         <motion.div
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: 10 }}
-                                            className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 overflow-hidden"
+                                            className="absolute top-full left-0 right-0 mt-3 bg-white rounded-[2rem] shadow-2xl border border-slate-100 z-50 overflow-hidden min-h-[300px] flex flex-col"
                                         >
-                                            {searchResults.map((res: any) => (
-                                                <button
-                                                    key={res.id}
-                                                    onClick={() => addVehicle(res.id)}
-                                                    className="w-full text-left px-5 py-3.5 hover:bg-slate-50 flex items-center space-x-3 md:space-x-4 transition-colors border-b last:border-0 border-slate-50"
-                                                >
-                                                    <div className="w-10 h-7 md:w-12 md:h-8 bg-slate-100 rounded-lg overflow-hidden relative shrink-0 border border-slate-200">
-                                                        {(() => {
-                                                            let photoUrl = '';
-                                                            if (res.photos) {
-                                                                try {
-                                                                    const p = typeof res.photos === 'string' && res.photos.startsWith('[')
-                                                                        ? JSON.parse(res.photos)
-                                                                        : res.photos.split(',');
-                                                                    photoUrl = Array.isArray(p) ? p[0] : p;
-                                                                } catch (e) { photoUrl = res.photos; }
-                                                            }
-                                                            return photoUrl ? (
-                                                                <Image src={photoUrl} alt={res.name} fill className="object-cover" />
-                                                            ) : (
-                                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                                    <Zap size={10} />
-                                                                </div>
-                                                            );
-                                                        })()}
+                                            <div className="p-6 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                                                <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                                    {searchQuery ? 'Analysis Results' : selectingBrand && selectingBrand !== 'open' ? `Models for ${selectingBrand.name}` : 'Select Manufacturer'}
+                                                </h4>
+                                                {selectingBrand && selectingBrand !== 'open' && (
+                                                    <button onClick={() => setSelectingBrand('open')} className="text-[9px] font-bold text-burgundy uppercase tracking-widest flex items-center gap-1">
+                                                        <ArrowRight size={12} className="rotate-180" /> Back to Brands
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            <div className="flex-1 overflow-y-auto max-h-[400px] custom-scrollbar p-2">
+                                                {searchQuery ? (
+                                                    searchResults.map((res: any) => (
+                                                        <button
+                                                            key={res.id}
+                                                            onClick={() => addVehicle(res.id)}
+                                                            className="w-full text-left px-5 py-3.5 hover:bg-slate-50 flex items-center space-x-4 transition-colors rounded-xl mb-1 group"
+                                                        >
+                                                            <div className="w-10 h-7 bg-slate-100 rounded-lg overflow-hidden relative shrink-0 border border-slate-200 group-hover:border-burgundy/20">
+                                                                {res.photos ? (
+                                                                    <Image src={getVehicleImages(res.photos)[0]} alt={res.name} fill className="object-cover" />
+                                                                ) : <Zap size={10} className="m-auto" />}
+                                                            </div>
+                                                            <div className="flex flex-col min-w-0">
+                                                                <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400">{res.brand_name}</span>
+                                                                <span className="text-sm font-heading font-bold text-slate-900 truncate">{res.name}</span>
+                                                            </div>
+                                                        </button>
+                                                    ))
+                                                ) : selectingBrand === 'open' ? (
+                                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-4">
+                                                        {brands.map(b => (
+                                                            <button
+                                                                key={b.id}
+                                                                onClick={() => {
+                                                                    setSelectingBrand(b);
+                                                                    fetchModels(b.id);
+                                                                }}
+                                                                className="p-4 rounded-2xl border border-slate-100 hover:border-burgundy/20 hover:bg-burgundy/5 transition-all text-center group"
+                                                            >
+                                                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 group-hover:text-burgundy">{b.name}</p>
+                                                            </button>
+                                                        ))}
                                                     </div>
-                                                    <div className="flex flex-col min-w-0">
-                                                        <span className="text-[9px] font-bold uppercase tracking-widest text-slate-400 truncate">
-                                                            {res.brand_name || brands.find(b => b.id === res.brand_id)?.name}
-                                                        </span>
-                                                        <span className="text-xs md:text-sm font-heading font-bold text-slate-900 truncate">{res.name}</span>
+                                                ) : selectingBrand ? (
+                                                    <div className="p-4 space-y-1">
+                                                        {isLoadingModels ? (
+                                                            <div className="py-20 text-center italic text-slate-400 text-xs animate-pulse">Syncing catalog...</div>
+                                                        ) : availableModels.length > 0 ? (
+                                                            availableModels.map(m => (
+                                                                <button
+                                                                    key={m.id}
+                                                                    onClick={() => addVehicle(m.id)}
+                                                                    className="w-full text-left px-5 py-4 hover:bg-slate-50 flex items-center justify-between transition-colors rounded-xl group"
+                                                                >
+                                                                    <div className="flex items-center gap-4">
+                                                                        <div className="w-12 h-8 bg-slate-100 rounded-lg overflow-hidden relative border border-slate-100 group-hover:border-burgundy/20">
+                                                                            {m.photos ? <Image src={getVehicleImages(m.photos)[0]} alt={m.name} fill className="object-cover" /> : null}
+                                                                        </div>
+                                                                        <span className="text-sm font-heading font-extrabold text-slate-900 uppercase tracking-tight">{m.name}</span>
+                                                                    </div>
+                                                                    <Plus size={16} className="text-slate-200 group-hover:text-burgundy group-hover:translate-x-1 transition-all" />
+                                                                </button>
+                                                            ))
+                                                        ) : (
+                                                            <div className="py-20 text-center text-slate-400 text-xs">No models recorded for this manufacturer.</div>
+                                                        )}
                                                     </div>
-                                                </button>
-                                            ))}
+                                                ) : null}
+                                            </div>
                                         </motion.div>
                                     )}
                                 </AnimatePresence>

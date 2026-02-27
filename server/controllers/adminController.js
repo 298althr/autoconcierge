@@ -1,4 +1,5 @@
 const { pool } = require('../config/database');
+const notificationService = require('../services/notificationService');
 
 class AdminController {
     /**
@@ -60,6 +61,15 @@ class AdminController {
             res.status(200).json({
                 success: true,
                 message: `User KYC status updated to ${status}`
+            });
+
+            // Notify User
+            notificationService.createNotification(userId, {
+                title: 'KYC Verification Update',
+                message: `Your account verification status has been updated to: ${status}.`,
+                type: 'account_update',
+                link: '/dashboard/profile',
+                metadata: { status }
             });
         } catch (err) {
             next(err);

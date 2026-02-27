@@ -1,32 +1,32 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/api';
 import PremiumButton from '@/components/ui/PremiumButton';
-import PillHeader from '@/components/landing/PillHeader';
-import MotionBackground from '@/components/landing/MotionBackground';
 import {
     Wallet,
     Plus,
     History,
     ShieldCheck,
-    Clock,
-    CheckCircle2,
+    CreditCard,
+    ArrowUpRight,
+    ArrowDownLeft,
+    ChevronRight,
     Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FundWalletModal from '@/components/wallet/FundWalletModal';
-import TransactionRow from '@/components/wallet/TransactionRow';
+import { format } from 'date-fns';
 
 export default function WalletPage() {
-    const { user, token } = useAuth();
+    const { token } = useAuth();
     const [balanceData, setBalanceData] = useState<any>(null);
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showFundModal, setShowFundModal] = useState(false);
 
-    const fetchData = React.useCallback(async () => {
+    const fetchData = useCallback(async () => {
         if (!token) return;
         try {
             const [balRes, txRes] = await Promise.all([
@@ -43,200 +43,119 @@ export default function WalletPage() {
     }, [token]);
 
     useEffect(() => {
-        const verifyPayment = async (ref: string, amt: string) => {
-            try {
-                await apiFetch('/wallet/fund/verify', {
-                    method: 'POST',
-                    token,
-                    body: { reference: ref, amount: amt }
-                });
-                window.history.replaceState({}, document.title, window.location.pathname);
-                fetchData();
-            } catch (err) {
-                console.error('Verification failed', err);
-                fetchData();
-            }
-        };
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const ref = urlParams.get('ref');
-        const amount = urlParams.get('amount');
-
-        if (ref && amount && token) {
-            verifyPayment(ref, amount);
-        } else {
-            fetchData();
-        }
-    }, [token, fetchData]);
-
-    useEffect(() => {
-        if (!token) return;
-
-        const hasProcessing = transactions.some((tx: any) => tx.status === 'processing');
-        if (!hasProcessing) return;
-
-        const interval = setInterval(() => {
-            fetchData();
-        }, 30000);
-
-        return () => clearInterval(interval);
-    }, [token, transactions, fetchData]);
+        fetchData();
+    }, [fetchData]);
 
     if (loading) {
         return (
-            <main className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
-                <div className="w-16 h-16 bg-slate-900/5 text-slate-900 rounded-full flex items-center justify-center animate-pulse mb-6">
-                    <Wallet size={24} />
-                </div>
-            </main>
+            <div className="flex items-center justify-center min-h-[60vh]">
+                <div className="w-12 h-12 border-4 border-burgundy/20 border-t-burgundy rounded-full animate-spin" />
+            </div>
         );
     }
 
+    const availableBalance = balanceData?.balance || 0;
+    const heldBalance = balanceData?.held || 0;
+    const totalBalance = availableBalance + heldBalance;
+
     return (
-        <div className="space-y-6 max-w-5xl mx-auto">
-            <div className="relative z-10 w-full">
-                <header className="mb-12">
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-                        <div className="flex items-center space-x-2 text-burgundy font-bold uppercase tracking-widest text-[10px] mb-3">
-                            <Wallet size={16} />
-                            <span>Capital Reserves</span>
+        <div className="max-w-4xl mx-auto space-y-6 pb-12">
+            {/* Header */}
+            <header className="px-1">
+                <div className="flex items-center gap-2 text-burgundy font-black text-[10px] uppercase tracking-[0.2em] mb-1">
+                    <Wallet size={12} />
+                    <span>Financial Hub</span>
+                </div>
+                <h1 className="text-3xl font-black text-onyx tracking-tight">Wallet</h1>
+            </header>
+
+            {/* Mobile-First Balance Card */}
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative overflow-hidden bg-onyx text-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl shadow-onyx/20"
+            >
+                {/* Background Pattern */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-burgundy/20 rounded-full blur-[60px] translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-[40px] -translate-x-1/2 translate-y-1/2" />
+
+                <div className="relative z-10 flex flex-col items-center text-center">
+                    <span className="text-[10px] uppercase font-black tracking-widest text-white/40 mb-2">Total Balance</span>
+                    <h2 className="text-4xl md:text-5xl font-black tracking-tighter mb-8">
+                        ₦{totalBalance.toLocaleString()}
+                    </h2>
+
+                    <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
+                        <div className="bg-white/5 backdrop-blur-md p-4 rounded-3xl border border-white/10 text-left">
+                            <div className="text-[9px] uppercase font-black text-white/30 mb-1 flex items-center gap-1">
+                                <Plus size={10} className="text-emerald-400" /> Available
+                            </div>
+                            <div className="text-lg font-black tracking-tight">₦{availableBalance.toLocaleString()}</div>
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-heading font-extrabold text-slate-900 tracking-tight mb-3">Treasury.</h1>
-                        <p className="text-slate-500 font-subheading text-sm leading-relaxed">Oversee liquid assets and escrow allocations.</p>
-                    </motion.div>
-                </header>
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Main Balance Card */}
-                    <div className="lg:col-span-2 space-y-8">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.1 }}
-                            className="bg-slate-900 text-white p-10 md:p-12 rounded-[2.5rem] relative overflow-hidden shadow-2xl group"
-                        >
-                            <div className="absolute -top-10 -right-10 w-64 h-64 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-colors duration-1000" />
-                            <div className="absolute top-0 right-0 p-8 opacity-5 text-white">
-                                <Wallet size={160} />
+                        <div className="bg-white/5 backdrop-blur-md p-4 rounded-3xl border border-white/10 text-left">
+                            <div className="text-[9px] uppercase font-black text-white/30 mb-1 flex items-center gap-1">
+                                <Lock size={10} className="text-amber-400" /> Held
                             </div>
-
-                            <div className="relative z-10">
-                                <span className="text-white/50 font-bold uppercase tracking-[0.2em] text-[10px] block mb-2 font-subheading">Total Liquidity</span>
-                                <h2 className="text-5xl md:text-6xl font-heading font-extrabold mb-10 tracking-tight">
-                                    ₦{balanceData?.balance?.toLocaleString() || '0.00'}
-                                </h2>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div className="bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-white/10">
-                                        <div className="flex items-center text-white/50 text-[10px] font-bold uppercase mb-2 tracking-widest font-subheading">
-                                            <Lock size={12} className="mr-1.5" /> Escrow Allocated
-                                        </div>
-                                        <div className="text-2xl font-heading font-extrabold text-white">₦{balanceData?.held?.toLocaleString() || '0.00'}</div>
-                                    </div>
-                                    <div className="bg-emerald-500/10 backdrop-blur-md p-6 rounded-2xl border border-emerald-500/20">
-                                        <div className="flex items-center text-emerald-400 text-[10px] font-bold uppercase mb-2 tracking-widest font-subheading">
-                                            Deployable Capital
-                                        </div>
-                                        <div className="text-2xl font-heading font-extrabold text-emerald-50">₦{balanceData?.balance?.toLocaleString() || '0.00'}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-
-                        {/* Recent Activity */}
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                            className="glass-card p-8 md:p-10"
-                        >
-                            <div className="flex items-center justify-between mb-8 pb-6 border-b border-slate-100">
-                                <div className="flex items-center space-x-3">
-                                    <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 shadow-inner">
-                                        <History size={18} />
-                                    </div>
-                                    <h3 className="text-xl font-heading font-extrabold text-slate-900">Ledger</h3>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                {transactions.length > 0 ? (
-                                    transactions.map((tx: any) => (
-                                        <TransactionRow key={tx.id} transaction={tx} />
-                                    ))
-                                ) : (
-                                    <div className="py-24 text-center">
-                                        <History className="mx-auto mb-4 text-slate-300" size={32} />
-                                        <p className="text-slate-500 font-subheading text-sm font-medium">No ledger entries detected.</p>
-                                    </div>
-                                )}
-                            </div>
-                        </motion.div>
+                            <div className="text-lg font-black tracking-tight">₦{heldBalance.toLocaleString()}</div>
+                        </div>
                     </div>
 
-                    {/* Sidebar Actions */}
-                    <div className="space-y-6">
-                        <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.3 }}>
-                            <PremiumButton
-                                onClick={() => setShowFundModal(true)}
-                                className="w-full py-6 text-lg"
-                                icon={Plus}
-                                tooltip="Add Liquid Capital"
-                            >
-                                Inject Capital
-                            </PremiumButton>
-                        </motion.div>
+                    <button
+                        onClick={() => setShowFundModal(true)}
+                        className="mt-8 px-8 py-4 bg-burgundy hover:bg-burgundy-dark text-white rounded-2xl font-black text-sm uppercase tracking-widest transition-all hover:scale-105 active:scale-95 shadow-xl shadow-burgundy/40 flex items-center gap-2 group"
+                    >
+                        <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+                        Add Capital
+                    </button>
+                </div>
+            </motion.div>
 
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
-                            className="bg-emerald-50 border border-emerald-100 p-6 rounded-[2rem] shadow-sm"
-                        >
-                            <div className="flex items-start space-x-4">
-                                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-500 shadow-sm border border-emerald-50 shrink-0">
-                                    <ShieldCheck size={24} />
-                                </div>
-                                <div>
-                                    <h4 className="font-heading font-extrabold text-slate-900 uppercase text-xs tracking-tight mb-1.5 flex flex-col">
-                                        <span>Cryptographic</span>
-                                        <span>Security</span>
-                                    </h4>
-                                    <p className="text-[10px] text-slate-500 leading-relaxed font-body">
-                                        Transactions secured via bank-grade encryption endpoints. Escrow integrated directly with the settlement engine.
-                                    </p>
-                                </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Transactions Ledger */}
+                <div className="md:col-span-2 space-y-4">
+                    <div className="flex items-center justify-between px-1">
+                        <div className="flex items-center gap-2 text-onyx font-black text-xs uppercase tracking-widest">
+                            <History size={16} className="text-burgundy" />
+                            <span>Recent Activity</span>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        {transactions.length > 0 ? (
+                            transactions.map((tx: any) => (
+                                <TransactionItem key={tx.id} tx={tx} />
+                            ))
+                        ) : (
+                            <div className="bg-white/50 border border-dashed border-gray-200 rounded-3xl py-12 text-center">
+                                <p className="text-sm text-gray-400">No transactions recorded.</p>
                             </div>
-                        </motion.div>
+                        )}
+                    </div>
+                </div>
 
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.5 }}
-                            className="glass-card p-8"
-                        >
-                            <h4 className="font-bold mb-6 uppercase text-[10px] tracking-widest text-slate-400 font-subheading">Security Posture</h4>
-                            <ul className="space-y-5">
-                                <li className="flex items-center space-x-3 text-[11px] font-bold text-slate-700">
-                                    <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-500">
-                                        <CheckCircle2 size={14} />
-                                    </div>
-                                    <span className="font-subheading uppercase tracking-wider">Multi-Factor Auth Active</span>
-                                </li>
-                                <li className="flex items-center space-x-3 text-[11px] font-bold text-slate-700">
-                                    <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-500">
-                                        <CheckCircle2 size={14} />
-                                    </div>
-                                    <span className="font-subheading uppercase tracking-wider">Real-Time Ledger Alerts</span>
-                                </li>
-                                <li className="flex items-center space-x-3 text-[11px] font-bold text-slate-400 opacity-60">
-                                    <div className="p-1.5 bg-slate-100 rounded-lg text-slate-400">
-                                        <Clock size={14} />
-                                    </div>
-                                    <span className="font-subheading uppercase tracking-wider">Multi-Sig Settlement (Beta)</span>
-                                </li>
-                            </ul>
-                        </motion.div>
+                {/* Account Security Tips */}
+                <div className="space-y-6">
+                    <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm">
+                        <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 mb-4">
+                            <ShieldCheck size={20} />
+                        </div>
+                        <h4 className="text-sm font-black text-onyx uppercase tracking-tight mb-2">Secured Assets</h4>
+                        <p className="text-xs text-gray-500 leading-relaxed">
+                            Your funds are protected by multi-signature escrow protocols. Deploy capital with absolute confidence.
+                        </p>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm">
+                        <div className="w-10 h-10 bg-onyx text-white rounded-xl flex items-center justify-center mb-4">
+                            <CreditCard size={20} />
+                        </div>
+                        <h4 className="text-sm font-black text-onyx uppercase tracking-tight mb-2">Withdrawal</h4>
+                        <p className="text-xs text-gray-500 leading-relaxed mb-4">
+                            Need to move capital out? Instant withdrawals available to verified accounts.
+                        </p>
+                        <button className="text-[10px] font-black text-burgundy uppercase tracking-widest flex items-center gap-1 hover:gap-2 transition-all">
+                            Initiate Withdrawal <ChevronRight size={12} />
+                        </button>
                     </div>
                 </div>
             </div>
@@ -253,5 +172,46 @@ export default function WalletPage() {
                 )}
             </AnimatePresence>
         </div>
+    );
+}
+
+function TransactionItem({ tx }: { tx: any }) {
+    const isIncome = ['funding', 'bid_release', 'escrow_release', 'escrow_refund', 'refund'].includes(tx.type);
+    const isOutgoing = ['bid_hold', 'escrow_hold', 'auction_payment', 'commission'].includes(tx.type);
+
+    return (
+        <motion.div
+            layout
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-4 p-4 bg-white hover:bg-gray-50/50 rounded-3xl border border-gray-100 transition-colors group cursor-default"
+        >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${isIncome ? 'bg-emerald-50 text-emerald-500' :
+                    isOutgoing ? 'bg-burgundy/5 text-burgundy' :
+                        'bg-gray-50 text-gray-400'
+                }`}>
+                {isIncome ? <ArrowDownLeft size={18} /> : <ArrowUpRight size={18} />}
+            </div>
+
+            <div className="flex-1 min-w-0">
+                <p className="text-sm font-black text-onyx truncate group-hover:text-burgundy transition-colors">
+                    {tx.description || tx.type.replace('_', ' ')}
+                </p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                    {format(new Date(tx.created_at), 'MMM dd, HH:mm')} • {tx.status}
+                </p>
+            </div>
+
+            <div className="text-right">
+                <p className={`text-sm font-black tracking-tight ${isIncome ? 'text-emerald-500' : 'text-onyx'}`}>
+                    {isIncome ? '+' : '-'}{parseFloat(tx.amount).toLocaleString()}
+                </p>
+                {tx.balance_after && (
+                    <p className="text-[9px] font-bold text-gray-300">
+                        Balance: ₦{parseFloat(tx.balance_after).toLocaleString()}
+                    </p>
+                )}
+            </div>
+        </motion.div>
     );
 }
