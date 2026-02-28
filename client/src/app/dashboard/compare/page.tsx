@@ -260,7 +260,7 @@ export default function DashboardComparePage() {
             <div className="min-h-screen bg-canvas pb-safe-bottom">
                 <DashboardNavbar />
 
-                <main className="relative z-10 max-w-7xl mx-auto md:px-8 py-4 md:py-6 px-4 md:px-4 pb-32 md:pb-6 overflow-hidden">
+                <main className="relative z-10 max-w-7xl mx-auto md:px-8 pt-1 md:pt-2 px-4 pb-32 md:pb-6 overflow-hidden">
                     <div className="mb-10 px-2">
                         <Link href="/dashboard" className="flex items-center gap-2 text-slate-400 hover:text-slate-900 font-black uppercase tracking-widest text-[10px] transition-colors group mb-6">
                             <ChevronLeft size={16} className="group-hover:-translate-x-1 transition-transform" />

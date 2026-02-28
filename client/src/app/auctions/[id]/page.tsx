@@ -76,7 +76,7 @@ export default function AuctionRoomPage() {
     );
 
     return (
-        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pb-40 px-6">
+        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-1 pb-40 px-6">
             <MotionBackground />
             <AnimatePresence>
                 {buyNowSuccess && (

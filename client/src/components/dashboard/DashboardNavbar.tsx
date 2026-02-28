@@ -60,7 +60,7 @@ export default function DashboardNavbar() {
                         {/* Middle Logo */}
                         <Link href="/dashboard" className="mx-10 flex-shrink-0 transition-transform hover:scale-105 active:scale-95">
                             <Image
-                                src="/autogaard-logo.png"
+                                src="/dashboard-logo.png"
                                 alt="Autogaard"
                                 width={320}
                                 height={80}
@@ -112,7 +112,7 @@ export default function DashboardNavbar() {
                     <div className="md:hidden flex-1 flex justify-center">
                         <Link href="/dashboard">
                             <Image
-                                src="/autogaard-logo.png"
+                                src="/dashboard-logo.png"
                                 alt="Autogaard"
                                 width={320}
                                 height={80}

@@ -251,7 +251,7 @@ export default function ValuationWizard() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto pb-24">
+        <div className="max-w-4xl mx-auto pt-1 pb-24">
             {/* Header Navigation - Progress Only */}
             <div className="flex items-center justify-end mb-12">
                 <div className="flex items-center gap-4">
