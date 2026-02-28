@@ -108,7 +108,7 @@ export default function DashboardHome() {
 
             {/* Quick Actions */}
             <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
-                <Link href="/valuation/wizard" className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-burgundy/30 group transition-all flex flex-col justify-between min-h-[120px]">
+                <Link href="/dashboard/valuation/wizard" className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-burgundy/30 group transition-all flex flex-col justify-between min-h-[120px]">
                     <div className="w-10 h-10 rounded-full bg-burgundy/5 flex items-center justify-center mb-4 group-hover:bg-burgundy group-hover:scale-110 transition-all">
                         <Zap size={20} className="text-burgundy group-hover:text-white transition-colors" />
                     </div>
@@ -133,7 +133,7 @@ export default function DashboardHome() {
             <motion.div variants={itemVariants}>
                 <div className="flex justify-between items-end px-2 mb-4">
                     <h3 className="text-lg font-black text-onyx">Active Bids</h3>
-                    <Link href="/auctions" className="text-xs font-bold text-burgundy hover:underline">
+                    <Link href="/dashboard/market" className="text-xs font-bold text-burgundy hover:underline">
                         View Auctions
                     </Link>
                 </div>
@@ -184,7 +184,7 @@ export default function DashboardHome() {
                                 <Car className="text-emerald/50 mb-3" size={32} />
                                 <h4 className="font-bold text-emerald text-sm uppercase tracking-widest">No Active Positions</h4>
                                 <p className="text-xs text-emerald/70 font-medium px-4 mt-2 mb-4">Start trading by placing your first bid on any live asset.</p>
-                                <Link href="/auctions" className="px-6 py-2 bg-emerald text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all">
+                                <Link href="/dashboard/market" className="px-6 py-2 bg-emerald text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all">
                                     Explore Marketplace
                                 </Link>
                             </div>
