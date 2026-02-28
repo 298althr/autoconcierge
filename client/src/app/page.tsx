@@ -66,7 +66,7 @@ export default function Home() {
 
             {/* Hero Section - Product First */}
             <section
-                className="relative pt-32 pb-20 md:pt-60 md:pb-40 px-6 bg-cover bg-center bg-no-repeat"
+                className="relative pt-60 pb-20 md:pt-96 md:pb-40 px-6 bg-cover bg-center bg-no-repeat"
                 style={{ backgroundImage: `url('https://res.cloudinary.com/dt6n4pnjb/image/upload/v1771840184/modern-background-with-white-round-lines_wuz5nm.jpg')` }}
             >
                 <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px]"></div>

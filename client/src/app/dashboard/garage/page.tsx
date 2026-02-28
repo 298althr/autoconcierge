@@ -71,7 +71,7 @@ export default function GaragePage() {
                     <Link href="/dashboard/market" className="bg-white/10 backdrop-blur-md hover:bg-white/20 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all border border-white/10">
                         Explore Market
                     </Link>
-                    <Link href="/valuation/wizard" className="bg-burgundy hover:bg-burgundy-dark text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-burgundy/30">
+                    <Link href="/dashboard/valuation/wizard" className="bg-burgundy hover:bg-burgundy-dark text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl shadow-burgundy/30">
                         Register Asset
                     </Link>
                 </div>
@@ -83,7 +83,7 @@ export default function GaragePage() {
                     <Search size={20} className="text-burgundy" />
                     <span className="text-[10px] font-black uppercase tracking-widest">Discover</span>
                 </Link>
-                <Link href="/valuation/wizard" className="bg-burgundy p-4 rounded-[2rem] shadow-lg shadow-burgundy/20 flex flex-col items-center gap-2 text-white">
+                <Link href="/dashboard/valuation/wizard" className="bg-burgundy p-4 rounded-[2rem] shadow-lg shadow-burgundy/20 flex flex-col items-center gap-2 text-white">
                     <Plus size={20} />
                     <span className="text-[10px] font-black uppercase tracking-widest">Register</span>
                 </Link>

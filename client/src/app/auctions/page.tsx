@@ -41,7 +41,7 @@ export default function AuctionsPage() {
             <MotionBackground />
             {user ? <DashboardNavbar /> : <PillHeader />}
 
-            <div className={`max-w-7xl mx-auto px-6 relative z-10 ${user ? 'pt-48' : 'pt-32'}`}>
+            <div className={`max-w-7xl mx-auto px-6 relative z-10 ${user ? 'pt-24' : 'pt-96'}`}>
                 {/* Hero / Header */}
                 <div className="mb-16">
                     <motion.div

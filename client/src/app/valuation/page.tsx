@@ -89,7 +89,7 @@ export default function ValuationPage() {
     };
 
     return (
-        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-32 pb-20">
+        <main className="relative min-h-screen selection:bg-burgundy selection:text-white bg-[#F8FAFC] overflow-x-hidden pt-80 pb-20">
             <MotionBackground />
             <PillHeader />
 

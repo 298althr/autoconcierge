@@ -138,7 +138,7 @@ export default function BrowseVehicles() {
                                     animate={{ x: 0 }}
                                     exit={{ x: '100%' }}
                                     transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                                    className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[101] shadow-2xl flex flex-col pt-8 pb-10"
+                                    className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[101] shadow-2xl flex flex-col pt-8 pb-32"
                                 >
                                     <div className="flex items-center justify-between px-8 mb-8 border-b border-slate-100 pb-6">
                                         <div>
