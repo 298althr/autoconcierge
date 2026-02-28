@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "../styles/globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 export const metadata: Metadata = {
     title: "Autogaard | Nigeria's Smartest Car Marketplace",
@@ -24,7 +25,9 @@ export default function RootLayout({
             <body className="antialiased">
                 <ToastProvider>
                     <AuthProvider>
-                        {children}
+                        <NotificationProvider>
+                            {children}
+                        </NotificationProvider>
                     </AuthProvider>
                 </ToastProvider>
             </body>
