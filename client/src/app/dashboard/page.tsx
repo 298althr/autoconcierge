@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Bell, ArrowRight, ShieldAlert, BookOpen, Clock, Car, Zap, Loader2, CheckCircle2 } from 'lucide-react';
+import { Bell, ArrowRight, ShieldAlert, BookOpen, Clock, Car, Zap, Loader2, CheckCircle2, ArrowLeftRight } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { apiFetch } from '@/lib/api';
@@ -118,13 +118,13 @@ export default function DashboardHome() {
                     </div>
                 </Link>
 
-                <Link href="/dashboard/garage" className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-onyx/30 group transition-all flex flex-col justify-between min-h-[120px]">
+                <Link href="/dashboard/compare" className="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:border-onyx/30 group transition-all flex flex-col justify-between min-h-[120px]">
                     <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center mb-4 group-hover:bg-onyx group-hover:scale-110 transition-all">
-                        <Car size={20} className="text-onyx group-hover:text-white transition-colors" />
+                        <ArrowLeftRight size={20} className="text-onyx group-hover:text-white transition-colors" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-black text-onyx mb-1 group-hover:text-onyx transition-colors">My Garage</h3>
-                        <p className="text-[9px] uppercase font-bold text-onyx-light tracking-widest">Saved Assets</p>
+                        <h3 className="text-sm font-black text-onyx mb-1 group-hover:text-onyx transition-colors">Compare Models</h3>
+                        <p className="text-[9px] uppercase font-bold text-onyx-light tracking-widest">Forensic Matrix</p>
                     </div>
                 </Link>
             </motion.div>
