@@ -34,7 +34,7 @@ const PillHeader = () => {
                             alt="Autogaard"
                             width={960}
                             height={260}
-                            className="h-40 sm:h-48 w-auto object-contain"
+                            className="h-10 sm:h-12 w-auto object-contain"
                             priority
                         />
                     </Link>

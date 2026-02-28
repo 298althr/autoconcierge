@@ -120,13 +120,15 @@ export default function LoginPage() {
                     transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                     className="glass-card p-10 md:p-12 w-full flex flex-col items-center"
                 >
-                    <Image
-                        src="/logo.png"
-                        alt="Autogaard Logo"
-                        width={240}
-                        height={60}
-                        className="mb-8"
-                    />
+                    <Link href="/">
+                        <Image
+                            src="/logo.png"
+                            alt="Autogaard Logo"
+                            width={240}
+                            height={60}
+                            className="mb-8"
+                        />
+                    </Link>
 
                     <div className="text-center w-full mb-10">
                         <h1 className="text-3xl font-heading font-extrabold tracking-tight text-slate-900 mb-2">Welcome Back.</h1>
