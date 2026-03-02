@@ -22,11 +22,10 @@ if (env.CLOUDINARY_CLOUD_NAME && env.CLOUDINARY_API_KEY && env.CLOUDINARY_API_SE
         params: {
             folder: 'Autogaard/vehicles',
             allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
-            // Applied to ALL uploads
+            // Applied to ALL uploads for forensic branding and security
             transformation: [
                 { quality: 'auto', fetch_format: 'auto' }, // Standard Optimization
-                { effect: 'blur_region:1000' },          // Attempt sensitive info blurring
-                // Primary Watermark: bottom center, 50% opacity
+                // Primary Watermark: bottom center, 50% opacity, Scaled to 30% of width
                 {
                     overlay: 'Autogaard:logo:autogaard_watermark',
                     gravity: 'south',
