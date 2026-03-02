@@ -192,14 +192,19 @@ export default function ValuationWizard() {
         setError('');
         try {
             // 1. Create vehicle (Initiate Registration)
-            const res = await apiFetch('/registrations/initiate', {
+            const sanitizedData = {
+                ...formData,
+                vin: formData.vin.trim().toUpperCase(),
+                owner_id: user?.id,
+                status: 'available'
+            };
+
+            console.log('[Registration] Initiating with data:', { ...sanitizedData, images: sanitizedData.images.length });
+
+            const res = await apiFetch('/registration/initiate', {
                 method: 'POST',
                 token,
-                body: {
-                    ...formData,
-                    owner_id: user?.id,
-                    status: 'available'
-                }
+                body: sanitizedData
             });
 
             if (res.success) {
@@ -207,7 +212,7 @@ export default function ValuationWizard() {
 
                 // 2. Upload/Link Documents
                 if (formData.documents.length > 0) {
-                    await apiFetch(`/registrations/${vehicleId}/documents`, {
+                    await apiFetch(`/registration/${vehicleId}/documents`, {
                         method: 'POST',
                         token,
                         body: { documents: formData.documents }
@@ -215,7 +220,7 @@ export default function ValuationWizard() {
                 }
 
                 // 3. Submit for Verification
-                await apiFetch(`/registrations/${vehicleId}/submit`, {
+                await apiFetch(`/registration/${vehicleId}/submit`, {
                     method: 'POST',
                     token
                 });
